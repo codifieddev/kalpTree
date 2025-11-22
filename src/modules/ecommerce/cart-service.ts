@@ -33,12 +33,19 @@ export class CartService {
         createdAt: now,
       },
     };
-    const r = await col.findOneAndUpdate(
+    const doc = await col.findOneAndUpdate(
       { tenantId: tid, sessionId },
       update,
       { upsert: true, returnDocument: 'after' }
     );
-    return r.value as Cart;
+    // In MongoDB Node.js driver v7, by default includeResultMetadata is false and the return is the document or null
+    if (!doc) {
+      // In extremely rare race conditions, doc can be null right after upsert; fetch explicitly
+      const fresh = await col.findOne({ tenantId: tid, sessionId });
+      if (!fresh) throw new Error('Failed to create or fetch cart');
+      return fresh as Cart;
+    }
+    return doc as Cart;
   }
 
   async updateExpiry(id: string | ObjectId, expiresAt: Date): Promise<boolean> {

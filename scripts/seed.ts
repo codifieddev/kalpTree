@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs';
 
 async function main() {
   const dbName = process.env.MONGODB_DB || 'kalpdee';
+  const uri = process.env.MONGODB_URI || 'mongodb://localhost:27017';
   const client = new MongoClient(uri);
   await client.connect();
   const db = client.db(dbName);
@@ -38,6 +39,7 @@ async function main() {
   const email = 'admin@demo.local';
   const password = 'Password123!';
   const existingUser = await users.findOne({ tenantId, email });
+  if (!existingUser) {
     const passwordHash = await bcrypt.hash(password, 10);
     await users.insertOne({
       tenantId,

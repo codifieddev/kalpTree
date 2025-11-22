@@ -1,13 +1,14 @@
 "use client";
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { signIn } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 
-export default function SignInPage() {
+function SignInForm() {
   const search = useSearchParams();
+  const initialTenant = search?.get("tenant") || "demo";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [tenantSlug, setTenantSlug] = useState(search.get("tenant") || "demo");
+  const [tenantSlug, setTenantSlug] = useState(initialTenant);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -16,18 +17,18 @@ export default function SignInPage() {
     setLoading(true);
     setError(null);
     try {
-      const res = await signIn("credentials", {
+      await signIn("credentials", {
         redirect: true,
         callbackUrl: "/",
         email,
         password,
         tenantSlug,
       });
-      if (!res || (res as any).error) {
-        setError((res as any)?.error || "Invalid credentials");
-      }
-    } catch (err: any) {
-      setError(err?.message || "Sign-in failed");
+      // With redirect: true, signIn returns void; errors will navigate to the error page.
+      // We keep this note for future non-redirect flows.
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Sign-in failed";
+      setError(msg);
     } finally {
       setLoading(false);
     }
@@ -72,5 +73,13 @@ export default function SignInPage() {
         </button>
       </form>
     </div>
+  );
+}
+
+export default function SignInPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
+      <SignInForm />
+    </Suspense>
   );
 }

@@ -20,7 +20,7 @@ export async function ensureIndexes() {
     // Ecommerce
     db.collection('products').createIndex({ tenantId: 1, slug: 1 }, { unique: true, name: 'uniq_products_tenant_slug' }),
     db.collection('products').createIndex({ tenantId: 1, status: 1 }, { name: 'products_tenant_status' }),
-    db.collection('products').createIndex({ name: 'text', description: 'text', tags: 'text' } as any, { name: 'text_products' } as any),
+    db.collection('products').createIndex({ name: 'text', description: 'text', tags: 'text' }),
     db.collection('product_categories').createIndex({ tenantId: 1, slug: 1 }, { unique: true, name: 'uniq_product_categories_tenant_slug' }),
     db.collection('product_variants').createIndex({ tenantId: 1, productId: 1, name: 1 }, { unique: true, name: 'uniq_variants_tenant_product_name' }),
 

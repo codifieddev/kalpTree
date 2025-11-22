@@ -17,9 +17,9 @@ export class PostService {
   async list(tenantId: string | ObjectId, opts?: { status?: Post['status']; tag?: string; skip?: number; limit?: number }): Promise<Post[]> {
     const col = await this.getCollection();
     const tid = typeof tenantId === 'string' ? new ObjectId(tenantId) : tenantId;
-    const query: any = { tenantId: tid };
+    const query: Partial<Post> & { tenantId: ObjectId } = { tenantId: tid };
     if (opts?.status) query.status = opts.status;
-    if (opts?.tag) query.tags = opts.tag;
+    if (opts?.tag) query.tags = { $in: [opts.tag] } as unknown as Post['tags'];
     return col.find(query).skip(opts?.skip || 0).limit(opts?.limit || 50).sort({ createdAt: -1 }).toArray();
   }
 

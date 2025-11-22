@@ -17,7 +17,7 @@ export class OrderService {
   async list(tenantId: string | ObjectId, opts?: { status?: Order['status']; skip?: number; limit?: number }): Promise<Order[]> {
     const col = await this.getCollection();
     const tid = typeof tenantId === 'string' ? new ObjectId(tenantId) : tenantId;
-    const query: any = { tenantId: tid };
+    const query: Partial<Order> & { tenantId: ObjectId } = { tenantId: tid };
     if (opts?.status) query.status = opts.status;
     return col.find(query).skip(opts?.skip || 0).limit(opts?.limit || 50).sort({ createdAt: -1 }).toArray();
   }

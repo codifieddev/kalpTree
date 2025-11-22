@@ -23,7 +23,8 @@ export async function GET() {
       }
     }
     return NextResponse.json({ ok: true, counts });
-  } catch (e: any) {
-    return NextResponse.json({ ok: false, error: e?.message }, { status: 500 });
+  } catch (e: unknown) {
+    const msg = e instanceof Error ? e.message : 'Internal Error';
+    return NextResponse.json({ ok: false, error: msg }, { status: 500 });
   }
 }

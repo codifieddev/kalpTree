@@ -1,6 +1,6 @@
 import { ObjectId } from 'mongodb';
 import { getDatabase } from '@/lib/db/mongodb';
-import type { Product, ProductCategory } from './types';
+import type { Product } from './types';
 
 export class ProductService {
   private async getCollection() {
