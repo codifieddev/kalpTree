@@ -56,4 +56,5 @@ export interface Media extends BaseDocument {
   alt?: string;
   caption?: string;
   uploadedBy: string; // userId
+  folderId?: ObjectId;
 }
