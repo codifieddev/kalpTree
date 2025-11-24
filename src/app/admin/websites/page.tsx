@@ -1,20 +1,39 @@
 "use client";
-import useSWR from 'swr';
-import { useState } from 'react';
-
-const fetcher = (url: string) => fetch(url).then((r) => r.json());
+import { useEffect, useState } from 'react';
 
 export default function WebsitesPage() {
-  const swr = useSWR('/api/websites', fetcher);
-  const sessionSWR = useSWR('/api/session/website', fetcher);
-  const data = (swr.data as any) || {};
-  const error = swr.error as any;
-  const mutate = swr.mutate;
-  const loading = !swr.data && !swr.error;
-  const currentId = (sessionSWR.data as any)?.websiteId as string | undefined;
+  const [items, setItems] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [currentId, setCurrentId] = useState<string | null>(null);
+
   const [name, setName] = useState('');
   const [serviceType, setServiceType] = useState<'WEBSITE_ONLY' | 'ECOMMERCE'>('WEBSITE_ONLY');
   const [primaryDomain, setPrimaryDomain] = useState('');
+
+  async function load() {
+    try {
+      setLoading(true);
+      setError(null);
+      const [listRes, curRes] = await Promise.all([
+        fetch('/api/websites'),
+        fetch('/api/session/website')
+      ]);
+      if (!listRes.ok) throw new Error('Failed to load websites');
+      const listJson = await listRes.json();
+      setItems(listJson.items || []);
+      if (curRes.ok) {
+        const curJson = await curRes.json();
+        setCurrentId(curJson.websiteId || null);
+      }
+    } catch (e: any) {
+      setError(e?.message || 'Error');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => { load(); }, []);
 
   const onCreate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,10 +43,8 @@ export default function WebsitesPage() {
       body: JSON.stringify({ name, serviceType, primaryDomain: primaryDomain || null }),
     });
     if (res.ok) {
-      setName('');
-      setPrimaryDomain('');
-      setServiceType('WEBSITE_ONLY');
-      mutate();
+      setName(''); setPrimaryDomain(''); setServiceType('WEBSITE_ONLY');
+      load();
     } else {
       let msg = '';
       try { msg = (await res.json()).error; } catch {}
@@ -37,11 +54,9 @@ export default function WebsitesPage() {
 
   const setCurrent = async (websiteId: string) => {
     const res = await fetch('/api/session/website', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ websiteId })
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ websiteId })
     });
-    if (res.ok) sessionSWR.mutate();
+    if (res.ok) load();
   };
 
   return (
@@ -67,8 +82,8 @@ export default function WebsitesPage() {
       </form>
 
       {loading && <p>Loading...</p>}
-      {error && <p className="text-red-600">Failed to load</p>}
-      {data?.items?.length > 0 ? (
+      {error && <p className="text-red-600">{error}</p>}
+      {!loading && items.length > 0 ? (
         <table className="w-full border-collapse">
           <thead>
             <tr className="text-left border-b">
@@ -81,7 +96,7 @@ export default function WebsitesPage() {
             </tr>
           </thead>
           <tbody>
-            {data.items.map((w: any) => (
+            {items.map((w: any) => (
               <tr key={w.websiteId} className="border-b">
                 <td className="py-2">{w.name}</td>
                 <td>{w.systemSubdomain}</td>
