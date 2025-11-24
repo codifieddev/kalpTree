@@ -30,7 +30,7 @@ export async function POST(req: Request) {
     await userService.createUser({ tenantId: tenant._id, email: adminEmail, password: adminPassword, name: tenantName + ' Owner', role: 'owner' });
 
     // Create default website for tenant
-    const website = await websiteService.create({ tenantId: tenant._id, tenantSlug: tenant.slug, name: websiteName, serviceType, primaryDomain: null });
+    const website = await websiteService.create({ tenantId: tenant._id, tenantSlug: tenant.slug, name: websiteName, serviceType });
 
     // Do not auto sign-in here; return details to allow redirect to signin with tenant prefilled
     return NextResponse.json({ ok: true, tenantId: String(tenant._id), tenantSlug: tenant.slug, websiteId: website.websiteId, systemSubdomain: website.systemSubdomain });

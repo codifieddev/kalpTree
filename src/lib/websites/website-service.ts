@@ -41,6 +41,7 @@ export class WebsiteService {
       c.createIndex({ websiteId: 1 }, { unique: true, name: 'uniq_websites_id' }),
       c.createIndex({ tenantId: 1, createdAt: -1 }, { name: 'websites_tenant_createdAt' }),
       c.createIndex({ systemSubdomain: 1 }, { unique: true, name: 'uniq_websites_sys_sub' }),
+      // Unique only for actual string domains; avoid indexing nulls
       c.createIndex({ primaryDomain: 1 }, { unique: true, sparse: true, name: 'uniq_websites_primary_domain' }),
     ]);
   }
@@ -85,7 +86,7 @@ export class WebsiteService {
       tenantId: tid,
       name: params.name,
       serviceType: params.serviceType,
-      primaryDomain: params.primaryDomain || null,
+      ...(params.primaryDomain ? { primaryDomain: params.primaryDomain } : {}),
       systemSubdomain,
       branding: { },
       createdAt: now,
