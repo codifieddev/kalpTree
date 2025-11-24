@@ -1,4 +1,5 @@
 import { BaseDocument } from '@/types';
+import { ObjectId } from 'mongodb';
 
 // Pages
 export interface Page extends BaseDocument {
