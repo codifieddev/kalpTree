@@ -6,8 +6,8 @@ export async function middleware(req: NextRequest) {
   const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
   const { pathname, origin } = req.nextUrl;
 
-  // Auth guard for admin and protected APIs (exclude /api/public/*)
-  const isProtectedApi = /^\/api\/(?!public\b)/.test(pathname);
+  // Auth guard for admin and protected APIs (exclude /api/public/* and /api/auth/*)
+  const isProtectedApi = /^\/api\/(?!(public|auth)\b)/.test(pathname);
   const isProtected = pathname.startsWith("/admin") || isProtectedApi;
   if (isProtected && !token) {
     const signInUrl = new URL("/auth/signin", req.url);

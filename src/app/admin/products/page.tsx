@@ -1,4 +1,5 @@
 import { cookies, headers } from "next/headers";
+import { DataTableExt } from "@/components/admin/DataTableExt";
 
 export default async function ProductsAdmin() {
   const cookie = cookies().toString();
@@ -15,24 +16,18 @@ export default async function ProductsAdmin() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xl font-medium">Products</h2>
-        <div className="flex gap-2">
-          <a className="underline text-sm self-center" href="/admin/products/new">New</a>
-          <a className="underline text-sm self-center" href="/admin/products">Refresh</a>
-        </div>
-      </div>
-      <ul className="space-y-2">
-        {items.map((p: { _id: string; name: string; slug: string }) => (
-          <li key={p._id} className="border p-3 rounded">
-            <div className="font-medium flex items-center justify-between">
-              <span>{p.name}</span>
-              <a className="underline text-sm" href={`/admin/products/${p._id}`}>Edit</a>
-            </div>
-            <div className="text-xs text-muted-foreground">/{p.slug}</div>
-          </li>
-        ))}
-      </ul>
+      <DataTableExt
+        title="Products"
+        data={items}
+        createHref="/admin/products/new"
+        initialColumns={[
+          { key: "name", label: "Name", render: (_v, row) => (<a className="underline" href={`/admin/products/${row._id}`}>{row.name}</a>) },
+          { key: "slug", label: "Slug" },
+          { key: "productType", label: "Type" },
+          { key: "status", label: "Status" },
+          { key: "createdAt", label: "Created" },
+        ]}
+      />
     </div>
   )
 }

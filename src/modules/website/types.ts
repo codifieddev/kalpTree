@@ -1,4 +1,5 @@
 import { BaseDocument } from '@/types';
+import { ObjectId } from 'mongodb';
 
 // Pages
 export interface Page extends BaseDocument {
@@ -56,4 +57,5 @@ export interface Media extends BaseDocument {
   alt?: string;
   caption?: string;
   uploadedBy: string; // userId
+  folderId?: ObjectId;
 }

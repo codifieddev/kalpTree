@@ -1,4 +1,5 @@
 import { cookies, headers } from "next/headers";
+import { DataTableExt } from "@/components/admin/DataTableExt";
 
 export default async function PagesAdmin() {
   const cookie = cookies().toString();
@@ -11,28 +12,25 @@ export default async function PagesAdmin() {
     return <div className="text-sm text-red-600">Failed to load pages</div>
   }
   const data = await res.json()
-  const items = data.items || []
+  const items = (data.items || []).map((p: any) => ({
+    ...p,
+    publishedAt: p.publishedAt ? new Date(p.publishedAt).toISOString().slice(0,10) : null,
+  }));
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xl font-medium">Pages</h2>
-        <div className="flex gap-2">
-          <a className="underline text-sm self-center" href="/admin/pages/new">New</a>
-          <a className="underline text-sm self-center" href="/admin/pages">Refresh</a>
-        </div>
-      </div>
-      <ul className="space-y-2">
-        {items.map((p: { _id: string; title: string; slug: string }) => (
-          <li key={p._id} className="border p-3 rounded">
-            <div className="font-medium flex items-center justify-between">
-              <span>{p.title}</span>
-              <a className="underline text-sm" href={`/admin/pages/${p._id}`}>Edit</a>
-            </div>
-            <div className="text-xs text-muted-foreground">/{p.slug}</div>
-          </li>
-        ))}
-      </ul>
+      <DataTableExt
+        title="Pages"
+        data={items}
+        createHref="/admin/pages/new"
+        initialColumns={[
+          { key: "title", label: "Title", render: (_v, row) => (<a className="underline" href={`/admin/pages/${row._id}`}>{row.title}</a>) },
+          { key: "slug", label: "Slug" },
+          { key: "status", label: "Status" },
+          { key: "publishedAt", label: "Published" },
+          { key: "createdAt", label: "Created" },
+        ]}
+      />
     </div>
   )
 }

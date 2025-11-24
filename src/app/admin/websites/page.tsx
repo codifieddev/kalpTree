@@ -84,36 +84,13 @@ export default function WebsitesPage() {
       {loading && <p>Loading...</p>}
       {error && <p className="text-red-600">{error}</p>}
       {!loading && items.length > 0 ? (
-        <table className="w-full border-collapse">
-          <thead>
-            <tr className="text-left border-b">
-              <th className="py-2">Name</th>
-              <th>System Subdomain</th>
-              <th>Primary Domain</th>
-              <th>Service</th>
-              <th>Current</th>
-              <th>Action</th>
-              <th>Branding</th>
-            </tr>
-          </thead>
-          <tbody>
-            {items.map((w: any) => (
-              <tr key={w.websiteId} className="border-b">
-                <td className="py-2">{w.name}</td>
-                <td>{w.systemSubdomain}</td>
-                <td>{w.primaryDomain || '-'}</td>
-                <td>{w.serviceType}</td>
-                <td>{currentId === w.websiteId ? 'Yes' : '-'}</td>
-                <td>
-                  <button onClick={() => setCurrent(w.websiteId)} className="text-blue-600 underline">Select</button>
-                </td>
-                <td>
-                  <a href="/admin/websites/branding" className="text-blue-600 underline">Edit</a>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <div className="mt-4">
+          {/* Use extended shadcn table */}
+          {(() => {
+            const Ext = require('./ExtTable').default as any;
+            return <Ext items={items} currentId={currentId} />
+          })()}
+        </div>
       ) : (
         !loading && <p>No websites yet.</p>
       )}

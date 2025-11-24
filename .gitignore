@@ -41,3 +41,6 @@ yarn-error.log*
 next-env.d.ts
 dev-55803.log
 dev-55803.pid
+tmp/
+dev-55803.log.*
+
