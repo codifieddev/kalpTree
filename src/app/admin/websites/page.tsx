@@ -6,10 +6,12 @@ const fetcher = (url: string) => fetch(url).then((r) => r.json());
 
 export default function WebsitesPage() {
   const swr = useSWR('/api/websites', fetcher);
+  const sessionSWR = useSWR('/api/session/website', fetcher);
   const data = (swr.data as any) || {};
   const error = swr.error as any;
   const mutate = swr.mutate;
   const loading = !swr.data && !swr.error;
+  const currentId = (sessionSWR.data as any)?.websiteId as string | undefined;
   const [name, setName] = useState('');
   const [serviceType, setServiceType] = useState<'WEBSITE_ONLY' | 'ECOMMERCE'>('WEBSITE_ONLY');
   const [primaryDomain, setPrimaryDomain] = useState('');
@@ -31,6 +33,15 @@ export default function WebsitesPage() {
       try { msg = (await res.json()).error; } catch {}
       alert('Create failed: ' + (msg || res.status));
     }
+  };
+
+  const setCurrent = async (websiteId: string) => {
+    const res = await fetch('/api/session/website', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ websiteId })
+    });
+    if (res.ok) sessionSWR.mutate();
   };
 
   return (
@@ -65,6 +76,8 @@ export default function WebsitesPage() {
               <th>System Subdomain</th>
               <th>Primary Domain</th>
               <th>Service</th>
+              <th>Current</th>
+              <th>Action</th>
             </tr>
           </thead>
           <tbody>
@@ -74,6 +87,10 @@ export default function WebsitesPage() {
                 <td>{w.systemSubdomain}</td>
                 <td>{w.primaryDomain || '-'}</td>
                 <td>{w.serviceType}</td>
+                <td>{currentId === w.websiteId ? 'Yes' : '-'}</td>
+                <td>
+                  <button onClick={() => setCurrent(w.websiteId)} className="text-blue-600 underline">Select</button>
+                </td>
               </tr>
             ))}
           </tbody>
