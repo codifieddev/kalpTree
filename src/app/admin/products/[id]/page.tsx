@@ -1,4 +1,6 @@
 import { cookies, headers } from 'next/headers';
+import Editor from './Editor';
+
 
 export default async function ProductDetail({ params }: { params: { id: string } }) {
   const cookie = cookies().toString();
@@ -12,18 +14,8 @@ export default async function ProductDetail({ params }: { params: { id: string }
   return (
     <div className="space-y-4">
       <h2 className="text-xl font-medium">Edit Product</h2>
-      <div>
-        <div className="text-sm text-muted-foreground">Slug</div>
-        <div>/{item.slug}</div>
-      </div>
-      <div>
-        <div className="text-sm text-muted-foreground">Name</div>
-        <div>{item.name}</div>
-      </div>
-      <div>
-        <div className="text-sm text-muted-foreground">Status</div>
-        <div>{item.status}</div>
-      </div>
+      {/* @ts-expect-error Server Component import of client component */}
+      <Editor id={params.id} item={item} />
     </div>
   );
 }

@@ -25,6 +25,9 @@ export async function GET(_req: Request, { params }: { params: { id: string } })
 export async function PATCH(req: Request, { params }: { params: { id: string } }) {
   const session = await auth();
   if (!session?.user?.tenantId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const websiteId = cookies().get('current_website_id')?.value;
+  const exists = await postService.getById(session.user.tenantId as string, params.id, websiteId);
+  if (!exists) return NextResponse.json({ error: 'Not found' }, { status: 404 });
   const json = await req.json();
   const parsed = updateSchema.safeParse(json);
   if (!parsed.success) return NextResponse.json({ error: 'Invalid payload', issues: parsed.error.flatten() }, { status: 400 });
