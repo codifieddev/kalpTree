@@ -123,20 +123,16 @@ async function main() {
   // Website: blog categories and tags
   const wCategories = db.collection('categories');
   const blogTags = db.collection('blog_tags');
-  const cat1 = await wCategories.insertOne({
-    tenantId: new ObjectId(tenantId),
-    name: 'News',
-    slug: 'news',
-    createdAt: now,
-    updatedAt: now,
-  });
-  const cat2 = await wCategories.insertOne({
-    tenantId: new ObjectId(tenantId),
-    name: 'Guides',
-    slug: 'guides',
-    createdAt: now,
-    updatedAt: now,
-  });
+  await wCategories.updateOne(
+    { tenantId: new ObjectId(tenantId), slug: 'news' },
+    { $set: { tenantId: new ObjectId(tenantId), name: 'News', slug: 'news', createdAt: now, updatedAt: now } },
+    { upsert: true }
+  );
+  await wCategories.updateOne(
+    { tenantId: new ObjectId(tenantId), slug: 'guides' },
+    { $set: { tenantId: new ObjectId(tenantId), name: 'Guides', slug: 'guides', createdAt: now, updatedAt: now } },
+    { upsert: true }
+  );
   await blogTags.updateOne(
     { tenantId: new ObjectId(tenantId), slug: 'welcome' },
     { $set: { tenantId: new ObjectId(tenantId), slug: 'welcome', name: 'Welcome', createdAt: now, updatedAt: now } },
@@ -154,7 +150,7 @@ async function main() {
         title: 'Getting Started with KalpTree',
         excerpt: 'A quick intro to your new SaaS.',
         content: '<p>Welcome to KalpTree!</p>',
-        categoryId: String(cat2.insertedId),
+        categoryId: 'guides',
         tags: ['welcome'],
         author: { userId: String(adminUserId), name: 'Demo Admin' },
         seo: {},
