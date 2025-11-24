@@ -80,12 +80,14 @@ export class PageService {
 
   async updatePage(
     id: string | ObjectId,
+    tenantId: string | ObjectId,
     updates: Partial<Page>
   ): Promise<boolean> {
     const collection = await this.getCollection();
     const oid = typeof id === 'string' ? new ObjectId(id) : id;
+    const tid = typeof tenantId === 'string' ? new ObjectId(tenantId) : tenantId;
     const result = await collection.updateOne(
-      { _id: oid },
+      { _id: oid, tenantId: tid },
       {
         $set: {
           ...updates,
@@ -96,10 +98,11 @@ export class PageService {
     return result.modifiedCount > 0;
   }
 
-  async deletePage(id: string | ObjectId): Promise<boolean> {
+  async deletePage(id: string | ObjectId, tenantId: string | ObjectId): Promise<boolean> {
     const collection = await this.getCollection();
     const oid = typeof id === 'string' ? new ObjectId(id) : id;
-    const result = await collection.deleteOne({ _id: oid });
+    const tid = typeof tenantId === 'string' ? new ObjectId(tenantId) : tenantId;
+    const result = await collection.deleteOne({ _id: oid, tenantId: tid });
     return result.deletedCount > 0;
   }
 }

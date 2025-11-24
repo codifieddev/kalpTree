@@ -32,7 +32,7 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
   const parsed = updateSchema.safeParse(json);
   if (!parsed.success) return NextResponse.json({ error: 'Invalid payload', issues: parsed.error.flatten() }, { status: 400 });
 
-  const ok = await pageService.updatePage(params.id, parsed.data);
+  const ok = await pageService.updatePage(params.id, session.user.tenantId as string, parsed.data);
   if (!ok) return NextResponse.json({ error: 'Update failed' }, { status: 500 });
   return NextResponse.json({ ok: true });
 }
@@ -44,7 +44,7 @@ export async function DELETE(_req: Request, { params }: { params: { id: string }
   const exists = await pageService.getById(session.user.tenantId as string, params.id, websiteId);
   if (!exists) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
-  const ok = await pageService.deletePage(params.id);
+  const ok = await pageService.deletePage(params.id, session.user.tenantId as string);
   if (!ok) return NextResponse.json({ error: 'Delete failed' }, { status: 500 });
   return NextResponse.json({ ok: true });
 }
