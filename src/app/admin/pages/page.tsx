@@ -25,7 +25,10 @@ export default async function PagesAdmin() {
       <ul className="space-y-2">
         {items.map((p: { _id: string; title: string; slug: string }) => (
           <li key={p._id} className="border p-3 rounded">
-            <div className="font-medium">{p.title}</div>
+            <div className="font-medium flex items-center justify-between">
+              <span>{p.title}</span>
+              <a className="underline text-sm" href={`/admin/pages/${p._id}`}>Edit</a>
+            </div>
             <div className="text-xs text-muted-foreground">/{p.slug}</div>
           </li>
         ))}
