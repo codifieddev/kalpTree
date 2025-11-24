@@ -1,4 +1,6 @@
 import { ObjectId } from 'mongodb';
+import { Filter } from 'mongodb';
+
 import { getDatabase } from '@/lib/db/mongodb';
 import type { Product } from './types';
 
@@ -27,11 +29,20 @@ export class ProductService {
   ): Promise<Product | null> {
     const collection = await this.getCollection();
     const tid = typeof tenantId === 'string' ? new ObjectId(tenantId) : tenantId;
-    return collection.findOne({
-      tenantId: tid,
-      slug,
-      status: 'published',
-    });
+    return collection.findOne({ tenantId: tid, slug, status: 'published' });
+  }
+
+  async getProductBySlugForWebsite(
+    tenantId: string | ObjectId,
+    slug: string,
+    websiteId?: string | ObjectId,
+  ): Promise<Product | null> {
+    const c = await this.getCollection();
+    const tid = typeof tenantId === 'string' ? new ObjectId(tenantId) : tenantId;
+    const wid = websiteId ? (typeof websiteId === 'string' ? new ObjectId(websiteId) : websiteId) : undefined;
+    const query: Filter<Product> = { tenantId: tid, slug, status: 'published' } as any;
+    if (wid) (query as any).$or = [{ websiteId: wid }, { websiteId: { $exists: false } }];
+    return c.findOne(query);
   }
 
   async listProducts(
@@ -49,7 +60,8 @@ export class ProductService {
     const tid = typeof tenantId === 'string' ? new ObjectId(tenantId) : tenantId;
     const query: Partial<Product> & { tenantId: ObjectId } = { tenantId: tid };
     if (filters?.websiteId) {
-      (query as any).websiteId = typeof filters.websiteId === 'string' ? new ObjectId(filters.websiteId) : filters.websiteId;
+      const wid = typeof filters.websiteId === 'string' ? new ObjectId(filters.websiteId) : filters.websiteId;
+      (query as any).$or = [{ websiteId: wid }, { websiteId: { $exists: false } }];
     }
     if (filters?.productType) {
       query.productType = filters.productType;
@@ -119,6 +131,20 @@ export class ProductService {
       tenantId: tid,
     });
     return result.deletedCount > 0;
+  }
+
+  async getById(
+    tenantId: string | ObjectId,
+    id: string | ObjectId,
+    websiteId?: string | ObjectId,
+  ): Promise<Product | null> {
+    const c = await this.getCollection();
+    const tid = typeof tenantId === 'string' ? new ObjectId(tenantId) : tenantId;
+    const oid = typeof id === 'string' ? new ObjectId(id) : id;
+    const wid = websiteId ? (typeof websiteId === 'string' ? new ObjectId(websiteId) : websiteId) : undefined;
+    const query: Filter<Product> = { _id: oid, tenantId: tid } as any;
+    if (wid) (query as any).$or = [{ websiteId: wid }, { websiteId: { $exists: false } }];
+    return c.findOne(query);
   }
 
   async searchProducts(

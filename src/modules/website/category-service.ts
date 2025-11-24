@@ -19,7 +19,7 @@ export class WebsiteCategoryService {
     const tid = typeof tenantId === 'string' ? new ObjectId(tenantId) : tenantId;
     const wid = websiteId ? (typeof websiteId === 'string' ? new ObjectId(websiteId) : websiteId) : undefined;
     const query: any = { tenantId: tid };
-    if (wid) query.websiteId = wid;
+    if (wid) query.$or = [{ websiteId: wid }, { websiteId: { $exists: false } }];
     return col.find(query).sort({ name: 1 }).toArray();
   }
 
