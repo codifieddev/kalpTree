@@ -30,7 +30,7 @@ export async function POST(req: Request) {
     tenantSlug: session.user.tenantSlug,
     name: parsed.data.name,
     serviceType: parsed.data.serviceType,
-    primaryDomain: parsed.data.primaryDomain ?? null,
+    ...(parsed.data.primaryDomain ? { primaryDomain: parsed.data.primaryDomain } : {}),
   });
   return NextResponse.json(created, { status: 201 });
 }

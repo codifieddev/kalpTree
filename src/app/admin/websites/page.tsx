@@ -93,6 +93,7 @@ export default function WebsitesPage() {
               <th>Service</th>
               <th>Current</th>
               <th>Action</th>
+              <th>Branding</th>
             </tr>
           </thead>
           <tbody>
@@ -105,6 +106,9 @@ export default function WebsitesPage() {
                 <td>{currentId === w.websiteId ? 'Yes' : '-'}</td>
                 <td>
                   <button onClick={() => setCurrent(w.websiteId)} className="text-blue-600 underline">Select</button>
+                </td>
+                <td>
+                  <a href="/admin/websites/branding" className="text-blue-600 underline">Edit</a>
                 </td>
               </tr>
             ))}

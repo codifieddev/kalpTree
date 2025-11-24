@@ -12,10 +12,20 @@ export interface WebsiteDoc {
   primaryDomain?: string | null;
   systemSubdomain: string;
   branding?: {
+    // legacy fields
     logoUrl?: string | null;
     colorPaletteJson?: Record<string, unknown> | null;
     headerLayoutId?: string | null;
     footerContentHtml?: string | null;
+    // new structured branding
+    header?: {
+      logoUrl?: string | null;
+      navLinks?: { label: string; href: string }[];
+    };
+    footer?: {
+      text?: string | null;
+      links?: { label: string; href: string }[];
+    };
   };
   createdAt: Date;
   updatedAt: Date;
@@ -94,6 +104,11 @@ export class WebsiteService {
     };
     const r = await c.insertOne(doc as WebsiteDoc);
     return { ...doc, _id: r.insertedId } as WebsiteDoc;
+  }
+
+  async getByWebsiteId(websiteId: string) {
+    const c = await this.col();
+    return c.findOne({ websiteId });
   }
 
   async updateBranding(websiteId: string, updates: NonNullable<WebsiteDoc['branding']>) {
