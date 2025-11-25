@@ -3,7 +3,7 @@ import { DataTableExt } from "@/components/admin/DataTableExt";
 
 export default async function PagesAdmin() {
   const cookie = cookies().toString();
-  const h = headers();
+  const h = await headers();
   const host = h.get("x-forwarded-host") ?? h.get("host");
   const proto = h.get("x-forwarded-proto") ?? "http";
   const baseUrl = `${proto}://${host}`;
@@ -24,7 +24,7 @@ export default async function PagesAdmin() {
         data={items}
         createHref="/admin/pages/new"
         initialColumns={[
-          { key: "title", label: "Title", render: (_v, row) => (<a className="underline" href={`/admin/pages/${row._id}`}>{row.title}</a>) },
+          // { key: "title", label: "Title", render: (_v, row) => (<a className="underline" href={`/admin/pages/${row._id}`}>{row.title}</a>) },
           { key: "slug", label: "Slug" },
           { key: "status", label: "Status" },
           { key: "publishedAt", label: "Published" },

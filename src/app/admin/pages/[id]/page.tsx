@@ -15,7 +15,6 @@ export default async function PageDetail({ params }: { params: { id: string } })
   return (
     <div className="space-y-4">
       <h2 className="text-xl font-medium">Edit Page</h2>
-      {/* @ts-expect-error Server Component import of client component */}
       <Editor id={params.id} item={item} />
     </div>
   );
