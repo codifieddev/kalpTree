@@ -16,7 +16,7 @@ const updateSchema = z.object({
 export async function GET(_req: Request, { params }: { params: { id: string } }) {
   const session = await auth();
   if (!session?.user?.tenantId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  const websiteId = cookies().get('current_website_id')?.value;
+  const websiteId = (await cookies()).get('current_website_id')?.value;
   const doc = await postService.getById(session.user.tenantId as string, params.id, websiteId);
   if (!doc) return NextResponse.json({ error: 'Not found' }, { status: 404 });
   return NextResponse.json({ item: doc });
@@ -25,7 +25,7 @@ export async function GET(_req: Request, { params }: { params: { id: string } })
 export async function PATCH(req: Request, { params }: { params: { id: string } }) {
   const session = await auth();
   if (!session?.user?.tenantId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  const websiteId = cookies().get('current_website_id')?.value;
+  const websiteId = (await cookies()).get('current_website_id')?.value;
   const exists = await postService.getById(session.user.tenantId as string, params.id, websiteId);
   if (!exists) return NextResponse.json({ error: 'Not found' }, { status: 404 });
   const json = await req.json();

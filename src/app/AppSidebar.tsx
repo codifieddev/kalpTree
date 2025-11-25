@@ -56,6 +56,7 @@ import {
   SidebarRail,
   useSidebar,
 } from "@/components/ui/sidebar"
+import { signOut } from "next-auth/react"
 
 // Data
 const data = {
@@ -191,13 +192,9 @@ export function AppSidebar({ handleSwitchTab, ...rest }: AppSidebarProps) {
                   </DropdownMenuItem>
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  onSelect={async (e) => {
-                    e.preventDefault();
-                    // Use NextAuth helper for sign out and redirect to sign-in page
-                    await signOut({ callbackUrl: "/auth/signin" });
-                  }}
-                >
+                <DropdownMenuItem onClick={async()=>{
+                   signOut()
+                }}>
                   <LogOut className="mr-2 size-4" />
                   Log out
                 </DropdownMenuItem>
