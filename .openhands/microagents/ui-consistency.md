@@ -1,69 +1,49 @@
 ---
 name: ui-consistency
-type: lint
-version: 1.0.0
 agent: CodeActAgent
-# This microagent has no automatic triggers. Invoke it manually when needed.
+triggers:
+  - ui-consistency
+  - ui-review
 ---
 
-# UI & Component Consistency Guidelines
+# UI & Component Consistency
 
-This microagent ensures consistency across all UI components and application layouts in the multitenant SaaS project. It prevents design drift, enforces theming rules, and ensures the UI does not leak tenant-specific or business logic.
+This microagent enforces repo-specific UI rules for the Next.js App Router project. It prevents design drift, enforces theming, and ensures the UI does not leak tenant or business logic.
 
-All checks performed by this microagent must rely on facts derived from the existing source code. If the agent cannot confirm the rule from the codebase, it must not flag an issue.
+All checks must be grounded in this repository’s code. Do not flag rules that cannot be verified.
 
----
+## Design System Usage
+- Use shared primitives from src/components/ui/*: Button, Card, Input, Select, Dialog, Table, Tabs, Textarea, Label, Separator, Sidebar, Avatar, Badge, Breadcrumb, Collapsible.
+- Prefer these components over raw HTML with arbitrary Tailwind classes for repeated patterns.
+- For admin tables and filtering UIs, prefer src/components/admin/DataTableExt and follow its patterns for sorting/filtering/pagination.
 
-## Best Practices for UI Consistency
+## Tenant & URL Safety
+- Do NOT hardcode tenantId, websiteId, domains, or slugs in UI.
+- When UI needs tenant context, get it from server auth/session helpers (src/lib/auth/session.ts -> getSession/requireAuth) or API responses, never literals.
+- Do not embed absolute URLs. Use relative fetches from server components with base derived from headers (as seen in src/app/admin/*/[id]/page.tsx).
 
-1. **Use Shared Design System Components**  
-   Always prefer shared UI components (e.g., `Button`, `Card`, `Input`) instead of raw styling or repeated patterns.  
-   This ensures visual consistency and reduces duplication.
+## Theming & Colors
+- Tailwind v4 is used with globals.css and shadcn-style tokens. Avoid arbitrary literal colors when a tokenized class exists.
+- Reuse classes consistent with the design system components. If a new color is required, extend via design tokens or component variants rather than inline hex.
 
-2. **Avoid Hardcoded Tenant or URL Values**  
-   UI files must not contain:  
-   - `tenantId`, `businessId`, or `franchiseId` as literal strings  
-   - absolute URLs (e.g., `https://domain.com/api/...`)  
-   All tenant-aware values must come from context, hooks, or utilities.
+## Separation of Concerns
+- No DB calls or direct Mongo usage in components.
+- Business logic should live in:
+  - src/modules/** (ecommerce, website) services
+  - src/lib/** (rbac, tenant, websites, auth)
+  - Route handlers under src/app/api/** for data access
+- UI components should receive data via props or via server-side fetches in page-level server components.
 
-3. **Maintain Theme / Whitelabel Consistency**  
-   Avoid static color usage such as `bg-red-500`, `text-blue-600`, etc.  
-   Use theme tokens or CSS variables to support multi-tenant theming.
+## Component Conventions
+- Component names: PascalCase; files under src/components/** use .tsx.
+- Co-locate admin “Editor” components under feature folders (e.g., src/app/admin/products/[id]/Editor.tsx).
+- Prefer client components only when necessary (forms, interactivity). Mark with 'use client' at top.
+- Keep server components pure; no client-only APIs.
 
-4. **Separate UI from Business Logic**  
-   UI components must never contain:  
-   - DB queries  
-   - direct API calls  
-   - server-side utilities  
-   - business rule computations  
-   Such logic should live in `modules`, `lib`, or server actions.
-
-5. **Follow Component Conventions**  
-   - Component names must use PascalCase  
-   - Props must be typed with interfaces/types  
-   - No tenant-specific assumptions should be hardcoded  
-   - Folder structure must align with `src/components` and `src/app` conventions
-
----
-
-## UI Review Process
-
-1. Scan all affected files under `src/components` and `src/app`.
-2. Verify usage of:
-   - shared UI components  
-   - theme variables  
-   - layout patterns defined in the project  
-3. Flag any hardcoded identifiers or URLs.
-4. Confirm separation of UI rendering and application logic.
-5. Provide clear comments in PRs with explanation and recommended fix.
-6. Do not raise issues unless supported by patterns in the existing codebase.
-
----
-
-## Enforcement Principles
-
-- Do not guess rules — only enforce patterns visible in the repository.
-- Do not enforce subjective style choices.
-- Do not make assumptions about tenant hierarchy logic in UI code.
-- Always prioritize design consistency and theme safety.
-- Only report issues grounded in verifiable code evidence.
+## PR Checklist
+- Uses shared components from src/components/ui/* where appropriate.
+- No hardcoded tenantId/websiteId/domains/slugs.
+- Colors/classes align with existing UI tokens; no arbitrary hex unless justified.
+- Business logic moved to src/modules/** or src/lib/**; UI components are lean.
+- Any new server component fetches derive baseUrl from headers and forward cookies as done in existing admin pages.
+- Pagination/filter/sort UIs leverage DataTableExt where applicable and support dynamic field-based filters.

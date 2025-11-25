@@ -1,5 +1,5 @@
 "use client";
-
+import { useParams, usePathname, useRouter } from "next/navigation";
 import { useMemo, useState, useEffect } from "react";
 import Link from "next/link";
 import { Input } from "@/components/ui/input";
@@ -92,6 +92,12 @@ export function DataTableExt({
   const [dateFilters, setDateFilters] = useState<
     Record<string, { from?: string; to?: string }>
   >({});
+  const router = useRouter();
+  
+
+const path = usePathname()
+const lastSegment = path.split("/").filter(Boolean).pop();
+
 
   // derive columns
   const columns = useMemo(() => {
@@ -515,35 +521,44 @@ export function DataTableExt({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {pageRows.map((row, i) => (
-              <TableRow key={row._id ?? i}>
-                {columns
-                  .filter((c:any) => columnVisibility[c.key] !== false)
-                  .map((c:any) => (
-                    <TableCell key={c.key} className="py-2 text-sm">
-                      {(() => {
-                        // 1) If the column is a link type
-                        if (c.type === "link") {
-                          return (
-                            <Link
-                              href={`${c.href}/${row._id}`}
-                              className="underline text-blue-600 hover:text-blue-800"
-                            >
-                              {row[c.key]}
-                            </Link>
-                          );
-                        }
+            {pageRows.map((row, i) => {
+          
+              return (
+                <TableRow
+                  key={row._id ?? i}
+                  className="cursor-pointer hover:bg-muted/50"
+                  onClick={() => router.push(`${lastSegment}/${row._id}`)}
+                >
+                  {columns
+                    .filter((c: any) => columnVisibility[c.key] !== false)
+                    .map((c: any) => {
+                      return (
+                        <TableCell key={c.key} className="py-2 text-sm">
+                          {(() => {
+                            // 1) If the column is a link type
+                            if (c.type === "link") {
+                              return (
+                                <Link
+                                  href={`${c.href}/${row._id}`}
+                                  className="underline text-blue-600 hover:text-blue-800"
+                                >
+                                  {row[c.key]}
+                                </Link>
+                              );
+                            }
 
-                        // 2) Fallback to custom render if defined
-                        if (c.render) return c.render(row[c.key], row);
+                            // 2) Fallback to custom render if defined
+                            if (c.render) return c.render(row[c.key], row);
 
-                        // 3) Default formatter
-                        return formatValue(row[c.key]);
-                      })()}
-                    </TableCell>
-                  ))}
-              </TableRow>
-            ))}
+                            // 3) Default formatter
+                            return formatValue(row[c.key]);
+                          })()}
+                        </TableCell>
+                      );
+                    })}
+                </TableRow>
+              );
+            })}
             {pageRows.length === 0 && (
               <TableRow>
                 <TableCell

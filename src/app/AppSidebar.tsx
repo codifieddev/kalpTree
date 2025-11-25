@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import clsx from "clsx"
+import { signOut } from "next-auth/react"
 import {
   Book,
   ChevronRight,
@@ -55,6 +56,7 @@ import {
   SidebarRail,
   useSidebar,
 } from "@/components/ui/sidebar"
+import { signOut } from "next-auth/react"
 
 // Data
 const data = {
@@ -190,7 +192,9 @@ export function AppSidebar({ handleSwitchTab, ...rest }: AppSidebarProps) {
                   </DropdownMenuItem>
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>
+                <DropdownMenuItem onClick={async()=>{
+                   signOut()
+                }}>
                   <LogOut className="mr-2 size-4" />
                   Log out
                 </DropdownMenuItem>
