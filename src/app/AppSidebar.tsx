@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import clsx from "clsx"
+import { signOut } from "next-auth/react"
 import {
   Book,
   ChevronRight,

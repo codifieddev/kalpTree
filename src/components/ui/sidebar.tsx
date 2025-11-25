@@ -51,17 +51,25 @@ export function SidebarMenu({ children }: { children: React.ReactNode }) {
 export function SidebarMenuItem({ children }: { children: React.ReactNode }) {
   return <li>{children}</li>;
 }
-export function SidebarMenuButton({ children, className, size, tooltip, asChild, ...props }: { children: React.ReactNode; className?: string; size?: string; tooltip?: string; asChild?: boolean } & React.ButtonHTMLAttributes<HTMLButtonElement>) {
-  const classes = clsx("w-full flex items-center gap-2 px-2 py-2 rounded hover:bg-muted/50 text-left", className);
-  if (asChild) {
-    return <div className={classes}>{children}</div>;
+export const SidebarMenuButton = React.forwardRef<HTMLButtonElement, { children: React.ReactNode; className?: string; size?: string; tooltip?: string; asChild?: boolean } & React.ButtonHTMLAttributes<HTMLButtonElement>>(
+  ({ children, className, size, tooltip, asChild, ...props }, ref) => {
+    const classes = clsx("w-full flex items-center gap-2 px-2 py-2 rounded hover:bg-muted/50 text-left", className);
+    if (asChild) {
+      // Allow Radix primitives to attach handlers/refs via asChild usage
+      return (
+        <div ref={ref as unknown as React.Ref<HTMLDivElement>} className={classes} {...(props as unknown as React.HTMLAttributes<HTMLDivElement>)}>
+          {children}
+        </div>
+      );
+    }
+    return (
+      <button ref={ref} className={classes} {...props}>
+        {children}
+      </button>
+    );
   }
-  return (
-    <button className={classes} {...props}>
-      {children}
-    </button>
-  );
-}
+);
+SidebarMenuButton.displayName = "SidebarMenuButton";
 export function SidebarGroup({ children, className }: { children: React.ReactNode; className?: string }) {
   return <div className={clsx("mt-3", className)}>{children}</div>;
 }
