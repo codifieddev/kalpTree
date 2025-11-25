@@ -4,7 +4,9 @@ import { pageService } from '@/modules/website/page-service';
 import { auth } from '@/auth';
 
 // Public: no auth required; uses selected website cookie or domain middleware ahead of time
-export async function GET(_req: Request, { params }: { params: { slug: string } }) {
+export async function GET(_req: Request, { params }: { params: Promise<{ slug: string }> }) {
+  const resolvedParams = await params;
+
   const session = await auth(); // optional, but we won’t require it
   const websiteId = cookies().get('current_website_id')?.value;
   const tenantId = (session?.user?.tenantId as string | undefined) || headers().get('x-tenant-id') || '';

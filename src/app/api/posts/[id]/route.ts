@@ -13,7 +13,9 @@ const updateSchema = z.object({
   publishedAt: z.coerce.date().optional(),
 });
 
-export async function GET(_req: Request, { params }: { params: { id: string } }) {
+export async function GET(_req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const resolvedParams = await params;
+
   const session = await auth();
   if (!session?.user?.tenantId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   const websiteId = (await cookies()).get('current_website_id')?.value;
@@ -22,7 +24,9 @@ export async function GET(_req: Request, { params }: { params: { id: string } })
   return NextResponse.json({ item: doc });
 }
 
-export async function PATCH(req: Request, { params }: { params: { id: string } }) {
+export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const resolvedParams = await params;
+
   const session = await auth();
   if (!session?.user?.tenantId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   const websiteId = (await cookies()).get('current_website_id')?.value;

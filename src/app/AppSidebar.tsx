@@ -56,7 +56,6 @@ import {
   SidebarRail,
   useSidebar,
 } from "@/components/ui/sidebar"
-import { signOut } from "next-auth/react"
 
 // Data
 const data = {

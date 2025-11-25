@@ -33,7 +33,7 @@ export type ColumnConfig = {
   key: string;
   label?: string;
   hidden?: boolean;
-  // render?: (value: any, row: any) => React.ReactNode;
+  render?: (value: any, row: any) => React.ReactNode;
 };
 
 export type DataTableExtProps = {

@@ -1,7 +1,7 @@
 import { cookies as cookiesFn, headers as headersFn } from 'next/headers';
 import Editor from './Editor';
 
-export default async function PageDetail({ params }: { params: { id: string } }) {
+export default async function PageDetail({ params }: { params: Promise<{ id: string }> }) {
   const param = await params
   const t = param.id
   const cookies = await cookiesFn(); // no await

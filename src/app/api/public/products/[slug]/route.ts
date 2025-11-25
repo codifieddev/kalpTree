@@ -3,7 +3,9 @@ import { cookies, headers } from 'next/headers';
 import { productService } from '@/modules/ecommerce/product-service';
 import { auth } from '@/auth';
 
-export async function GET(_req: Request, { params }: { params: { slug: string } }) {
+export async function GET(_req: Request, { params }: { params: Promise<{ slug: string }> }) {
+  const resolvedParams = await params;
+
   const session = await auth();
   const websiteId = cookies().get('current_website_id')?.value;
   const tenantId = (session?.user?.tenantId as string | undefined) || headers().get('x-tenant-id') || '';

@@ -12,7 +12,7 @@ const updateSchema = z.object({
   publishedAt: z.coerce.date().optional(),
 });
 
-export async function GET(_req: Request, { params }: { params: { id: string } }) {
+export async function GET(_req: Request, { params }: { params: Promise<{ id: string }> }) {
    const param = await params 
   const session = await auth();
   if (!session?.user?.tenantId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -22,7 +22,7 @@ export async function GET(_req: Request, { params }: { params: { id: string } })
   return NextResponse.json({ item: doc });
 }
 
-export async function PATCH(req: Request, { params }: { params: { id: string } }) {
+export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
   
    const param = await params 
    const session = await auth();
@@ -35,7 +35,7 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
   return NextResponse.json({ ok: true });
 }
 
-export async function DELETE(_req: Request, { params }: { params: { id: string } }) {
+export async function DELETE(_req: Request, { params }: { params: Promise<{ id: string }> }) {
    const param = await params 
   const session = await auth();
   if (!session?.user?.tenantId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
