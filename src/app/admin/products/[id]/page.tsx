@@ -1,12 +1,13 @@
-import { cookies, headers } from 'next/headers';
+import { cookies as cookiesFn, headers as headersFn } from 'next/headers';
 import Editor from './Editor';
 
 
 export default async function ProductDetail({ params }: { params: { id: string } }) {
-  const cookie = cookies().toString();
-  const h = headers();
-  const host = h.get('x-forwarded-host') ?? h.get('host');
-  const proto = h.get('x-forwarded-proto') ?? 'http';
+  const cookies = await cookiesFn();
+  const headers = await headersFn();
+  const cookie = cookies.toString();
+  const host = headers.get('x-forwarded-host') ?? headers.get('host');
+  const proto = headers.get('x-forwarded-proto') ?? 'http';
   const baseUrl = `${proto}://${host}`;
   const res = await fetch(`${baseUrl}/api/products/${params.id}`, { cache: 'no-store', headers: { cookie } });
   if (!res.ok) return <div className="text-sm text-red-600">Not found</div>;

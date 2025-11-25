@@ -5,7 +5,9 @@ import { mediaService } from '@/modules/website/media-service';
 export async function GET(_req: Request, { params }: { params: { id: string } }) {
   const session = await auth();
   if (!session?.user?.tenantId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  const websiteId = (await import('next/headers')).cookies().get('current_website_id')?.value;
+  const { cookies } = await import('next/headers');
+  const jar = await cookies();
+  const websiteId = jar.get('current_website_id')?.value;
   const item = await mediaService.getById(session.user.tenantId, params.id, websiteId);
   if (!item) return NextResponse.json({ error: 'Not found' }, { status: 404 });
   return NextResponse.json(item);
