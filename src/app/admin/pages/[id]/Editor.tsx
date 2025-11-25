@@ -1,4 +1,6 @@
 "use client";
+import PageBuilder from "@/components/admin/PageBuilder";
+
 import { useState, useTransition } from 'react';
 
 export default function PageEditor({ id, item }: { id: string; item: any }) {
@@ -6,6 +8,7 @@ export default function PageEditor({ id, item }: { id: string; item: any }) {
   const [slug, setSlug] = useState(item.slug || '');
   const [status, setStatus] = useState(item.status || 'draft');
   const [content, setContent] = useState(item.content || '');
+  // content is HTML managed by PageBuilder
   const [saving, start] = useTransition();
   const [msg, setMsg] = useState<string | null>(null);
 
@@ -57,7 +60,10 @@ export default function PageEditor({ id, item }: { id: string; item: any }) {
       </div>
       <div>
         <label className="text-sm">Content</label>
-        <textarea className="border p-2 w-full rounded min-h-40" value={content} onChange={e => setContent(e.target.value)} />
+        <div className="border rounded">
+          {/* Rich text editor */}
+          <PageBuilder value={content} onChange={setContent} />
+        </div>
       </div>
       <button type="submit" className="px-3 py-2 rounded bg-black text-white disabled:opacity-60" disabled={saving}>Save</button>
       {msg && <span className="text-sm ml-2">{msg}</span>}
