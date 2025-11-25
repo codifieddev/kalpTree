@@ -24,7 +24,7 @@ export default async function OrdersAdmin() {
           { key: "status", label: "Status" },
           { key: "createdAt", label: "Created" },
         ]}
-        onRowClick={() => { /* Orders not navigable yet */ }}
+        disableRowClick
       />
     </div>
   )

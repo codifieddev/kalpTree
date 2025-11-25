@@ -42,6 +42,7 @@ export type DataTableExtProps = {
   createHref?: string;
   initialColumns?: ColumnConfig[];
   onRowClick?: (row: any) => void;
+  disableRowClick?: boolean;
 };
 
 type SortDir = "asc" | "desc";
@@ -75,6 +76,7 @@ export function DataTableExt({
   createHref,
   initialColumns,
   onRowClick,
+  disableRowClick,
 }: DataTableExtProps) {
   const [query, setQuery] = useState("");
   const [page, setPage] = useState(1);
@@ -528,8 +530,9 @@ const lastSegment = path.split("/").filter(Boolean).pop();
               return (
                 <TableRow
                   key={row._id ?? i}
-                  className={onRowClick ? "cursor-pointer hover:bg-muted/50" : undefined}
+                  className={!disableRowClick ? "cursor-pointer hover:bg-muted/50" : undefined}
                   onClick={() => {
+                    if (disableRowClick) return;
                     if (onRowClick) return onRowClick(row)
                     router.push(`${lastSegment}/${row._id}`)
                   }}
