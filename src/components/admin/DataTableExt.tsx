@@ -41,6 +41,7 @@ export type DataTableExtProps = {
   data: any[];
   createHref?: string;
   initialColumns?: ColumnConfig[];
+  onRowClick?: (row: any) => void;
 };
 
 type SortDir = "asc" | "desc";
@@ -73,6 +74,7 @@ export function DataTableExt({
   data,
   createHref,
   initialColumns,
+  onRowClick,
 }: DataTableExtProps) {
   const [query, setQuery] = useState("");
   const [page, setPage] = useState(1);
@@ -526,8 +528,11 @@ const lastSegment = path.split("/").filter(Boolean).pop();
               return (
                 <TableRow
                   key={row._id ?? i}
-                  className="cursor-pointer hover:bg-muted/50"
-                  onClick={() => router.push(`${lastSegment}/${row._id}`)}
+                  className={onRowClick ? "cursor-pointer hover:bg-muted/50" : undefined}
+                  onClick={() => {
+                    if (onRowClick) return onRowClick(row)
+                    router.push(`${lastSegment}/${row._id}`)
+                  }}
                 >
                   {columns
                     .filter((c: any) => columnVisibility[c.key] !== false)

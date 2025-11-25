@@ -1,22 +1,31 @@
+import { cookies, headers } from "next/headers";
+import { DataTableExt } from "@/components/admin/DataTableExt";
+
 export default async function OrdersAdmin() {
-  const res = await fetch("/api/orders", { cache: "no-store" })
+  const cookie = (await cookies()).toString();
+  const h = await headers();
+  const host = h.get("x-forwarded-host") ?? h.get("host");
+  const proto = h.get("x-forwarded-proto") ?? "http";
+  const baseUrl = `${proto}://${host}`;
+  const res = await fetch(`${baseUrl}/api/orders`, { cache: "no-store", headers: { cookie } })
+  if (!res.ok) {
+    return <div className="text-sm text-red-600">Failed to load orders</div>
+  }
   const data = await res.json()
   const items = data.items || []
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xl font-medium">Orders</h2>
-        <a className="underline text-sm self-center" href="/admin/orders">Refresh</a>
-      </div>
-      <ul className="space-y-2">
-        {items.map((p: { _id: string; orderNumber: number; status: string }) => (
-          <li key={p._id} className="border p-3 rounded">
-            <div className="font-medium">Order #{p.orderNumber}</div>
-            <div className="text-xs text-muted-foreground">{p.status}</div>
-          </li>
-        ))}
-      </ul>
+      <DataTableExt
+        title="Orders"
+        data={items}
+        initialColumns={[
+          { key: "orderNumber", label: "Order #" },
+          { key: "status", label: "Status" },
+          { key: "createdAt", label: "Created" },
+        ]}
+        onRowClick={() => { /* Orders not navigable yet */ }}
+      />
     </div>
   )
 }
