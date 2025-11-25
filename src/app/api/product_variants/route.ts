@@ -27,7 +27,9 @@ export async function GET(req: Request) {
   const productId = searchParams.get('productId') || undefined;
   const skip = toNumber(searchParams.get('skip'), 0, 0, 10000);
   const limit = toNumber(searchParams.get('limit'), 20, 1, 100);
-  const websiteId = (await import('next/headers')).cookies().get('current_website_id')?.value;
+  const { cookies } = await import('next/headers');
+  const jar = await cookies();
+  const websiteId = jar.get('current_website_id')?.value;
   const items = await productVariantService.list(session.user.tenantId as string, productId, { skip, limit, websiteId });
   return NextResponse.json({ items, meta: { total: items.length, skip, limit, hasMore: items.length === limit } });
 }
@@ -38,7 +40,9 @@ export async function POST(req: Request) {
   const json = await req.json();
   const parsed = createSchema.safeParse(json);
   if (!parsed.success) return NextResponse.json({ error: 'Invalid payload', issues: parsed.error.flatten() }, { status: 400 });
-  const websiteId = (await import('next/headers')).cookies().get('current_website_id')?.value;
+  const { cookies } = await import('next/headers');
+  const jar = await cookies();
+  const websiteId = jar.get('current_website_id')?.value;
   const created = await productVariantService.create(session.user.tenantId as string, parsed.data, websiteId);
   return NextResponse.json(created, { status: 201 });
 }
