@@ -32,6 +32,9 @@ export async function getDatabase(): Promise<Db> {
   return client.db(process.env.MONGODB_DB || 'kalpdee');
 }
 
+// Backward-compatible alias for older imports
+export const getDb = getDatabase;
+
 export function toObjectId(id: string): ObjectId {
   return new ObjectId(id);
 }
