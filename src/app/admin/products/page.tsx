@@ -3,7 +3,7 @@ import { DataTableExt } from "@/components/admin/DataTableExt";
 
 export default async function ProductsAdmin() {
   const cookie = cookies().toString();
-  const h = headers();
+  const h = await headers();
   const host = h.get("x-forwarded-host") ?? h.get("host");
   const proto = h.get("x-forwarded-proto") ?? "http";
   const baseUrl = `${proto}://${host}`;
@@ -21,7 +21,7 @@ export default async function ProductsAdmin() {
         data={items}
         createHref="/admin/products/new"
         initialColumns={[
-          { key: "name", label: "Name", render: (_v, row) => (<a className="underline" href={`/admin/products/${row._id}`}>{row.name}</a>) },
+          // { key: "name", label: "Name", render: (_v, row) => (<a className="underline" href={`/admin/products/${row._id}`}>{row.name}</a>) },
           { key: "slug", label: "Slug" },
           { key: "productType", label: "Type" },
           { key: "status", label: "Status" },

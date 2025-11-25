@@ -4,16 +4,36 @@ import { useMemo, useState, useEffect } from "react";
 import Link from "next/link";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuCheckboxItem, DropdownMenuTrigger, DropdownMenuLabel, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuCheckboxItem,
+  DropdownMenuTrigger,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { ChevronUp, ChevronDown, ListFilter, Columns } from "lucide-react";
 
 export type ColumnConfig = {
   key: string;
   label?: string;
   hidden?: boolean;
-  render?: (value: any, row: any) => React.ReactNode;
+  // render?: (value: any, row: any) => React.ReactNode;
 };
 
 export type DataTableExtProps = {
@@ -33,7 +53,8 @@ function inferType(values: any[]): "string" | "number" | "date" | "boolean" {
     if (typeof v === "string") {
       // date heuristic
       const d = new Date(v);
-      if (!Number.isNaN(d.getTime()) && /\d{4}-\d{2}-\d{2}/.test(v)) return "date";
+      if (!Number.isNaN(d.getTime()) && /\d{4}-\d{2}-\d{2}/.test(v))
+        return "date";
       return "string";
     }
   }
@@ -47,28 +68,50 @@ function formatValue(v: any) {
   return String(v);
 }
 
-export function DataTableExt({ title, data, createHref, initialColumns }: DataTableExtProps) {
+export function DataTableExt({
+  title,
+  data,
+  createHref,
+  initialColumns,
+}: DataTableExtProps) {
   const [query, setQuery] = useState("");
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [sortKey, setSortKey] = useState<string | null>(null);
   const [sortDir, setSortDir] = useState<SortDir>("asc");
-  const [columnVisibility, setColumnVisibility] = useState<Record<string, boolean>>({});
-  const [enumFilters, setEnumFilters] = useState<Record<string, string | null>>({});
+  const [columnVisibility, setColumnVisibility] = useState<
+    Record<string, boolean>
+  >({});
+  const [enumFilters, setEnumFilters] = useState<Record<string, string | null>>(
+    {}
+  );
   const [textFilters, setTextFilters] = useState<Record<string, string>>({});
-  const [numFilters, setNumFilters] = useState<Record<string, { min?: number; max?: number }>>({});
-  const [dateFilters, setDateFilters] = useState<Record<string, { from?: string; to?: string }>>({});
+  const [numFilters, setNumFilters] = useState<
+    Record<string, { min?: number; max?: number }>
+  >({});
+  const [dateFilters, setDateFilters] = useState<
+    Record<string, { from?: string; to?: string }>
+  >({});
 
   // derive columns
   const columns = useMemo(() => {
     const first = data[0] || {};
     const keys = new Set<string>(Object.keys(first));
     // include keys seen in others too
-    for (const row of data.slice(1)) for (const k of Object.keys(row)) keys.add(k);
+    for (const row of data.slice(1))
+      for (const k of Object.keys(row)) keys.add(k);
 
     const base: ColumnConfig[] = Array.from(keys)
-      .filter((k) => !["tenantId", "websiteId"].includes(k) && typeof first[k] !== "object")
-      .map((k) => ({ key: k, label: k.replace(/([A-Z])/g, " $1").replace(/^./, (ch) => ch.toUpperCase()) }));
+      .filter(
+        (k) =>
+          !["tenantId", "websiteId"].includes(k) && typeof first[k] !== "object"
+      )
+      .map((k) => ({
+        key: k,
+        label: k
+          .replace(/([A-Z])/g, " $1")
+          .replace(/^./, (ch) => ch.toUpperCase()),
+      }));
 
     if (initialColumns && initialColumns.length) {
       // Merge: respect provided order first, then append the rest
@@ -95,7 +138,14 @@ export function DataTableExt({ title, data, createHref, initialColumns }: DataTa
 
   // Build metadata for filter UI
   const meta = useMemo(() => {
-    const byKey: Record<string, { type: "string" | "number" | "date" | "boolean"; values: any[]; uniques: any[] } > = {};
+    const byKey: Record<
+      string,
+      {
+        type: "string" | "number" | "date" | "boolean";
+        values: any[];
+        uniques: any[];
+      }
+    > = {};
     for (const c of columns) {
       const values = data.map((r) => r[c.key]).filter((v) => v !== undefined);
       const type = inferType(values);
@@ -103,7 +153,10 @@ export function DataTableExt({ title, data, createHref, initialColumns }: DataTa
       const set = new Set<string>();
       for (const v of values) {
         const s = JSON.stringify(v);
-        if (!set.has(s)) { set.add(s); uniques.push(v); }
+        if (!set.has(s)) {
+          set.add(s);
+          uniques.push(v);
+        }
       }
       byKey[c.key] = { type, values, uniques };
     }
@@ -118,7 +171,13 @@ export function DataTableExt({ title, data, createHref, initialColumns }: DataTa
     const q = query.trim().toLowerCase();
     if (q) {
       rows = rows.filter((r) => {
-        return columns.some((c) => columnVisibility[c.key] !== false && String(r[c.key] ?? "").toLowerCase().includes(q));
+        return columns.some(
+          (c) =>
+            columnVisibility[c.key] !== false &&
+            String(r[c.key] ?? "")
+              .toLowerCase()
+              .includes(q)
+        );
       });
     }
 
@@ -138,7 +197,12 @@ export function DataTableExt({ title, data, createHref, initialColumns }: DataTa
         // text filter
         const tf = textFilters[c.key];
         if (tf && m.type === "string") {
-          if (!String(val ?? "").toLowerCase().includes(tf.toLowerCase())) return false;
+          if (
+            !String(val ?? "")
+              .toLowerCase()
+              .includes(tf.toLowerCase())
+          )
+            return false;
         }
         // number range
         const nf = numFilters[c.key];
@@ -163,7 +227,17 @@ export function DataTableExt({ title, data, createHref, initialColumns }: DataTa
     });
 
     return rows;
-  }, [data, query, columns, columnVisibility, enumFilters, textFilters, numFilters, dateFilters, meta]);
+  }, [
+    data,
+    query,
+    columns,
+    columnVisibility,
+    enumFilters,
+    textFilters,
+    numFilters,
+    dateFilters,
+    meta,
+  ]);
 
   // Sorting
   const sorted = useMemo(() => {
@@ -175,7 +249,8 @@ export function DataTableExt({ title, data, createHref, initialColumns }: DataTa
       if (va == null && vb == null) return 0;
       if (va == null) return -1 * dir;
       if (vb == null) return 1 * dir;
-      if (typeof va === "number" && typeof vb === "number") return (va - vb) * dir;
+      if (typeof va === "number" && typeof vb === "number")
+        return (va - vb) * dir;
       return String(va).localeCompare(String(vb)) * dir;
     });
     return rows;
@@ -190,12 +265,21 @@ export function DataTableExt({ title, data, createHref, initialColumns }: DataTa
   const pageRows = sorted.slice(start, end);
 
   function toggleSort(key: string) {
-    if (sortKey !== key) { setSortKey(key); setSortDir("asc"); return; }
+    if (sortKey !== key) {
+      setSortKey(key);
+      setSortDir("asc");
+      return;
+    }
     setSortDir((d) => (d === "asc" ? "desc" : "asc"));
   }
 
   function resetFilters() {
-    setEnumFilters({}); setTextFilters({}); setNumFilters({}); setDateFilters({}); setQuery(""); setPage(1);
+    setEnumFilters({});
+    setTextFilters({});
+    setNumFilters({});
+    setDateFilters({});
+    setQuery("");
+    setPage(1);
   }
 
   return (
@@ -213,17 +297,32 @@ export function DataTableExt({ title, data, createHref, initialColumns }: DataTa
 
       <div className="flex items-center gap-2">
         <div className="flex-1">
-          <Input placeholder="Search" value={query} onChange={(e) => { setQuery(e.target.value); setPage(1); }} />
+          <Input
+            placeholder="Search"
+            value={query}
+            onChange={(e) => {
+              setQuery(e.target.value);
+              setPage(1);
+            }}
+          />
         </div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" size="sm" className="gap-2"><Columns className="h-4 w-4" /> Columns</Button>
+            <Button variant="outline" size="sm" className="gap-2">
+              <Columns className="h-4 w-4" /> Columns
+            </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-56">
             <DropdownMenuLabel>Toggle columns</DropdownMenuLabel>
             <DropdownMenuSeparator />
             {columns.map((c) => (
-              <DropdownMenuCheckboxItem key={c.key} checked={columnVisibility[c.key] !== false} onCheckedChange={(v) => setColumnVisibility((s) => ({ ...s, [c.key]: Boolean(v) }))}>
+              <DropdownMenuCheckboxItem
+                key={c.key}
+                checked={columnVisibility[c.key] !== false}
+                onCheckedChange={(v) =>
+                  setColumnVisibility((s) => ({ ...s, [c.key]: Boolean(v) }))
+                }
+              >
                 {c.label || c.key}
               </DropdownMenuCheckboxItem>
             ))}
@@ -231,10 +330,14 @@ export function DataTableExt({ title, data, createHref, initialColumns }: DataTa
         </DropdownMenu>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" size="sm" className="gap-2"><ListFilter className="h-4 w-4" /> Filters</Button>
+            <Button variant="outline" size="sm" className="gap-2">
+              <ListFilter className="h-4 w-4" /> Filters
+            </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-[320px] p-2">
-            <div className="text-xs text-muted-foreground px-2 pb-1">Dynamic filters</div>
+            <div className="text-xs text-muted-foreground px-2 pb-1">
+              Dynamic filters
+            </div>
             {columns.map((c) => {
               if (columnVisibility[c.key] === false) return null;
               const m = meta[c.key];
@@ -244,40 +347,132 @@ export function DataTableExt({ title, data, createHref, initialColumns }: DataTa
               const lowCardinality = uniques.length > 0 && uniques.length <= 10;
               return (
                 <div key={c.key} className="px-2 py-2 border-b last:border-0">
-                  <div className="text-xs font-medium mb-1">{c.label || c.key}</div>
+                  <div className="text-xs font-medium mb-1">
+                    {c.label || c.key}
+                  </div>
                   {type === "string" && lowCardinality ? (
-                    <Select value={enumFilters[c.key] ?? "__any__"} onValueChange={(v) => setEnumFilters((s) => ({ ...s, [c.key]: v === "__any__" ? null : v }))}>
+                    <Select
+                      value={enumFilters[c.key] ?? "__any__"}
+                      onValueChange={(v) =>
+                        setEnumFilters((s) => ({
+                          ...s,
+                          [c.key]: v === "__any__" ? null : v,
+                        }))
+                      }
+                    >
                       <SelectTrigger className="h-8">
                         <SelectValue placeholder="Any" />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="__any__">Any</SelectItem>
                         {uniques.map((u) => (
-                          <SelectItem key={String(u)} value={String(u)}>{String(u)}</SelectItem>
+                          <SelectItem key={String(u)} value={String(u)}>
+                            {String(u)}
+                          </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
                   ) : type === "string" ? (
-                    <Input className="h-8" placeholder="contains..." value={textFilters[c.key] ?? ""} onChange={(e) => setTextFilters((s) => ({ ...s, [c.key]: e.target.value }))} />
+                    <Input
+                      className="h-8"
+                      placeholder="contains..."
+                      value={textFilters[c.key] ?? ""}
+                      onChange={(e) =>
+                        setTextFilters((s) => ({
+                          ...s,
+                          [c.key]: e.target.value,
+                        }))
+                      }
+                    />
                   ) : type === "number" ? (
                     <div className="flex gap-2">
-                      <Input className="h-8" placeholder="min" type="number" value={numFilters[c.key]?.min ?? ""} onChange={(e) => setNumFilters((s) => ({ ...s, [c.key]: { ...(s[c.key] || {}), min: e.target.value === "" ? undefined : Number(e.target.value) } }))} />
-                      <Input className="h-8" placeholder="max" type="number" value={numFilters[c.key]?.max ?? ""} onChange={(e) => setNumFilters((s) => ({ ...s, [c.key]: { ...(s[c.key] || {}), max: e.target.value === "" ? undefined : Number(e.target.value) } }))} />
+                      <Input
+                        className="h-8"
+                        placeholder="min"
+                        type="number"
+                        value={numFilters[c.key]?.min ?? ""}
+                        onChange={(e) =>
+                          setNumFilters((s) => ({
+                            ...s,
+                            [c.key]: {
+                              ...(s[c.key] || {}),
+                              min:
+                                e.target.value === ""
+                                  ? undefined
+                                  : Number(e.target.value),
+                            },
+                          }))
+                        }
+                      />
+                      <Input
+                        className="h-8"
+                        placeholder="max"
+                        type="number"
+                        value={numFilters[c.key]?.max ?? ""}
+                        onChange={(e) =>
+                          setNumFilters((s) => ({
+                            ...s,
+                            [c.key]: {
+                              ...(s[c.key] || {}),
+                              max:
+                                e.target.value === ""
+                                  ? undefined
+                                  : Number(e.target.value),
+                            },
+                          }))
+                        }
+                      />
                     </div>
                   ) : type === "date" ? (
                     <div className="flex gap-2">
-                      <Input className="h-8" type="date" value={dateFilters[c.key]?.from ?? ""} onChange={(e) => setDateFilters((s) => ({ ...s, [c.key]: { ...(s[c.key] || {}), from: e.target.value || undefined } }))} />
-                      <Input className="h-8" type="date" value={dateFilters[c.key]?.to ?? ""} onChange={(e) => setDateFilters((s) => ({ ...s, [c.key]: { ...(s[c.key] || {}), to: e.target.value || undefined } }))} />
+                      <Input
+                        className="h-8"
+                        type="date"
+                        value={dateFilters[c.key]?.from ?? ""}
+                        onChange={(e) =>
+                          setDateFilters((s) => ({
+                            ...s,
+                            [c.key]: {
+                              ...(s[c.key] || {}),
+                              from: e.target.value || undefined,
+                            },
+                          }))
+                        }
+                      />
+                      <Input
+                        className="h-8"
+                        type="date"
+                        value={dateFilters[c.key]?.to ?? ""}
+                        onChange={(e) =>
+                          setDateFilters((s) => ({
+                            ...s,
+                            [c.key]: {
+                              ...(s[c.key] || {}),
+                              to: e.target.value || undefined,
+                            },
+                          }))
+                        }
+                      />
                     </div>
                   ) : (
-                    <Select value={enumFilters[c.key] ?? "__any__"} onValueChange={(v) => setEnumFilters((s) => ({ ...s, [c.key]: v === "__any__" ? null : v }))}>
+                    <Select
+                      value={enumFilters[c.key] ?? "__any__"}
+                      onValueChange={(v) =>
+                        setEnumFilters((s) => ({
+                          ...s,
+                          [c.key]: v === "__any__" ? null : v,
+                        }))
+                      }
+                    >
                       <SelectTrigger className="h-8">
                         <SelectValue placeholder="Any" />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="__any__">Any</SelectItem>
                         {["true", "false"].map((u) => (
-                          <SelectItem key={u} value={u}>{u}</SelectItem>
+                          <SelectItem key={u} value={u}>
+                            {u}
+                          </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
@@ -286,7 +481,9 @@ export function DataTableExt({ title, data, createHref, initialColumns }: DataTa
               );
             })}
             <div className="px-2 pt-2">
-              <Button variant="ghost" size="sm" onClick={resetFilters}>Reset</Button>
+              <Button variant="ghost" size="sm" onClick={resetFilters}>
+                Reset
+              </Button>
             </div>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -296,31 +493,65 @@ export function DataTableExt({ title, data, createHref, initialColumns }: DataTa
         <Table>
           <TableHeader>
             <TableRow>
-              {columns.filter((c) => columnVisibility[c.key] !== false).map((c) => (
-                <TableHead key={c.key} className="whitespace-nowrap">
-                  <button className="inline-flex items-center gap-1 select-none" onClick={() => toggleSort(c.key)}>
-                    <span>{c.label || c.key}</span>
-                    {sortKey === c.key ? (
-                      sortDir === "asc" ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />
-                    ) : null}
-                  </button>
-                </TableHead>
-              ))}
+              {columns
+                .filter((c) => columnVisibility[c.key] !== false)
+                .map((c) => (
+                  <TableHead key={c.key} className="whitespace-nowrap">
+                    <button
+                      className="inline-flex items-center gap-1 select-none"
+                      onClick={() => toggleSort(c.key)}
+                    >
+                      <span>{c.label || c.key}</span>
+                      {sortKey === c.key ? (
+                        sortDir === "asc" ? (
+                          <ChevronUp className="h-3 w-3" />
+                        ) : (
+                          <ChevronDown className="h-3 w-3" />
+                        )
+                      ) : null}
+                    </button>
+                  </TableHead>
+                ))}
             </TableRow>
           </TableHeader>
           <TableBody>
             {pageRows.map((row, i) => (
               <TableRow key={row._id ?? i}>
-                {columns.filter((c) => columnVisibility[c.key] !== false).map((c) => (
-                  <TableCell key={c.key} className="py-2 text-sm">
-                    {c.render ? c.render(row[c.key], row) : formatValue(row[c.key])}
-                  </TableCell>
-                ))}
+                {columns
+                  .filter((c:any) => columnVisibility[c.key] !== false)
+                  .map((c:any) => (
+                    <TableCell key={c.key} className="py-2 text-sm">
+                      {(() => {
+                        // 1) If the column is a link type
+                        if (c.type === "link") {
+                          return (
+                            <Link
+                              href={`${c.href}/${row._id}`}
+                              className="underline text-blue-600 hover:text-blue-800"
+                            >
+                              {row[c.key]}
+                            </Link>
+                          );
+                        }
+
+                        // 2) Fallback to custom render if defined
+                        if (c.render) return c.render(row[c.key], row);
+
+                        // 3) Default formatter
+                        return formatValue(row[c.key]);
+                      })()}
+                    </TableCell>
+                  ))}
               </TableRow>
             ))}
             {pageRows.length === 0 && (
               <TableRow>
-                <TableCell colSpan={columns.length} className="text-center text-sm text-muted-foreground">No results</TableCell>
+                <TableCell
+                  colSpan={columns.length}
+                  className="text-center text-sm text-muted-foreground"
+                >
+                  No results
+                </TableCell>
               </TableRow>
             )}
           </TableBody>
@@ -329,21 +560,50 @@ export function DataTableExt({ title, data, createHref, initialColumns }: DataTa
 
       <div className="flex items-center justify-end gap-6 text-sm">
         <div>
-          {total === 0 ? "0" : `${start + 1}-${Math.min(end, total)}`} of {total}
+          {total === 0 ? "0" : `${start + 1}-${Math.min(end, total)}`} of{" "}
+          {total}
         </div>
         <div className="flex items-center gap-2">
           <span>Per Page:</span>
-          <Select value={String(pageSize)} onValueChange={(v) => { setPageSize(Number(v)); setPage(1); }}>
-            <SelectTrigger className="h-8 w-[90px]"><SelectValue /></SelectTrigger>
+          <Select
+            value={String(pageSize)}
+            onValueChange={(v) => {
+              setPageSize(Number(v));
+              setPage(1);
+            }}
+          >
+            <SelectTrigger className="h-8 w-[90px]">
+              <SelectValue />
+            </SelectTrigger>
             <SelectContent>
-              {[10,20,50,100].map((n) => <SelectItem key={n} value={String(n)}>{n}</SelectItem>)}
+              {[10, 20, 50, 100].map((n) => (
+                <SelectItem key={n} value={String(n)}>
+                  {n}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" disabled={currentPage <= 1} onClick={() => setPage((p) => Math.max(1, p-1))}>Prev</Button>
-          <div>{currentPage}/{totalPages}</div>
-          <Button variant="outline" size="sm" disabled={currentPage >= totalPages} onClick={() => setPage((p) => Math.min(totalPages, p+1))}>Next</Button>
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={currentPage <= 1}
+            onClick={() => setPage((p) => Math.max(1, p - 1))}
+          >
+            Prev
+          </Button>
+          <div>
+            {currentPage}/{totalPages}
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={currentPage >= totalPages}
+            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+          >
+            Next
+          </Button>
         </div>
       </div>
     </div>

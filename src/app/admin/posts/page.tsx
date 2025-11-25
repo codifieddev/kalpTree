@@ -3,7 +3,7 @@ import { DataTableExt } from "@/components/admin/DataTableExt";
 
 export default async function PostsAdmin() {
   const cookie = cookies().toString();
-  const h = headers();
+  const h = await headers();
   const host = h.get("x-forwarded-host") ?? h.get("host");
   const proto = h.get("x-forwarded-proto") ?? "http";
   const baseUrl = `${proto}://${host}`;
@@ -21,7 +21,7 @@ export default async function PostsAdmin() {
         data={items}
         createHref="/admin/posts/new"
         initialColumns={[
-          { key: "title", label: "Title", render: (_v, row) => (<a className="underline" href={`/admin/posts/${row._id}`}>{row.title}</a>) },
+          // { key: "title", label: "Title", render: (_v, row) => (<a className="underline" href={`/admin/posts/${row._id}`}>{row.title}</a>) },
           { key: "slug", label: "Slug" },
           { key: "status", label: "Status" },
           { key: "publishedAt", label: "Published" },
