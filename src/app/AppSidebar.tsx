@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import clsx from "clsx"
+import { signOut } from "next-auth/react"
 import {
   Book,
   ChevronRight,
@@ -190,7 +191,13 @@ export function AppSidebar({ handleSwitchTab, ...rest }: AppSidebarProps) {
                   </DropdownMenuItem>
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>
+                <DropdownMenuItem
+                  onSelect={async (e) => {
+                    e.preventDefault();
+                    // Use NextAuth helper for sign out and redirect to sign-in page
+                    await signOut({ callbackUrl: "/auth/signin" });
+                  }}
+                >
                   <LogOut className="mr-2 size-4" />
                   Log out
                 </DropdownMenuItem>
