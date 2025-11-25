@@ -5,7 +5,8 @@ import { cookies } from "next/headers";
 
 async function fetchCount(path: string) {
   try {
-    const cookie = cookies().toString();
+    const cookieStore = await cookies();
+    const cookie = cookieStore.toString();
     const res = await fetch(path, { cache: "no-store", headers: { cookie } });
     if (!res.ok) return 0;
     const data = await res.json();
