@@ -15,7 +15,9 @@ import {
   CreditCard,
   Bell,
   LogOut,
-  SquareTerminal
+  SquareTerminal,
+  ShoppingCart,
+  Tags
 } from "lucide-react"
 
 import {
@@ -69,9 +71,10 @@ const data = {
     { title: "Pages", url: "/admin/pages", icon: Folder },
     { title: "Posts", url: "/admin/posts", icon: Book },
     { title: "Products", url: "/admin/products", icon: Archive },
-    { title: "Websites", url: "/admin/websites", icon: Settings },
     { title: "Categories", url: "/admin/categories", icon: Settings },
-    // Extend with orders, tags etc. as needed
+    { title: "Tags", url: "/admin/tags", icon: Tags },
+    { title: "Orders", url: "/admin/orders", icon: ShoppingCart },
+    { title: "Websites", url: "/admin/websites", icon: Settings },
   ],
 }
 
