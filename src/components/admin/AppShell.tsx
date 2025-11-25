@@ -294,6 +294,7 @@ type SidebarProps = {
   user: User | null;
   onWebsiteChange: (websiteId: string) => void;
   collapsed?: boolean;
+  onToggleCollapse?: () => void;
 };
 
 function Sidebar({
@@ -302,6 +303,7 @@ function Sidebar({
   user,
   onWebsiteChange,
   collapsed,
+  onToggleCollapse,
 }: SidebarProps) {
   const pathname = usePathname();
   const [hoveredId, setHoveredId] = React.useState<string | null>(null);
@@ -419,6 +421,7 @@ function Sidebar({
               variant="ghost"
               size="sm"
               className="w-full justify-between text-xs text-muted-foreground hover:bg-muted hover:text-foreground"
+              onClick={onToggleCollapse}
             >
               {!collapsed && <span>Collapse sidebar</span>}
               <span className={cn(collapsed && "mx-auto")}>⟷</span>
@@ -614,6 +617,7 @@ export function AppShell({
   onWebsiteChange = () => {},
 }: AppShellProps) {
   const [mobileSidebarOpen, setMobileSidebarOpen] = React.useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = React.useState(false);
 
   return (
     <div className="flex min-h-screen bg-background text-foreground">
@@ -623,7 +627,8 @@ export function AppShell({
         currentWebsite={currentWebsite}
         user={user}
         onWebsiteChange={onWebsiteChange}
-        collapsed={false}
+        collapsed={sidebarCollapsed}
+        onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
       />
 
       {/* Main area */}
