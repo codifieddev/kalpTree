@@ -254,7 +254,6 @@ import { RoleManager } from '@/lib/rbac/roles';
 
 // Check if user can create users
 const canCreate = RoleManager.hasPermission('F', 'users', 'create', {
-  isTenantLevel: true
 });
 
 // Check role hierarchy

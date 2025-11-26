@@ -54,7 +54,7 @@ export function withRBAC(options: RBACMiddlewareOptions) {
         options.action,
         {
           tenantId,
-          isTenantLevel: true,
+       
         }
       );
 

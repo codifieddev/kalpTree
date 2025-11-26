@@ -27,7 +27,7 @@ export async function POST(req: Request) {
     const tenant = await tenantService.createTenant({ slug: tenantSlug, name: tenantName, email: adminEmail, plan: 'trial' });
 
     // Create owner user
-    await userService.createUser({ tenantId: tenant._id, email: adminEmail, password: adminPassword, name: tenantName + ' Owner', role: 'owner' });
+    await userService.createUser({ tenantId: tenant._id, email: adminEmail, password: adminPassword, name: tenantName + ' Owner', role: 'A' });
 
     // Create default website for tenant
     const website = await websiteService.create({ tenantId: tenant._id, tenantSlug: tenant.slug, name: websiteName, serviceType });

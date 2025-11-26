@@ -7,10 +7,10 @@ export async function GET(_req: Request, { params }: { params: Promise<{ slug: s
   const resolvedParams = await params;
 
   const session = await auth();
-  const websiteId = cookies().get('current_website_id')?.value;
-  const tenantId = (session?.user?.tenantId as string | undefined) || headers().get('x-tenant-id') || '';
+  const websiteId = (await cookies()).get('current_website_id')?.value;
+  const tenantId = (session?.user?.tenantId as string | undefined) || (await headers()).get('x-tenant-id') || '';
   if (!tenantId) return NextResponse.json({ error: 'Tenant unresolved' }, { status: 400 });
-  const doc = await postService.getBySlugForWebsite(tenantId, params.slug, websiteId);
+  const doc = await postService.getBySlugForWebsite(tenantId, resolvedParams.slug, websiteId);
   if (!doc) return NextResponse.json({ error: 'Not found' }, { status: 404 });
   return NextResponse.json({ item: doc });
 }

@@ -9,7 +9,7 @@ const bodySchema = z.object({ websiteId: z.string().min(1) });
 export async function GET() {
   const session = await auth();
   if (!session?.user?.tenantId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  const jar = cookies();
+  const jar = await cookies();
   const websiteId = jar.get('current_website_id')?.value || null;
   return NextResponse.json({ websiteId });
 }

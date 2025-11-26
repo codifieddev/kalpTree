@@ -60,6 +60,15 @@ import {
   Plug2,
   Store,
   ExternalLink,
+  Images,
+  RectangleHorizontal,
+  RectangleVertical,
+  Navigation,
+  BadgeCent,
+  Palette,
+  Share2,
+  LayoutTemplate,
+  Globe,
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -147,439 +156,427 @@ type NavSection = {
 // Navigation structure
 // ---------------------------------------------------------------------------
 
-const accountSection: NavSection = {
-  id: "account",
-  label: "Account / Platform",
-  items: [
-    {
-      label: "Platform Home",
-      href: "/admin",
-      icon: LayoutDashboard,
-    },
-    {
-      label: "Websites",
-      href: "/admin/websites",
-      icon: Globe2,
-      permission: "websites:read",
-    },
-    {
-      label: "Users & Roles",
-      href: "/admin/users",
-      icon: Users,
-      permission: "users:read",
-    },
-    {
-      label: "Billing & Plans",
-      href: "/admin/billing",
-      icon: CreditCard,
-      permission: "billing:read",
-      badge: "Pro",
-    },
-    {
-      label: "Platform Settings",
-      href: "/admin/settings",
-      icon: Settings,
-      permission: "settings:read",
-    },
-  ],
-};
-
 const currentWebsiteSections: NavSection[] = [
   {
     id: "website-overview",
-    label: "Current Website",
+    label: "Websites",
     items: [
       {
-        label: "Overview",
-        href: "/admin/site/overview",
-        icon: LayoutDashboard,
+        label: "Pages",
+        href: "/admin/pages",
+        icon: LayoutDashboard, // good for page overview
       },
       {
-        label: "Domain & Hosting",
-        href: "/admin/site/domain-hosting",
-        icon: Globe2,
+        label: "Posts",
+        href: "/admin/posts",
+        icon: FileText, // blogging / posts
         permission: "websites:update",
       },
       {
-        label: "Performance & Analytics",
-        href: "/admin/site/performance",
-        icon: BarChart3,
+        label: "Media",
+        href: "/admin/media",
+        icon: Images, // media / gallery
         permission: "analytics:view",
       },
       {
-        label: "Security",
-        href: "/admin/site/security",
-        icon: Shield,
+        label: "Header",
+        href: "/admin/header",
+        icon: RectangleHorizontal, // header bar
+        permission: "security:read",
+      },
+      {
+        label: "Footer",
+        href: "/admin/footer",
+        icon: RectangleVertical, // footer bar
+        permission: "security:read",
+      },
+      {
+        label: "Navigation",
+        href: "/admin/navigation",
+        icon: Navigation, // nav / menu
         permission: "security:read",
       },
     ],
   },
   {
-    id: "content",
-    label: "Content",
+    id: "branding",
+    label: "Branding & Design",
     items: [
       {
-        label: "Pages",
-        href: "/admin/pages",
-        icon: FileText,
+        label: "Logo",
+        href: "/admin/logo",
+        icon: BadgeCent, // best logo-style icon
         permission: "content:read",
       },
       {
-        label: "Posts",
-        href: "/admin/posts",
-        icon: FileText,
+        label: "Color Pallet",
+        href: "/admin/color-pallet",
+        icon: Palette, // color palette icon
         permission: "content:read",
       },
       {
-        label: "Tags",
-        href: "/admin/tags",
-        icon: Tags,
+        label: "Social Links",
+        href: "/admin/social-links",
+        icon: Share2, // links/share
         permission: "content:read",
       },
       {
-        label: "Media Library",
-        href: "/admin/site/media",
-        icon: ImageIcon,
+        label: "Layout Settings",
+        href: "/admin/layout-settings",
+        icon: LayoutTemplate, // layout / template
         permission: "content:read",
       },
       {
-        label: "Navigation",
-        href: "/admin/site/navigation",
-        icon: Server,
+        label: "Typography",
+        href: "/admin/typography",
+        icon: Type, // font / typography
         permission: "content:update",
       },
     ],
   },
   {
-    id: "brand",
-    label: "Brand & Design",
+    id: "domains",
+    label: "Domain & Hosting",
     items: [
       {
-        label: "Brand Profile",
-        href: "/admin/websites/branding",
-        icon: Type,
-        permission: "settings:branding",
-      },
-      {
-        label: "Theme & Layouts",
-        href: "/admin/site/theme",
-        icon: LayoutDashboard,
-        permission: "settings:branding",
-      },
-      {
-        label: "Sections & Blocks",
-        href: "/admin/site/sections",
-        icon: Sparkles,
-        permission: "settings:branding",
+        label: "Domains",
+        href: "/admin/domain",
+        icon: Globe, // domain icon
+        permission: "content:read",
       },
     ],
   },
-  {
-    id: "commerce",
-    label: "Commerce",
-    items: [
-      {
-        label: "Products",
-        href: "/admin/products",
-        icon: Package,
-        permission: "products:read",
-      },
-      {
-        label: "Categories",
-        href: "/admin/categories",
-        icon: ShoppingBag,
-        permission: "products:read",
-      },
-      {
-        label: "Orders",
-        href: "/admin/orders",
-        icon: ShoppingCart,
-        permission: "orders:read",
-      },
-    ],
-  },
-  {
-    id: "hosting",
-    label: "Hosting & Infrastructure",
-    items: [
-      {
-        label: "Server Management",
-        href: "/admin/hosting/servers",
-        icon: Server,
-        permission: "hosting:manage",
-      },
-      {
-        label: "Database Management",
-        href: "/admin/hosting/databases",
-        icon: Database,
-        permission: "hosting:database",
-      },
-      {
-        label: "File Manager",
-        href: "/admin/hosting/files",
-        icon: FolderOpen,
-        permission: "hosting:files",
-      },
-      {
-        label: "Backups & Restore",
-        href: "/admin/hosting/backups",
-        icon: HardDrive,
-        permission: "hosting:backup",
-      },
-      {
-        label: "SSL Certificates",
-        href: "/admin/hosting/ssl",
-        icon: Lock,
-        permission: "hosting:ssl",
-      },
-      {
-        label: "CDN Settings",
-        href: "/admin/hosting/cdn",
-        icon: CloudCog,
-        permission: "hosting:cdn",
-      },
-    ],
-  },
-  {
-    id: "email",
-    label: "Email & Communication",
-    items: [
-      {
-        label: "Email Accounts",
-        href: "/admin/email/accounts",
-        icon: Mail,
-        permission: "email:manage",
-      },
-      {
-        label: "Email Forwarding",
-        href: "/admin/email/forwarding",
-        icon: Forward,
-        permission: "email:forward",
-      },
-      {
-        label: "Autoresponders",
-        href: "/admin/email/autoresponders",
-        icon: MessageSquare,
-        permission: "email:autorespond",
-      },
-      {
-        label: "Mailing Lists",
-        href: "/admin/email/lists",
-        icon: Users,
-        permission: "email:lists",
-      },
-      {
-        label: "SMTP Settings",
-        href: "/admin/email/smtp",
-        icon: Settings,
-        permission: "email:smtp",
-      },
-    ],
-  },
-  {
-    id: "security",
-    label: "Security & Monitoring",
-    items: [
-      {
-        label: "Security Center",
-        href: "/admin/security/center",
-        icon: Shield,
-        permission: "security:manage",
-      },
-      {
-        label: "Firewall Settings",
-        href: "/admin/security/firewall",
-        icon: Zap,
-        permission: "security:firewall",
-      },
-      {
-        label: "Access Logs",
-        href: "/admin/security/access-logs",
-        icon: Eye,
-        permission: "security:logs",
-      },
-      {
-        label: "Malware Scanner",
-        href: "/admin/security/malware",
-        icon: AlertTriangle,
-        permission: "security:scan",
-      },
-      {
-        label: "Two-Factor Auth",
-        href: "/admin/security/2fa",
-        icon: Key,
-        permission: "security:2fa",
-      },
-      {
-        label: "IP Blocking",
-        href: "/admin/security/ip-blocking",
-        icon: Lock,
-        permission: "security:ip",
-      },
-    ],
-  },
-  {
-    id: "performance",
-    label: "Performance & Optimization",
-    items: [
-      {
-        label: "Caching Settings",
-        href: "/admin/performance/caching",
-        icon: Timer,
-        permission: "performance:cache",
-      },
-      {
-        label: "Performance Monitor",
-        href: "/admin/performance/monitor",
-        icon: Activity,
-        permission: "performance:monitor",
-      },
-      {
-        label: "Speed Optimization",
-        href: "/admin/performance/speed",
-        icon: TrendingUp,
-        permission: "performance:optimize",
-      },
-      {
-        label: "Resource Usage",
-        href: "/admin/performance/resources",
-        icon: Gauge,
-        permission: "performance:resources",
-      },
-      {
-        label: "Error Logs",
-        href: "/admin/performance/errors",
-        icon: FileBarChart,
-        permission: "performance:errors",
-      },
-      {
-        label: "Network Analysis",
-        href: "/admin/performance/network",
-        icon: Network,
-        permission: "performance:network",
-      },
-    ],
-  },
-  {
-    id: "integrations",
-    label: "Integrations & Apps",
-    items: [
-      {
-        label: "App Store",
-        href: "/admin/integrations/store",
-        icon: Store,
-        permission: "integrations:store",
-      },
-      {
-        label: "Third-party Integrations",
-        href: "/admin/integrations/third-party",
-        icon: Plug2,
-        permission: "integrations:manage",
-      },
-      {
-        label: "Plugins & Extensions",
-        href: "/admin/integrations/plugins",
-        icon: Puzzle,
-        permission: "integrations:plugins",
-      },
-      {
-        label: "API Connections",
-        href: "/admin/integrations/api",
-        icon: GitBranch,
-        permission: "integrations:api",
-      },
-      {
-        label: "Webhooks",
-        href: "/admin/integrations/webhooks",
-        icon: Webhook,
-        permission: "integrations:webhooks",
-      },
-      {
-        label: "External Services",
-        href: "/admin/integrations/external",
-        icon: ExternalLink,
-        permission: "integrations:external",
-      },
-    ],
-  },
-  {
-    id: "support",
-    label: "Support & Help",
-    items: [
-      {
-        label: "Help Center",
-        href: "/admin/support/help",
-        icon: HelpCircle,
-        permission: "support:help",
-      },
-      {
-        label: "Contact Support",
-        href: "/admin/support/contact",
-        icon: Phone,
-        permission: "support:contact",
-      },
-      {
-        label: "Documentation",
-        href: "/admin/support/docs",
-        icon: BookOpen,
-        permission: "support:docs",
-      },
-      {
-        label: "Video Tutorials",
-        href: "/admin/support/videos",
-        icon: Video,
-        permission: "support:videos",
-      },
-      {
-        label: "Community Forum",
-        href: "/admin/support/forum",
-        icon: MessageCircle,
-        permission: "support:forum",
-      },
-      {
-        label: "System Status",
-        href: "/admin/support/status",
-        icon: Activity,
-        permission: "support:status",
-      },
-    ],
-  },
-  {
-    id: "developer",
-    label: "Developer / Advanced",
-    items: [
-      {
-        label: "API & Webhooks",
-        href: "/admin/site/api",
-        icon: Code2,
-        permission: "system:api",
-      },
-      {
-        label: "Logs",
-        href: "/admin/site/logs",
-        icon: Server,
-        permission: "system:logs",
-      },
-      {
-        label: "Database Tools",
-        href: "/admin/developer/database",
-        icon: Database,
-        permission: "developer:database",
-      },
-      {
-        label: "Code Editor",
-        href: "/admin/developer/editor",
-        icon: Code2,
-        permission: "developer:code",
-      },
-      {
-        label: "Version Control",
-        href: "/admin/developer/git",
-        icon: GitBranch,
-        permission: "developer:git",
-      },
-    ],
-  },
+
+  // {
+  //   id: "brand",
+  //   label: "Brand & Design",
+  //   items: [
+  //     {
+  //       label: "Brand Profile",
+  //       href: "/admin/websites/branding",
+  //       icon: Type,
+  //       permission: "settings:branding",
+  //     },
+  //     {
+  //       label: "Theme & Layouts",
+  //       href: "/admin/site/theme",
+  //       icon: LayoutDashboard,
+  //       permission: "settings:branding",
+  //     },
+  //     {
+  //       label: "Sections & Blocks",
+  //       href: "/admin/site/sections",
+  //       icon: Sparkles,
+  //       permission: "settings:branding",
+  //     },
+  //   ],
+  // },
+  // {
+  //   id: "commerce",
+  //   label: "Commerce",
+  //   items: [
+  //     {
+  //       label: "Products",
+  //       href: "/admin/products",
+  //       icon: Package,
+  //       permission: "products:read",
+  //     },
+  //     {
+  //       label: "Categories",
+  //       href: "/admin/categories",
+  //       icon: ShoppingBag,
+  //       permission: "products:read",
+  //     },
+  //     {
+  //       label: "Orders",
+  //       href: "/admin/orders",
+  //       icon: ShoppingCart,
+  //       permission: "orders:read",
+  //     },
+  //   ],
+  // },
+  // {
+  //   id: "hosting",
+  //   label: "Hosting & Infrastructure",
+  //   items: [
+  //     {
+  //       label: "Server Management",
+  //       href: "/admin/hosting/servers",
+  //       icon: Server,
+  //       permission: "hosting:manage",
+  //     },
+  //     {
+  //       label: "Database Management",
+  //       href: "/admin/hosting/databases",
+  //       icon: Database,
+  //       permission: "hosting:database",
+  //     },
+  //     {
+  //       label: "File Manager",
+  //       href: "/admin/hosting/files",
+  //       icon: FolderOpen,
+  //       permission: "hosting:files",
+  //     },
+  //     {
+  //       label: "Backups & Restore",
+  //       href: "/admin/hosting/backups",
+  //       icon: HardDrive,
+  //       permission: "hosting:backup",
+  //     },
+  //     {
+  //       label: "SSL Certificates",
+  //       href: "/admin/hosting/ssl",
+  //       icon: Lock,
+  //       permission: "hosting:ssl",
+  //     },
+  //     {
+  //       label: "CDN Settings",
+  //       href: "/admin/hosting/cdn",
+  //       icon: CloudCog,
+  //       permission: "hosting:cdn",
+  //     },
+  //   ],
+  // },
+  // {
+  //   id: "email",
+  //   label: "Email & Communication",
+  //   items: [
+  //     {
+  //       label: "Email Accounts",
+  //       href: "/admin/email/accounts",
+  //       icon: Mail,
+  //       permission: "email:manage",
+  //     },
+  //     {
+  //       label: "Email Forwarding",
+  //       href: "/admin/email/forwarding",
+  //       icon: Forward,
+  //       permission: "email:forward",
+  //     },
+  //     {
+  //       label: "Autoresponders",
+  //       href: "/admin/email/autoresponders",
+  //       icon: MessageSquare,
+  //       permission: "email:autorespond",
+  //     },
+  //     {
+  //       label: "Mailing Lists",
+  //       href: "/admin/email/lists",
+  //       icon: Users,
+  //       permission: "email:lists",
+  //     },
+  //     {
+  //       label: "SMTP Settings",
+  //       href: "/admin/email/smtp",
+  //       icon: Settings,
+  //       permission: "email:smtp",
+  //     },
+  //   ],
+  // },
+  // {
+  //   id: "security",
+  //   label: "Security & Monitoring",
+  //   items: [
+  //     {
+  //       label: "Security Center",
+  //       href: "/admin/security/center",
+  //       icon: Shield,
+  //       permission: "security:manage",
+  //     },
+  //     {
+  //       label: "Firewall Settings",
+  //       href: "/admin/security/firewall",
+  //       icon: Zap,
+  //       permission: "security:firewall",
+  //     },
+  //     {
+  //       label: "Access Logs",
+  //       href: "/admin/security/access-logs",
+  //       icon: Eye,
+  //       permission: "security:logs",
+  //     },
+  //     {
+  //       label: "Malware Scanner",
+  //       href: "/admin/security/malware",
+  //       icon: AlertTriangle,
+  //       permission: "security:scan",
+  //     },
+  //     {
+  //       label: "Two-Factor Auth",
+  //       href: "/admin/security/2fa",
+  //       icon: Key,
+  //       permission: "security:2fa",
+  //     },
+  //     {
+  //       label: "IP Blocking",
+  //       href: "/admin/security/ip-blocking",
+  //       icon: Lock,
+  //       permission: "security:ip",
+  //     },
+  //   ],
+  // },
+  // {
+  //   id: "performance",
+  //   label: "Performance & Optimization",
+  //   items: [
+  //     {
+  //       label: "Caching Settings",
+  //       href: "/admin/performance/caching",
+  //       icon: Timer,
+  //       permission: "performance:cache",
+  //     },
+  //     {
+  //       label: "Performance Monitor",
+  //       href: "/admin/performance/monitor",
+  //       icon: Activity,
+  //       permission: "performance:monitor",
+  //     },
+  //     {
+  //       label: "Speed Optimization",
+  //       href: "/admin/performance/speed",
+  //       icon: TrendingUp,
+  //       permission: "performance:optimize",
+  //     },
+  //     {
+  //       label: "Resource Usage",
+  //       href: "/admin/performance/resources",
+  //       icon: Gauge,
+  //       permission: "performance:resources",
+  //     },
+  //     {
+  //       label: "Error Logs",
+  //       href: "/admin/performance/errors",
+  //       icon: FileBarChart,
+  //       permission: "performance:errors",
+  //     },
+  //     {
+  //       label: "Network Analysis",
+  //       href: "/admin/performance/network",
+  //       icon: Network,
+  //       permission: "performance:network",
+  //     },
+  //   ],
+  // },
+  // {
+  //   id: "integrations",
+  //   label: "Integrations & Apps",
+  //   items: [
+  //     {
+  //       label: "App Store",
+  //       href: "/admin/integrations/store",
+  //       icon: Store,
+  //       permission: "integrations:store",
+  //     },
+  //     {
+  //       label: "Third-party Integrations",
+  //       href: "/admin/integrations/third-party",
+  //       icon: Plug2,
+  //       permission: "integrations:manage",
+  //     },
+  //     {
+  //       label: "Plugins & Extensions",
+  //       href: "/admin/integrations/plugins",
+  //       icon: Puzzle,
+  //       permission: "integrations:plugins",
+  //     },
+  //     {
+  //       label: "API Connections",
+  //       href: "/admin/integrations/api",
+  //       icon: GitBranch,
+  //       permission: "integrations:api",
+  //     },
+  //     {
+  //       label: "Webhooks",
+  //       href: "/admin/integrations/webhooks",
+  //       icon: Webhook,
+  //       permission: "integrations:webhooks",
+  //     },
+  //     {
+  //       label: "External Services",
+  //       href: "/admin/integrations/external",
+  //       icon: ExternalLink,
+  //       permission: "integrations:external",
+  //     },
+  //   ],
+  // },
+  // {
+  //   id: "support",
+  //   label: "Support & Help",
+  //   items: [
+  //     {
+  //       label: "Help Center",
+  //       href: "/admin/support/help",
+  //       icon: HelpCircle,
+  //       permission: "support:help",
+  //     },
+  //     {
+  //       label: "Contact Support",
+  //       href: "/admin/support/contact",
+  //       icon: Phone,
+  //       permission: "support:contact",
+  //     },
+  //     {
+  //       label: "Documentation",
+  //       href: "/admin/support/docs",
+  //       icon: BookOpen,
+  //       permission: "support:docs",
+  //     },
+  //     {
+  //       label: "Video Tutorials",
+  //       href: "/admin/support/videos",
+  //       icon: Video,
+  //       permission: "support:videos",
+  //     },
+  //     {
+  //       label: "Community Forum",
+  //       href: "/admin/support/forum",
+  //       icon: MessageCircle,
+  //       permission: "support:forum",
+  //     },
+  //     {
+  //       label: "System Status",
+  //       href: "/admin/support/status",
+  //       icon: Activity,
+  //       permission: "support:status",
+  //     },
+  //   ],
+  // },
+  // {
+  //   id: "developer",
+  //   label: "Developer / Advanced",
+  //   items: [
+  //     {
+  //       label: "API & Webhooks",
+  //       href: "/admin/site/api",
+  //       icon: Code2,
+  //       permission: "system:api",
+  //     },
+  //     {
+  //       label: "Logs",
+  //       href: "/admin/site/logs",
+  //       icon: Server,
+  //       permission: "system:logs",
+  //     },
+  //     {
+  //       label: "Database Tools",
+  //       href: "/admin/developer/database",
+  //       icon: Database,
+  //       permission: "developer:database",
+  //     },
+  //     {
+  //       label: "Code Editor",
+  //       href: "/admin/developer/editor",
+  //       icon: Code2,
+  //       permission: "developer:code",
+  //     },
+  //     {
+  //       label: "Version Control",
+  //       href: "/admin/developer/git",
+  //       icon: GitBranch,
+  //       permission: "developer:git",
+  //     },
+  //   ],
+  // },
 ];
 
 // ---------------------------------------------------------------------------
@@ -613,14 +610,6 @@ function Sidebar({
     return true;
   };
 
-  // Filter sections and items based on permissions
-  const filteredAccountSection = {
-    ...accountSection,
-    items: accountSection.items.filter((item) =>
-      hasPermission(item.permission)
-    ),
-  };
-
   const filteredWebsiteSections = currentWebsiteSections
     .map((section) => ({
       ...section,
@@ -632,7 +621,7 @@ function Sidebar({
     <TooltipProvider>
       <div
         className={cn(
-          "relative hidden border-r bg-background md:flex",
+          "relative hidden border-r bg-background border-2 h-screen md:flex",
           collapsed ? "w-[72px]" : "w-64"
         )}
       >
@@ -685,15 +674,6 @@ function Sidebar({
 
           <ScrollArea className="mt-2 flex-1 px-1">
             <nav className="flex flex-col gap-4 pb-8">
-              {/* Account section */}
-              <SidebarSection
-                section={filteredAccountSection}
-                pathname={pathname}
-                collapsed={collapsed}
-                hoveredId={hoveredId}
-                setHoveredId={setHoveredId}
-              />
-
               {/* Current website sections - only show if website is selected */}
               {currentWebsite &&
                 filteredWebsiteSections.map((section) => (

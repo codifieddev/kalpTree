@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
     // Check if user has permission to read users
     const hasPermission = await RBACService.hasPermission(userId, 'users', 'read', {
       tenantId,
-      isTenantLevel: true,
+
     });
 
     if (!hasPermission) {
@@ -50,7 +50,6 @@ export async function POST(request: NextRequest) {
     // Check if user has permission to create users
     const hasPermission = await RBACService.hasPermission(userId, 'users', 'create', {
       tenantId,
-      isTenantLevel: true,
     });
 
     if (!hasPermission) {

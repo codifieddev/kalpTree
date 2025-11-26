@@ -1,3 +1,4 @@
+
 "use client";
 import { useParams, usePathname, useRouter } from "next/navigation";
 import { useMemo, useState, useEffect } from "react";
@@ -27,7 +28,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { ChevronUp, ChevronDown, ListFilter, Columns } from "lucide-react";
+import { ChevronUp, ChevronDown, ListFilter, Columns, Eye, Trash2 } from "lucide-react";
 
 export type ColumnConfig = {
   key: string;
@@ -41,6 +42,8 @@ export type DataTableExtProps = {
   data: any[];
   createHref?: string;
   initialColumns?: ColumnConfig[];
+  onDelete?: (row: any) => void;
+  onView?: (row: any) => void;
 };
 
 type SortDir = "asc" | "desc";
@@ -73,6 +76,8 @@ export function DataTableExt({
   data,
   createHref,
   initialColumns,
+  onDelete,
+  onView,
 }: DataTableExtProps) {
   const [query, setQuery] = useState("");
   const [page, setPage] = useState(1);
@@ -81,7 +86,7 @@ export function DataTableExt({
   const [sortDir, setSortDir] = useState<SortDir>("asc");
   const [columnVisibility, setColumnVisibility] = useState<
     Record<string, boolean>
-  >({});
+  >({content:false, _id:false});
   const [enumFilters, setEnumFilters] = useState<Record<string, string | null>>(
     {}
   );
@@ -93,7 +98,6 @@ export function DataTableExt({
     Record<string, { from?: string; to?: string }>
   >({});
   const router = useRouter();
-  
 
 const path = usePathname()
 const lastSegment = path.split("/").filter(Boolean).pop();
@@ -286,6 +290,24 @@ const lastSegment = path.split("/").filter(Boolean).pop();
     setDateFilters({});
     setQuery("");
     setPage(1);
+  }
+
+  function handleView(e: React.MouseEvent, row: any) {
+    e.stopPropagation();
+    if (onView) {
+      onView(row);
+    } else {
+      router.push(`${lastSegment}/${row._id}`);
+    }
+  }
+
+  function handleDelete(e: React.MouseEvent, row: any) {
+    e.stopPropagation();
+    if (onDelete) {
+      onDelete(row);
+    } else {
+      console.log("Delete:", row);
+    }
   }
 
   return (
@@ -518,6 +540,7 @@ const lastSegment = path.split("/").filter(Boolean).pop();
                     </button>
                   </TableHead>
                 ))}
+              <TableHead className="whitespace-nowrap text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -556,13 +579,35 @@ const lastSegment = path.split("/").filter(Boolean).pop();
                         </TableCell>
                       );
                     })}
+                  <TableCell className="py-2 text-right">
+                    <div className="flex items-center justify-end gap-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-8 w-8 p-0"
+                        onClick={(e) => handleView(e, row)}
+                        title="View"
+                      >
+                        <Eye className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-8 w-8 p-0 text-destructive hover:text-destructive"
+                        onClick={(e) => handleDelete(e, row)}
+                        title="Delete"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </TableCell>
                 </TableRow>
               );
             })}
             {pageRows.length === 0 && (
               <TableRow>
                 <TableCell
-                  colSpan={columns.length}
+                  colSpan={columns.length + 1}
                   className="text-center text-sm text-muted-foreground"
                 >
                   No results

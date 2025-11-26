@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
     // Check if user has franchise permissions
     const hasPermission = await RBACService.hasPermission(userId, 'franchise', 'manage_clients', {
       tenantId,
-      isTenantLevel: true,
+    
     });
 
     if (!hasPermission) {
@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
     // Check if user has franchise permissions to create clients
     const hasPermission = await RBACService.hasPermission(userId, 'franchise', 'create_clients', {
       tenantId: franchiseTenantId,
-      isTenantLevel: true,
+
     });
 
     if (!hasPermission) {

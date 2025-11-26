@@ -1,5 +1,5 @@
 import { Card, CardContent } from "@/components/ui/card";
-import type { BlockConfig } from "@/types/editor";
+
 import {
   Columns,
   Grid,
@@ -9,6 +9,7 @@ import {
   Type,
   Video,
 } from "lucide-react";
+import { BlockConfig } from "../../../../types/editor";
 
 interface BlocksPanelProps {
   blocks: BlockConfig[];

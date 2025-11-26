@@ -11,10 +11,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import type { DeviceConfig } from "@/types/editor";
+
 import { Monitor, Plus, Save, Smartphone, Tablet, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { v4 as uuid } from "uuid";
+import { DeviceConfig } from "../../../../types/editor";
 
 interface ResponsivePanelProps {
   devices: DeviceConfig[];

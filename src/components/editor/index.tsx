@@ -34,7 +34,6 @@ import { ResponsivePanel } from "./responsive-panel/responsive-panel";
 import { StyleEditor } from "./style-editor/style-editor";
 import { TemplateManager } from "./template-manager/template-manager";
 import { DeviceConfig } from "../../../types/editor";
-
 export default function GrapesJSEditor() {
   const containerRef = useRef<HTMLDivElement>(null);
   const { state, actions } = useEditor("gjs-editor");

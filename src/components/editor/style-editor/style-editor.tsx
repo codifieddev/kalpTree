@@ -18,7 +18,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
-import type { StyleState } from "@/types/editor";
+
 import {
   AlignCenter,
   AlignLeft,
@@ -27,6 +27,7 @@ import {
   Italic,
   Underline,
 } from "lucide-react";
+import { StyleState } from "../../../../types/editor";
 
 // Common interfaces
 interface StyleEditorProps {

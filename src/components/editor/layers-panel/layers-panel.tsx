@@ -1,8 +1,8 @@
 "use client"
 
 import { ChevronDown, ChevronRight } from "lucide-react"
-import type { LayerItem } from "@/types/editor"
 import { useState } from "react"
+import { LayerItem } from "../../../../types/editor"
 
 interface LayersPanelProps {
   layers: LayerItem[]

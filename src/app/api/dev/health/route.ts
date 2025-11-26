@@ -3,7 +3,7 @@ import { headers } from 'next/headers';
 
 export async function GET() {
   const now = new Date();
-  const hdrs = headers();
+  const hdrs = await headers();
   const host = hdrs.get('host') || '';
   return NextResponse.json({
     ok: true,
