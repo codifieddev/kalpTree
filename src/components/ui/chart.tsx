@@ -8,6 +8,25 @@ import { cn } from "@/lib/utils"
 // Format: { THEME_NAME: CSS_SELECTOR }
 const THEMES = { light: "", dark: ".dark" } as const
 
+// FIX START: Custom type for payload to bypass Recharts internal type issues
+
+type ChartTooltipPayload = {
+  dataKey: string | number;
+  name?: string;
+  // FIX: Changed 'value' type from unknown to any to resolve incompatibility with Recharts generics
+  value?: any; 
+  payload: { // This ensures item.payload is recognized
+    fill?: string;
+    color?: string;
+    [key: string]: unknown;
+  };
+  color?: string;
+  fill?: string;
+  [key: string]: unknown;
+};
+
+// FIX END
+
 export type ChartConfig = {
   [k in string]: {
     label?: React.ReactNode
@@ -88,7 +107,7 @@ ${colorConfig
     const color =
       itemConfig.theme?.[theme as keyof typeof itemConfig.theme] ||
       itemConfig.color
-    return color ? `  --color-${key}: ${color};` : null
+    return color ? ` 	--color-${key}: ${color};` : null
   })
   .join("\n")}
 }
@@ -104,6 +123,7 @@ const ChartTooltip = RechartsPrimitive.Tooltip
 
 const ChartTooltipContent = React.forwardRef<
   HTMLDivElement,
+  // We include RechartsPrimitive.TooltipProps to get the required props (active, payload, label, etc.)
   React.ComponentProps<typeof RechartsPrimitive.Tooltip> &
     React.ComponentProps<"div"> & {
       hideLabel?: boolean
@@ -111,6 +131,13 @@ const ChartTooltipContent = React.forwardRef<
       indicator?: "line" | "dot" | "dashed"
       nameKey?: string
       labelKey?: string
+    } & { // FIX: Fallback to manual prop definition to force TypeScript compliance
+      active?: boolean
+      // FIX: Use the custom defined type
+      payload?: ChartTooltipPayload[] 
+      label?: any
+      formatter?: any
+      color?: string
     }
 >(
   (
@@ -149,7 +176,8 @@ const ChartTooltipContent = React.forwardRef<
       if (labelFormatter) {
         return (
           <div className={cn("font-medium", labelClassName)}>
-            {labelFormatter(value, payload)}
+            {/* FIX: Cast payload to 'any' to resolve the type incompatibility in labelFormatter call */}
+            {labelFormatter(value, payload as any)} 
           </div>
         )
       }
@@ -186,9 +214,12 @@ const ChartTooltipContent = React.forwardRef<
         {!nestLabel ? tooltipLabel : null}
         <div className="grid gap-1.5">
           {payload.map((item, index) => {
+            // FIX: item is now correctly typed as ChartTooltipPayload
             const key = `${nameKey || item.name || item.dataKey || "value"}`
             const itemConfig = getPayloadConfigFromPayload(config, item, key)
-            const indicatorColor = color || item.payload.fill || item.color
+            
+            // FIX: item.payload is now accessible without TypeScript errors
+            const indicatorColor = color || item.payload.fill || item.color 
 
             return (
               <div
@@ -261,7 +292,10 @@ const ChartLegend = RechartsPrimitive.Legend
 const ChartLegendContent = React.forwardRef<
   HTMLDivElement,
   React.ComponentProps<"div"> &
-    Pick<RechartsPrimitive.LegendProps, "payload" | "verticalAlign"> & {
+    // FIX: Removed Pick and defined props manually to avoid type conflict with ComponentProps<'div'>
+    {
+      payload?: ChartTooltipPayload[]; // Use custom type for consistency
+      verticalAlign?: RechartsPrimitive.LegendProps["verticalAlign"]; // Use type from LegendProps
       hideIcon?: boolean
       nameKey?: string
     }
