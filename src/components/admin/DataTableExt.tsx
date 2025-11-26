@@ -28,7 +28,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { ChevronUp, ChevronDown, ListFilter, Columns, Eye, Trash2 } from "lucide-react";
+import { ChevronUp, ChevronDown, ListFilter, Columns, Eye, Trash2, Edit2 } from "lucide-react";
 
 export type ColumnConfig = {
   key: string;
@@ -310,6 +310,11 @@ const lastSegment = path.split("/").filter(Boolean).pop();
     }
   }
 
+
+  function handleViewPage(e:React.MouseEvent, row:any){
+    router.push(`/${row.slug}`)
+  }
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -550,7 +555,6 @@ const lastSegment = path.split("/").filter(Boolean).pop();
                 <TableRow
                   key={row._id ?? i}
                   className="cursor-pointer hover:bg-muted/50"
-                  onClick={() => router.push(`${lastSegment}/${row._id}`)}
                 >
                   {columns
                     .filter((c: any) => columnVisibility[c.key] !== false)
@@ -581,6 +585,15 @@ const lastSegment = path.split("/").filter(Boolean).pop();
                     })}
                   <TableCell className="py-2 text-right">
                     <div className="flex items-center justify-end gap-2">
+                       <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-8 w-8 p-0 text-green-500 hover:text-destructive"
+                        onClick={(e) => handleViewPage(e, row)}
+                        title="Delete"
+                      >
+                        <Eye className="h-4 w-4" />
+                      </Button>
                       <Button
                         variant="ghost"
                         size="sm"
@@ -588,7 +601,7 @@ const lastSegment = path.split("/").filter(Boolean).pop();
                         onClick={(e) => handleView(e, row)}
                         title="View"
                       >
-                        <Eye className="h-4 w-4" />
+                        <Edit2 className="h-4 w-4" />
                       </Button>
                       <Button
                         variant="ghost"
@@ -599,6 +612,7 @@ const lastSegment = path.split("/").filter(Boolean).pop();
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>
+                     
                     </div>
                   </TableCell>
                 </TableRow>

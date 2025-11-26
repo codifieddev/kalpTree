@@ -3,6 +3,8 @@ import { cookies } from 'next/headers';
 import { auth } from '@/auth';
 import { pageService } from '@/modules/website/page-service';
 import { z } from 'zod';
+import { getDatabase } from '@/lib/db/mongodb';
+import { ObjectId } from 'mongodb';
 
 const updateSchema = z.object({
   title: z.string().min(1).optional(),
@@ -13,14 +15,37 @@ const updateSchema = z.object({
 });
 
 export async function GET(_req: Request, { params }: { params: Promise<{ id: string }> }) {
-  const param = await params
+  const param = await params;
+
+  // Try to get session
   const session = await auth();
-  if (!session?.user?.tenantId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+  // Get current website id from cookies
   const websiteId = (await cookies()).get('current_website_id')?.value;
-  const doc = await pageService.getById(session.user.tenantId as string, param.id, websiteId);
-  if (!doc) return NextResponse.json({ error: 'Not found' }, { status: 404 });
+
+  let tenantId: string | undefined = undefined;
+
+  if (session?.user?.tenantId) {
+    tenantId = session.user.tenantId as string;
+  }
+
+  // Fetch the page
+  const doc = await pageService.getById(tenantId!, param.id, websiteId);
+
+  if (!doc) {
+    // const data = 
+    const db = await getDatabase();
+    const collection = await db.collection("pages")
+    const id = new ObjectId(param.id)
+    const t = await collection.findOne({_id: id})
+    
+    return NextResponse.json({item: t});
+  }
+
+  // Return the page data
   return NextResponse.json({ item: doc });
 }
+
 
 export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
    const param = await params

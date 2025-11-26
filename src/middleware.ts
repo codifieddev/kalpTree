@@ -9,31 +9,40 @@ export async function middleware(req: NextRequest) {
   // Auth guard for admin and protected APIs (exclude /api/public/* and /api/auth/*)
   const isProtectedApi = /^\/api\/(?!(public|auth)\b)/.test(pathname);
   const isProtected = pathname.startsWith("/admin") || isProtectedApi;
+ 
+  if(!token){
+    return NextResponse.next();
+  }
+
   if (isProtected && !token) {
     const signInUrl = new URL("/auth/signin", req.url);
     return NextResponse.redirect(signInUrl);
   }
 
   // For public content (non-/api and non-/admin), resolve website by host and set cookie
-  const isPublicContent = !pathname.startsWith("/api") && !pathname.startsWith("/admin");
+  const isPublicContent =
+    !pathname.startsWith("/api") && !pathname.startsWith("/admin");
   if (isPublicContent) {
     try {
-      const hostHeader = req.headers.get('host') || '';
-      const hostOnly = hostHeader.split(':')[0].toLowerCase();
+      const hostHeader = req.headers.get("host") || "";
+      const hostOnly = hostHeader.split(":")[0].toLowerCase();
       if (hostOnly) {
         const u = new URL("/api/public/websites/resolve-host", origin);
-        u.searchParams.set('host', hostOnly);
-        const r = await fetch(u.toString(), { headers: { host: hostHeader }, cache: 'no-store' });
+        u.searchParams.set("host", hostOnly);
+        const r = await fetch(u.toString(), {
+          headers: { host: hostHeader },
+          cache: "no-store",
+        });
         if (r.ok) {
           const data = await r.json();
           if (data?.matched && data.websiteId) {
-            const current = req.cookies.get('current_website_id')?.value;
+            const current = req.cookies.get("current_website_id")?.value;
             if (current !== data.websiteId) {
               const res = NextResponse.next();
-              res.cookies.set('current_website_id', String(data.websiteId), {
+              res.cookies.set("current_website_id", String(data.websiteId), {
                 httpOnly: true,
-                sameSite: 'lax',
-                path: '/',
+                sameSite: "lax",
+                path: "/",
                 maxAge: 60 * 60 * 24 * 30,
               });
               return res;
