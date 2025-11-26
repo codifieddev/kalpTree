@@ -95,6 +95,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { signOut } from "next-auth/react";
 
 // ---------------------------------------------------------------------------
 // Types & interfaces
@@ -106,7 +107,7 @@ export type Website = {
   name: string;
   primaryDomain?: string | null;
   systemSubdomain: string;
-  serviceType: 'WEBSITE_ONLY' | 'ECOMMERCE';
+  serviceType: "WEBSITE_ONLY" | "ECOMMERCE";
   status?: "active" | "paused" | "error";
 };
 
@@ -615,13 +616,17 @@ function Sidebar({
   // Filter sections and items based on permissions
   const filteredAccountSection = {
     ...accountSection,
-    items: accountSection.items.filter(item => hasPermission(item.permission))
+    items: accountSection.items.filter((item) =>
+      hasPermission(item.permission)
+    ),
   };
 
-  const filteredWebsiteSections = currentWebsiteSections.map(section => ({
-    ...section,
-    items: section.items.filter(item => hasPermission(item.permission))
-  })).filter(section => section.items.length > 0);
+  const filteredWebsiteSections = currentWebsiteSections
+    .map((section) => ({
+      ...section,
+      items: section.items.filter((item) => hasPermission(item.permission)),
+    }))
+    .filter((section) => section.items.length > 0);
 
   return (
     <TooltipProvider>
@@ -657,25 +662,16 @@ function Sidebar({
                 onValueChange={onWebsiteChange}
               >
                 <SelectTrigger
-                  className={cn(
-                    "h-9 w-full text-xs",
-                    collapsed && "px-2"
-                  )}
+                  className={cn("h-9 w-full text-xs", collapsed && "px-2")}
                 >
-                  {!collapsed && (
-                    <SelectValue placeholder="Select website" />
-                  )}
-                  {collapsed && (
-                    <Globe2 className="h-4 w-4" />
-                  )}
+                  {!collapsed && <SelectValue placeholder="Select website" />}
+                  {collapsed && <Globe2 className="h-4 w-4" />}
                 </SelectTrigger>
                 <SelectContent>
                   {websites.map((site) => (
                     <SelectItem key={site.websiteId} value={site.websiteId}>
                       <div className="flex flex-col">
-                        <span className="text-xs font-medium">
-                          {site.name}
-                        </span>
+                        <span className="text-xs font-medium">{site.name}</span>
                         <span className="text-[11px] text-muted-foreground">
                           {site.primaryDomain || site.systemSubdomain}
                         </span>
@@ -699,16 +695,17 @@ function Sidebar({
               />
 
               {/* Current website sections - only show if website is selected */}
-              {currentWebsite && filteredWebsiteSections.map((section) => (
-                <SidebarSection
-                  key={section.id}
-                  section={section}
-                  pathname={pathname}
-                  collapsed={collapsed}
-                  hoveredId={hoveredId}
-                  setHoveredId={setHoveredId}
-                />
-              ))}
+              {currentWebsite &&
+                filteredWebsiteSections.map((section) => (
+                  <SidebarSection
+                    key={section.id}
+                    section={section}
+                    pathname={pathname}
+                    collapsed={collapsed}
+                    hoveredId={hoveredId}
+                    setHoveredId={setHoveredId}
+                  />
+                ))}
             </nav>
           </ScrollArea>
 
@@ -755,7 +752,8 @@ function SidebarSection({
       <div className="space-y-1">
         {section.items.map((item) => {
           const Icon = item.icon;
-          const isActive = pathname === item.href || pathname?.startsWith(item.href + "/");
+          const isActive =
+            pathname === item.href || pathname?.startsWith(item.href + "/");
           const id = `${section.id}-${item.href}`;
           const showLabel = !collapsed;
 
@@ -784,7 +782,11 @@ function SidebarSection({
                             initial={{ opacity: 0, scale: 0.9 }}
                             animate={{ opacity: 1, scale: 1 }}
                             exit={{ opacity: 0, scale: 0.9 }}
-                            transition={{ type: "spring", stiffness: 260, damping: 25 }}
+                            transition={{
+                              type: "spring",
+                              stiffness: 260,
+                              damping: 25,
+                            }}
                           />
                         )}
                       </AnimatePresence>
@@ -794,7 +796,10 @@ function SidebarSection({
                       <div className="flex items-center gap-2 flex-1">
                         <span className="truncate">{item.label}</span>
                         {item.badge && (
-                          <Badge variant="secondary" className="text-[10px] px-1 py-0">
+                          <Badge
+                            variant="secondary"
+                            className="text-[10px] px-1 py-0"
+                          >
                             {item.badge}
                           </Badge>
                         )}
@@ -804,9 +809,7 @@ function SidebarSection({
                 </Link>
               </TooltipTrigger>
               {collapsed && (
-                <TooltipContent side="right">
-                  {item.label}
-                </TooltipContent>
+                <TooltipContent side="right">{item.label}</TooltipContent>
               )}
             </Tooltip>
           );
@@ -858,7 +861,11 @@ function Topbar({ currentWebsite, user, onToggleMobileSidebar }: TopbarProps) {
       </div>
 
       <div className="flex items-center gap-2">
-        <Button variant="outline" size="sm" className="hidden text-xs sm:inline-flex">
+        <Button
+          variant="outline"
+          size="sm"
+          className="hidden text-xs sm:inline-flex"
+        >
           <Search className="h-3 w-3 mr-1" />
           Search
         </Button>
@@ -894,7 +901,12 @@ function Topbar({ currentWebsite, user, onToggleMobileSidebar }: TopbarProps) {
             <DropdownMenuItem>Profile</DropdownMenuItem>
             <DropdownMenuItem>Account settings</DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="text-destructive">Sign out</DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => signOut()}
+              className="text-destructive"
+            >
+              Sign out
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
@@ -936,9 +948,7 @@ export function AppShell({
           onToggleMobileSidebar={() => setMobileSidebarOpen(true)}
         />
         <main className="flex-1 px-3 py-4 md:px-6 md:py-6">
-          <div className="mx-auto max-w-7xl">
-            {children}
-          </div>
+          <div className="mx-auto max-w-7xl">{children}</div>
         </main>
       </div>
 

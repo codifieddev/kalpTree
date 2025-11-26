@@ -18,7 +18,6 @@ export async function GET(request: NextRequest) {
     // Check if user has permission to read branding settings
     const hasPermission = await RBACService.hasPermission(userId, 'settings', 'read', {
       tenantId,
-      isTenantLevel: true,
     });
 
     if (!hasPermission) {
@@ -51,7 +50,6 @@ export async function PUT(request: NextRequest) {
     // Check if user has permission to update branding settings
     const hasPermission = await RBACService.hasPermission(userId, 'settings', 'branding', {
       tenantId,
-      isTenantLevel: true,
     });
 
     if (!hasPermission) {

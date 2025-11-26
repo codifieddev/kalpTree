@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
     // Check if user has permission to update branding settings
     const hasPermission = await RBACService.hasPermission(userId, 'settings', 'branding', {
       tenantId,
-      isTenantLevel: true,
+      isOwn: true
     });
 
     if (!hasPermission) {
