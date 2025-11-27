@@ -14,19 +14,28 @@ export const authConfig: NextAuthConfig = {
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
+       
           return null;
         }
         const tenantSlug = credentials.tenantSlug as string;
+       
+    
         // Get tenant
         const tenant = await tenantService.getTenantBySlug(tenantSlug);
+    
         if (!tenant || tenant.status !== 'active') {
           return null;
         }
+
+     
         // Get user
         const user = await userService.getUserByEmail(
           tenant._id,
           credentials.email as string
         );
+
+
+
         if (!user || user.status !== 'active') {
           return null;
         }
@@ -35,6 +44,7 @@ export const authConfig: NextAuthConfig = {
           user,
           credentials.password as string
         );
+        console.log("validddd----", isValid)
         if (!isValid) {
           return null;
         }

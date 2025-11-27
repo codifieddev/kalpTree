@@ -15,10 +15,12 @@ export class UserService {
   ): Promise<User | null> {
     const collection = await this.getCollection();
     const tid = typeof tenantId === 'string' ? new ObjectId(tenantId) : tenantId;
-    return collection.findOne({
+    const response = await collection.findOne({
       tenantId: tid,
       email: email.toLowerCase(),
     });
+    console.log("respsne user---", response)
+    return response
   }
 
   async getUserById(id: string | ObjectId): Promise<User | null> {

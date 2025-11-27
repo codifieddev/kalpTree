@@ -187,7 +187,7 @@ export function useEditor(containerId: string) {
 
         const domc = editor.DomComponents;
         const bm = editor.BlockManager;
-
+         console.log("bloick bm", bm)
         domc.addType("product-list", {
           model: {
             defaults: {
@@ -1407,6 +1407,7 @@ export function useEditor(containerId: string) {
       }
     },
   };
+
 
   return {
     state,

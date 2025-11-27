@@ -32,11 +32,23 @@ import {
   Type,
   Video,
 } from "lucide-react";
+import { BlocksModel } from "@/types/block/Blocks";
+import { filterBlocks, getCategories, groupBlocksByCategory } from "./blocksManagerUtils";
+import { EmptyBlocksMessage } from "./EmptyBlocksMessage";
+import { SearchAndFilterBar } from "./SearchAndFilterBar";
+import { CategoryTabs } from "./CategoryTabs";
+import { BlockGridItem } from "./BlockGridItem";
+import { SelectedBlocksFooter } from "./SelectedBlocksFooter";
+import BlockListItem from "./BlockListItem";
 
+// Helper function to get icon for any block id
+export const getBlockIcon = (blockId: keyof typeof blockIcons) => {
+  return blockIcons[blockId] || <Layout className="w-4 h-4" />;
+};
 // Types
 interface BlocksManagerProps {
-  blocks: any[];
-  onAddBlock: (blockContent: any) => void;
+  blocks: BlocksModel[];
+  onAddBlock: (blockContent: BlocksModel) => void;
   recentBlocks?: string[];
   onRecentBlocksChange?: (blocks: string[]) => void;
   favorites?: string[];
@@ -54,61 +66,6 @@ const blockIcons = {
   column1: <AlignCenter className="w-4 h-4" />,
   column2: <Grid2X2 className="w-4 h-4" />,
   column3: <Grid3X3 className="w-4 h-4" />,
-};
-
-// Helper function to get icon for any block id
-const getBlockIcon = (blockId: keyof typeof blockIcons) => {
-  return blockIcons[blockId] || <Layout className="w-4 h-4" />;
-};
-
-// Helper function to group blocks by category
-const groupBlocksByCategory = (blocks: any[]) => {
-  return blocks.reduce((acc, block) => {
-    const category = block.category || "Basic";
-    if (!acc[category]) {
-      acc[category] = [];
-    }
-    acc[category].push(block);
-    return acc;
-  }, {});
-};
-
-// Helper function to get unique categories
-const getCategories = (blocksByCategory: Record<string, any[]>) => {
-  return [
-    "all",
-    "favorites",
-    "recent",
-    ...Object.keys(blocksByCategory).sort(),
-  ];
-};
-
-// Helper function to filter blocks
-const filterBlocks = (
-  blocks: any[],
-  searchTerm: string,
-  activeCategory: string,
-  favoritesList: string[],
-  recentBlocksList: string[]
-) => {
-  return blocks.filter((block) => {
-    const matchesSearch =
-      block.label.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (block.category &&
-        block.category.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      (block.description &&
-        block.description.toLowerCase().includes(searchTerm.toLowerCase()));
-
-    if (activeCategory === "all") {
-      return matchesSearch;
-    } else if (activeCategory === "favorites") {
-      return matchesSearch && favoritesList.includes(block.id);
-    } else if (activeCategory === "recent") {
-      return matchesSearch && recentBlocksList.includes(block.id);
-    } else {
-      return matchesSearch && block.category === activeCategory;
-    }
-  });
 };
 
 export function BlocksManager({
@@ -130,7 +87,7 @@ export function BlocksManager({
   const [blockView, setBlockView] = useState<"grid" | "list">("grid");
   const [selectedBlocks, setSelectedBlocks] = useState<string[]>([]);
 
-
+console.log("selected block array",selectedBlocks)
   // Process blocks data
   const blocksByCategory = groupBlocksByCategory(blocks);
   const categories = getCategories(blocksByCategory);
@@ -150,8 +107,8 @@ export function BlocksManager({
 
       if (block) {
         try {
-          updateRecentBlocks(blockId);
-          addBlockContent(block);
+          // updateRecentBlocks(blockId);
+          // addBlockContent(block);
         } catch (error) {
           console.error("Error adding block:", error);
         }
@@ -178,9 +135,9 @@ export function BlocksManager({
 
   // Add block content to canvas
   const addBlockContent = useCallback(
-    (block: any) => {
+    (block: BlocksModel) => {
       if (block.content) {
-        onAddBlock(block.content);
+        onAddBlock(block?.content);
       } else {
         // Fallback for blocks without content
         onAddBlock(`<div class="p-4 bg-gray-100 border border-gray-300 rounded">
@@ -349,317 +306,263 @@ export function BlocksManager({
   );
 }
 
-// Component for search bar and filter options
-function SearchAndFilterBar({
-  searchTerm,
-  setSearchTerm,
-  blockView,
-  setBlockView,
-  showFilterOptions,
-  setShowFilterOptions,
-}: {
-  searchTerm: string;
-  setSearchTerm: (term: string) => void;
-  blockView: "grid" | "list";
-  setBlockView: (view: "grid" | "list") => void;
-  showFilterOptions: boolean;
-  setShowFilterOptions: (show: boolean) => void;
-}) {
-  return (
-    <div className="flex items-center mb-4 space-x-2">
-      <div className="relative flex-1">
-        <Search className="absolute w-4 h-4 -translate-y-1/2 left-2 top-1/2 text-muted-foreground" />
-        <Input
-          placeholder="Search blocks..."
-          className="pl-8"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
-      </div>
 
-      {/* View toggle and filter buttons */}
-      <div className="flex items-center space-x-1">
-        <Button
-          variant="ghost"
-          size="icon"
-          className="w-8 h-8"
-          onClick={() => setBlockView(blockView === "grid" ? "list" : "grid")}
-        >
-          {blockView === "grid" ? (
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <line x1="3" y1="6" x2="21" y2="6" />
-              <line x1="3" y1="12" x2="21" y2="12" />
-              <line x1="3" y1="18" x2="21" y2="18" />
-            </svg>
-          ) : (
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <rect x="3" y="3" width="7" height="7" />
-              <rect x="14" y="3" width="7" height="7" />
-              <rect x="3" y="14" width="7" height="7" />
-              <rect x="14" y="14" width="7" height="7" />
-            </svg>
-          )}
-        </Button>
 
-        <div className="relative">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="w-8 h-8"
-            onClick={() => setShowFilterOptions(!showFilterOptions)}
-          >
-            <Filter className="w-4 h-4" />
-          </Button>
 
-          {showFilterOptions && <FilterOptionsDropdown />}
-        </div>
-      </div>
-    </div>
-  );
-}
+// // Component for search bar and filter options
+// function SearchAndFilterBar({
+//   searchTerm,
+//   setSearchTerm,
+//   blockView,
+//   setBlockView,
+//   showFilterOptions,
+//   setShowFilterOptions,
+// }: {
+//   searchTerm: string;
+//   setSearchTerm: (term: string) => void;
+//   blockView: "grid" | "list";
+//   setBlockView: (view: "grid" | "list") => void;
+//   showFilterOptions: boolean;
+//   setShowFilterOptions: (show: boolean) => void;
+// }) {
+//   return (
+//     <div className="flex items-center mb-4 space-x-2">
+//       <div className="relative flex-1">
+//         <Search className="absolute w-4 h-4 -translate-y-1/2 left-2 top-1/2 text-muted-foreground" />
+//         <Input
+//           placeholder="Search blocks..."
+//           className="pl-8"
+//           value={searchTerm}
+//           onChange={(e) => setSearchTerm(e.target.value)}
+//         />
+//       </div>
+
+//       {/* View toggle and filter buttons */}
+//       <div className="flex items-center space-x-1">
+//         <Button
+//           variant="ghost"
+//           size="icon"
+//           className="w-8 h-8"
+//           onClick={() => setBlockView(blockView === "grid" ? "list" : "grid")}
+//         >
+//           {blockView === "grid" ? (
+//             <svg
+//               xmlns="http://www.w3.org/2000/svg"
+//               width="16"
+//               height="16"
+//               viewBox="0 0 24 24"
+//               fill="none"
+//               stroke="currentColor"
+//               strokeWidth="2"
+//               strokeLinecap="round"
+//               strokeLinejoin="round"
+//             >
+//               <line x1="3" y1="6" x2="21" y2="6" />
+//               <line x1="3" y1="12" x2="21" y2="12" />
+//               <line x1="3" y1="18" x2="21" y2="18" />
+//             </svg>
+//           ) : (
+//             <svg
+//               xmlns="http://www.w3.org/2000/svg"
+//               width="16"
+//               height="16"
+//               viewBox="0 0 24 24"
+//               fill="none"
+//               stroke="currentColor"
+//               strokeWidth="2"
+//               strokeLinecap="round"
+//               strokeLinejoin="round"
+//             >
+//               <rect x="3" y="3" width="7" height="7" />
+//               <rect x="14" y="3" width="7" height="7" />
+//               <rect x="3" y="14" width="7" height="7" />
+//               <rect x="14" y="14" width="7" height="7" />
+//             </svg>
+//           )}
+//         </Button>
+
+//         <div className="relative">
+//           <Button
+//             variant="ghost"
+//             size="icon"
+//             className="w-8 h-8"
+//             onClick={() => setShowFilterOptions(!showFilterOptions)}
+//           >
+//             <Filter className="w-4 h-4" />
+//           </Button>
+
+//           {showFilterOptions && <FilterOptionsDropdown />}
+//         </div>
+//       </div>
+//     </div>
+//   );
+// }
 
 // Component for filter options dropdown
-function FilterOptionsDropdown() {
-  return (
-    <div className="absolute right-0 z-10 w-48 p-2 mt-1 border rounded-md shadow-md bg-popover text-popover-foreground">
-      <div className="mb-2 text-xs font-medium">Sort By</div>
-      <div className="space-y-1">
-        <div className="flex items-center px-2 py-1 rounded-sm cursor-pointer hover:bg-muted">
-          <input type="radio" id="sort-name" name="sort" className="mr-2" />
-          <label htmlFor="sort-name" className="text-xs cursor-pointer">
-            Name
-          </label>
-        </div>
-        <div className="flex items-center px-2 py-1 rounded-sm cursor-pointer hover:bg-muted">
-          <input type="radio" id="sort-category" name="sort" className="mr-2" />
-          <label htmlFor="sort-category" className="text-xs cursor-pointer">
-            Category
-          </label>
-        </div>
-        <div className="flex items-center px-2 py-1 rounded-sm cursor-pointer hover:bg-muted">
-          <input
-            type="radio"
-            id="sort-recent"
-            name="sort"
-            className="mr-2"
-            defaultChecked
-          />
-          <label htmlFor="sort-recent" className="text-xs cursor-pointer">
-            Recently Used
-          </label>
-        </div>
-      </div>
-    </div>
-  );
-}
+// function FilterOptionsDropdown() {
+//   return (
+//     <div className="absolute right-0 z-10 w-48 p-2 mt-1 border rounded-md shadow-md bg-popover text-popover-foreground">
+//       <div className="mb-2 text-xs font-medium">Sort By</div>
+//       <div className="space-y-1">
+//         <div className="flex items-center px-2 py-1 rounded-sm cursor-pointer hover:bg-muted">
+//           <input type="radio" id="sort-name" name="sort" className="mr-2" />
+//           <label htmlFor="sort-name" className="text-xs cursor-pointer">
+//             Name
+//           </label>
+//         </div>
+//         <div className="flex items-center px-2 py-1 rounded-sm cursor-pointer hover:bg-muted">
+//           <input type="radio" id="sort-category" name="sort" className="mr-2" />
+//           <label htmlFor="sort-category" className="text-xs cursor-pointer">
+//             Category
+//           </label>
+//         </div>
+//         <div className="flex items-center px-2 py-1 rounded-sm cursor-pointer hover:bg-muted">
+//           <input
+//             type="radio"
+//             id="sort-recent"
+//             name="sort"
+//             className="mr-2"
+//             defaultChecked
+//           />
+//           <label htmlFor="sort-recent" className="text-xs cursor-pointer">
+//             Recently Used
+//           </label>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// }
 
-// Component for category tabs
-function CategoryTabs({
-  categories,
-  activeCategory,
-  setActiveCategory,
-}: {
-  categories: string[];
-  activeCategory: string;
-  setActiveCategory: (category: string) => void;
-}) {
-  return (
-    <Tabs
-      defaultValue="all"
-      value={activeCategory}
-      onValueChange={setActiveCategory}
-    >
-      <div className="mb-4 overflow-x-auto">
-        <TabsList className="inline-flex w-auto p-1 h-9 bg-muted/50">
-          {categories.map((category) => (
-            <TabsTrigger
-              key={category}
-              value={category}
-              className="px-3 py-1.5 text-xs whitespace-nowrap flex items-center gap-1"
-            >
-              {category === "all" ? (
-                <>
-                  <Layout className="w-3 h-3" />
-                  <span>All Blocks</span>
-                </>
-              ) : category === "favorites" ? (
-                <>
-                  <Star className="w-3 h-3" />
-                  <span>Favorites</span>
-                </>
-              ) : category === "recent" ? (
-                <>
-                  <Clock className="w-3 h-3" />
-                  <span>Recent</span>
-                </>
-              ) : (
-                <span className="capitalize">{category}</span>
-              )}
-            </TabsTrigger>
-          ))}
-        </TabsList>
-      </div>
-    </Tabs>
-  );
-}
+// // Component for category tabs
+// function CategoryTabs({
+//   categories,
+//   activeCategory,
+//   setActiveCategory,
+// }: {
+//   categories: string[];
+//   activeCategory: string;
+//   setActiveCategory: (category: string) => void;
+// }) {
+//   return (
+//     <Tabs
+//       defaultValue="all"
+//       value={activeCategory}
+//       onValueChange={setActiveCategory}
+//     >
+//       <div className="mb-4 overflow-x-auto">
+//         <TabsList className="inline-flex w-auto p-1 h-9 bg-muted/50">
+//           {categories.map((category) => (
+//             <TabsTrigger
+//               key={category}
+//               value={category}
+//               className="px-3 py-1.5 text-xs whitespace-nowrap flex items-center gap-1"
+//             >
+//               {category === "all" ? (
+//                 <>
+//                   <Layout className="w-3 h-3" />
+//                   <span>All Blocks</span>
+//                 </>
+//               ) : category === "favorites" ? (
+//                 <>
+//                   <Star className="w-3 h-3" />
+//                   <span>Favorites</span>
+//                 </>
+//               ) : category === "recent" ? (
+//                 <>
+//                   <Clock className="w-3 h-3" />
+//                   <span>Recent</span>
+//                 </>
+//               ) : (
+//                 <span className="capitalize">{category}</span>
+//               )}
+//             </TabsTrigger>
+//           ))}
+//         </TabsList>
+//       </div>
+//     </Tabs>
+//   );
+// }
 
 // Component for grid view item
-function BlockGridItem({
-  block,
-  isSelected,
-  isFavorite,
-  onToggleSelection,
-  onToggleFavorite,
-}: {
-  block: any;
-  isSelected: boolean;
-  isFavorite: boolean;
-  onToggleSelection: (blockId: string, event: React.MouseEvent) => void;
-  onToggleFavorite: (blockId: string, event: React.MouseEvent) => void;
-}) {
-  return (
-    <Card
-      className={`cursor-pointer transition-colors relative group ${
-        isSelected ? "border-2 border-primary" : "hover:border-primary"
-      }`}
-      onClick={(e) => onToggleSelection(block.id, e)}
-    >
-      <CardContent className="flex flex-col items-center justify-center p-3 text-center">
-        <div className="absolute z-10 transition-opacity opacity-0 top-1 right-1 group-hover:opacity-100">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="w-6 h-6 hover:bg-muted"
-            onClick={(e) => onToggleFavorite(block.id, e)}
-          >
-            <Star
-              className={`h-3.5 w-3.5 ${
-                isFavorite
-                  ? "fill-yellow-400 text-yellow-400"
-                  : "text-muted-foreground"
-              }`}
-            />
-          </Button>
-        </div>
-        <div className="flex items-center justify-center w-10 h-10 mb-2 rounded-full bg-muted">
-          {getBlockIcon(block.id)}
-        </div>
-        <span className="text-sm font-medium">{block.label}</span>
-        <span className="mt-1 text-xs text-muted-foreground">
-          {block.category || "Basic"}
-        </span>
+// function BlockGridItem({
+//   block,
+//   isSelected,
+//   isFavorite,
+//   onToggleSelection,
+//   onToggleFavorite,
+// }: {
+//   block: any;
+//   isSelected: boolean;
+//   isFavorite: boolean;
+//   onToggleSelection: (blockId: string, event: React.MouseEvent) => void;
+//   onToggleFavorite: (blockId: string, event: React.MouseEvent) => void;
+// }) {
+//   return (
+//     <Card
+//       className={`cursor-pointer transition-colors relative group ${
+//         isSelected ? "border-2 border-primary" : "hover:border-primary"
+//       }`}
+//       onClick={(e) => onToggleSelection(block.id, e)}
+//     >
+//       <CardContent className="flex flex-col items-center justify-center p-3 text-center">
+//         <div className="absolute z-10 transition-opacity opacity-0 top-1 right-1 group-hover:opacity-100">
+//           <Button
+//             variant="ghost"
+//             size="icon"
+//             className="w-6 h-6 hover:bg-muted"
+//             onClick={(e) => onToggleFavorite(block.id, e)}
+//           >
+//             <Star
+//               className={`h-3.5 w-3.5 ${
+//                 isFavorite
+//                   ? "fill-yellow-400 text-yellow-400"
+//                   : "text-muted-foreground"
+//               }`}
+//             />
+//           </Button>
+//         </div>
+//         <div className="flex items-center justify-center w-10 h-10 mb-2 rounded-full bg-muted">
+//           {getBlockIcon(block.id)}
+//         </div>
+//         <span className="text-sm font-medium">{block.label}</span>
+//         <span className="mt-1 text-xs text-muted-foreground">
+//           {block.category || "Basic"}
+//         </span>
 
-        {/* Premium badge */}
-        {block.premium && (
-          <Badge
-            variant="outline"
-            className="mt-2 text-white border-0 bg-gradient-to-r from-amber-500 to-amber-300"
-          >
-            Premium
-          </Badge>
-        )}
-      </CardContent>
-    </Card>
-  );
-}
+//         {/* Premium badge */}
+//         {block.premium && (
+//           <Badge
+//             variant="outline"
+//             className="mt-2 text-white border-0 bg-gradient-to-r from-amber-500 to-amber-300"
+//           >
+//             Premium
+//           </Badge>
+//         )}
+//       </CardContent>
+//     </Card>
+//   );
+// }
 
-// Component for list view item
-function BlockListItem({
-  block,
-  isSelected,
-  isFavorite,
-  onToggleSelection,
-  onToggleFavorite,
-}: {
-  block: any;
-  isSelected: boolean;
-  isFavorite: boolean;
-  onToggleSelection: (blockId: string, event: React.MouseEvent) => void;
-  onToggleFavorite: (blockId: string, event: React.MouseEvent) => void;
-}) {
-  return (
-    <div
-      className={`flex items-center p-2 rounded-md cursor-pointer group ${
-        isSelected ? "bg-accent" : "hover:bg-accent"
-      }`}
-      onClick={(e) => onToggleSelection(block.id, e)}
-    >
-      <div className="flex items-center justify-center w-8 h-8 mr-3 rounded-full bg-muted">
-        {getBlockIcon(block.id)}
-      </div>
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center justify-between">
-          <span className="text-sm font-medium">{block.label}</span>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="w-6 h-6 transition-opacity opacity-0 group-hover:opacity-100"
-            onClick={(e) => onToggleFavorite(block.id, e)}
-          >
-            <Star
-              className={`h-3.5 w-3.5 ${
-                isFavorite
-                  ? "fill-yellow-400 text-yellow-400"
-                  : "text-muted-foreground"
-              }`}
-            />
-          </Button>
-        </div>
-        <span className="block text-xs truncate text-muted-foreground">
-          {block.category || "Basic"}
-        </span>
-      </div>
-    </div>
-  );
-}
 
-// Component for empty blocks message
-function EmptyBlocksMessage() {
-  return (
-    <div className="py-8 text-center col-span-full text-muted-foreground">
-      <p>No blocks found matching your search.</p>
-    </div>
-  );
-}
 
-// Component for selected blocks footer
-function SelectedBlocksFooter({
-  selectedCount,
-  onAddSelectedBlocks,
-}: {
-  selectedCount: number;
-  onAddSelectedBlocks: () => void;
-}) {
-  return (
-    <div className="sticky bottom-0 p-3 mt-4 border-t bg-background">
-      <div className="flex items-center justify-between">
-        <span className="text-xs text-muted-foreground">
-          {selectedCount} block(s) selected
-        </span>
-        <Button size="sm" onClick={onAddSelectedBlocks}>
-          Add Selected Blocks
-        </Button>
-      </div>
-    </div>
-  );
-}
+// // Component for selected blocks footer
+// function SelectedBlocksFooter({
+//   selectedCount,
+//   onAddSelectedBlocks,
+// }: {
+//   selectedCount: number;
+//   onAddSelectedBlocks: () => void;
+// }) {
+//   return (
+//     <div className="sticky bottom-0 p-3 mt-4 border-t bg-background">
+//       <div className="flex items-center justify-between">
+//         <span className="text-xs text-muted-foreground">
+//           {selectedCount} block(s) selected
+//         </span>
+//         <Button size="sm" onClick={onAddSelectedBlocks}>
+//           Add Selected Blocks
+//         </Button>
+//       </div>
+//     </div>
+//   );
+// }
