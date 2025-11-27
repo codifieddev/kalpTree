@@ -19,10 +19,11 @@ import {
 import React from "react";
 
 import { BlocksModel } from "@/types/block/Blocks";
+import { BlockConfig } from "../../../../types/editor";
 
 
 // Block icons mapping
-const blockIcons = {
+  const blockIcons = {
   section: <Layout className="w-4 h-4" />,
   text: <Type className="w-4 h-4" />,
   image: <Image className="w-4 h-4" />,
@@ -38,7 +39,7 @@ export const getBlockIcon = (blockId: keyof typeof blockIcons) => {
   return blockIcons[blockId] || <Layout className="w-4 h-4" />;
 };
 export interface BlockGridItemProps {
-  block:BlocksModel;
+  block:BlockConfig;
   isSelected: boolean;
   isFavorite: boolean;
   onToggleSelection: (blockId: string, event: React.MouseEvent) => void;

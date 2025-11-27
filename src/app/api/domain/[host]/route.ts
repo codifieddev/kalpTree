@@ -1,20 +1,22 @@
+import { NextRequest } from "next/server";
 import { getDatabase } from "@/lib/db/mongodb";
-import { NextRequest, NextResponse } from "next/server";
 
-export async function GET(req: NextRequest, { params }: { params: { host: string } }) {
-  const param = await params
-
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ host: string }> }
+) {
+  const { host } = await params; // 
 
   const db = await getDatabase();
   const collection = db.collection("websites");
 
- const website = await collection.findOne({
-  primaryDomain: { $in: [param.host] }
-});
+  const website = await collection.findOne({
+    primaryDomain: { $in: [host] },
+  });
 
-  if(website){
-   return NextResponse.json({ item: String(website._id) });
+  if (website) {
+    return Response.json({ item: String(website._id) });
   }
 
-  return  NextResponse.json({ item: null });
+  return Response.json({ item: null });
 }

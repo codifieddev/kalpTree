@@ -1,6 +1,7 @@
 import { ObjectId } from 'mongodb';
 import { getDatabase } from '../db/mongodb';
 import type { Tenant } from '@/types';
+import { TenantModel } from '@/models/tenant';
 
 export class TenantService {
   private async getCollection() {
@@ -41,7 +42,7 @@ export class TenantService {
       throw new Error('Tenant slug already exists');
     }
 
-    const tenant: Omit<Tenant, '_id'> = {
+    const tenant: Omit<TenantModel, "_id"> = {
       slug: data.slug.toLowerCase(),
       name: data.name,
       email: data.email,
@@ -49,8 +50,10 @@ export class TenantService {
       subscriptionStatus: 'active',
       customDomainVerified: false,
       branding: {
-        primaryColor: '#3b82f6',
-        secondaryColor: '#f4e04f',
+        colors: {
+          primary: '#3b82f6',
+          secondary: '#f4e04f',
+        },
       },
       paymentGateways: {},
       features: {

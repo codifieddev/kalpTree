@@ -32,7 +32,7 @@ import {
   Type,
   Video,
 } from "lucide-react";
-import { BlocksModel } from "@/types/block/Blocks";
+import { BlocksModel, BlocksByCategory } from "@/types/block/Blocks";
 import { filterBlocks, getCategories, groupBlocksByCategory } from "./blocksManagerUtils";
 import { EmptyBlocksMessage } from "./EmptyBlocksMessage";
 import { SearchAndFilterBar } from "./SearchAndFilterBar";
@@ -40,6 +40,7 @@ import { CategoryTabs } from "./CategoryTabs";
 import { BlockGridItem } from "./BlockGridItem";
 import { SelectedBlocksFooter } from "./SelectedBlocksFooter";
 import BlockListItem from "./BlockListItem";
+import { BlockConfig } from "../../../../types/editor";
 
 // Helper function to get icon for any block id
 export const getBlockIcon = (blockId: keyof typeof blockIcons) => {
@@ -47,8 +48,8 @@ export const getBlockIcon = (blockId: keyof typeof blockIcons) => {
 };
 // Types
 interface BlocksManagerProps {
-  blocks: BlocksModel[];
-  onAddBlock: (blockContent: BlocksModel) => void;
+  blocks: BlockConfig[];
+  onAddBlock: (blockContent: BlockConfig) => void;
   recentBlocks?: string[];
   onRecentBlocksChange?: (blocks: string[]) => void;
   favorites?: string[];
@@ -90,7 +91,7 @@ export function BlocksManager({
 console.log("selected block array",selectedBlocks)
   // Process blocks data
   const blocksByCategory = groupBlocksByCategory(blocks);
-  const categories = getCategories(blocksByCategory);
+  const categories = getCategories(blocksByCategory as BlocksByCategory);
   const filteredBlocks = filterBlocks(
     blocks,
     searchTerm,
@@ -135,16 +136,18 @@ console.log("selected block array",selectedBlocks)
 
   // Add block content to canvas
   const addBlockContent = useCallback(
-    (block: BlocksModel) => {
-      if (block.content) {
-        onAddBlock(block?.content);
-      } else {
-        // Fallback for blocks without content
-        onAddBlock(`<div class="p-4 bg-gray-100 border border-gray-300 rounded">
-          <h3 class="text-lg font-medium">${block.label}</h3>
-          <p class="text-gray-600">This is a placeholder for ${block.label}</p>
-        </div>`);
-      }
+    (block: BlockConfig) => {
+if (block.content) {
+  onAddBlock(block);
+} else {
+  onAddBlock({
+    ...block,
+    content: `<div class="p-4 bg-gray-100 border border-gray-300 rounded">
+      <h3 class="text-lg font-medium">${block.label}</h3>
+      <p class="text-gray-600">This is a placeholder for ${block.label}</p>
+    </div>`
+  });
+}
     },
     [onAddBlock]
   );

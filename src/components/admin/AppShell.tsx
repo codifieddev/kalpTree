@@ -115,7 +115,7 @@ export type Website = {
   _id: string;
   websiteId: string;
   name: string;
-  primaryDomain?: string | null;
+  primaryDomain?: string []|string | null;
   systemSubdomain: string;
   serviceType: "WEBSITE_ONLY" | "ECOMMERCE";
   status?: "active" | "paused" | "error";

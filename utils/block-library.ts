@@ -1,5 +1,6 @@
+import { BlockConfig } from "../types/editor";
 
-import type { BlockConfig } from "@/types/editor";
+
 
 // Enhanced blocks library with additional components
 export const defaultBlocks: BlockConfig[] = [

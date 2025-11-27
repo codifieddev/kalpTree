@@ -27,14 +27,14 @@ export default async function AdminIndex() {
     fetchCount("/api/blog_tags"),
   ]);
 
-  const cards = [
-    { title: "Pages", count: pages, href: "/admin/pages" },
-    { title: "Posts", count: posts, href: "/admin/posts" },
-    { title: "Products", count: products, href: "/admin/products" },
-    { title: "Orders", count: orders, href: "/admin/orders" },
-    { title: "Categories", count: categories, href: "/admin/categories" },
-    { title: "Tags", count: tags, href: "/admin/tags" },
-  ];
+  // const cards = [
+  //   { title: "Pages", count: pages, href: "/admin/pages" },
+  //   { title: "Posts", count: posts, href: "/admin/posts" },
+  //   { title: "Products", count: products, href: "/admin/products" },
+  //   { title: "Orders", count: orders, href: "/admin/orders" },
+  //   { title: "Categories", count: categories, href: "/admin/categories" },
+  //   { title: "Tags", count: tags, href: "/admin/tags" },
+  // ];
 
   return (
     <div className="space-y-6">

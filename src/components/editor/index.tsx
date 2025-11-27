@@ -34,6 +34,7 @@ import { ResponsivePanel } from "./responsive-panel/responsive-panel";
 import { StyleEditor } from "./style-editor/style-editor";
 import { TemplateManager } from "./template-manager/template-manager";
 import { DeviceConfig } from "../../../types/editor";
+import TopToolbar from "./GrapesJSEditor/toolbars/TopToolbar";
 export default function GrapesJSEditor() {
   const containerRef = useRef<HTMLDivElement>(null);
   const { state, actions } = useEditor("gjs-editor");
@@ -94,7 +95,7 @@ export default function GrapesJSEditor() {
       state.editor.DeviceManager.remove(deviceId);
     }
   };
-
+  console.log("state. blocks", state.blocks)
   const handleUpdateDevice = (
     deviceId: string,
     updates: Partial<DeviceConfig>
@@ -821,6 +822,7 @@ export default function GrapesJSEditor() {
       <TooltipProvider delayDuration={300}>
         {/* Top Toolbar */}
         {renderTopToolbar()}
+        {/* <TopToolbar/> */}
 
         {/* Main Content Area with Sidebar */}
         <div className="relative flex flex-1 overflow-hidden">

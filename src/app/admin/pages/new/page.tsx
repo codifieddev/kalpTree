@@ -6,7 +6,7 @@ export default async function NewPage() {
   const session = await auth()
   console.log(session?.user)
   const cookies = await cookiesFn();
-  const headers = await headersFn();
+
 
   const currentWebsiteId = cookies.get('current_website_id')?.value;
 

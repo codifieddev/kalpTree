@@ -60,6 +60,7 @@ export interface BrandingSettings {
 
 // Tenant (franchise/client) - Enhanced
 export interface Tenant extends Omit<BaseDocument, 'tenantId'> {
+
   slug: string; // subdomain: "franchise1"
   name: string; // "Franchise Store 1"
   email: string;
@@ -231,7 +232,7 @@ export interface DashboardWidget {
   title: string;
   size: 'small' | 'medium' | 'large' | 'full';
   position: { x: number; y: number; w: number; h: number };
-  config: Record<string, any>;
+  config: Record<string, unknown>;
   permissions: string[];
   roles: UserRole[];
 }
@@ -265,9 +266,9 @@ export interface ActivityLog {
   resourceId?: ObjectId;
   
   details: {
-    before?: Record<string, any>;
-    after?: Record<string, any>;
-    metadata?: Record<string, any>;
+    before?: Record<string, unknown>;
+    after?: Record<string, unknown>;
+    metadata?: Record<string, unknown>;
   };
   
   ipAddress?: string;

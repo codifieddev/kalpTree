@@ -149,9 +149,9 @@ export function useEditor(containerId: string) {
         editorRef.current = editor as any;
 
         // Add fallback methods if needed
-        if (typeof editor?.setJs !== "function") {
+        if (typeof (editor as any).setJs !== "function") {
           console.log("Adding custom setJs method");
-          editor.setJs = (js: string) => {
+          (editor as any).setJs = (js: string) => {
             // Store JS in editor's storage
             editor.StorageManager.store({
               jsCode: js,
@@ -406,13 +406,14 @@ export function useEditor(containerId: string) {
           editor.getJs = () => {
             // Try to get from storage first
             const stored = editor.StorageManager.get("jsCode");
-            if (stored) return stored;
+            if (typeof stored === "string") return stored;
 
             // Otherwise try to find script component
             const scriptComponent = editor.Components.getWrapper()?.find(
               'script[data-gjs-type="custom-script"]'
             )[0];
-            return scriptComponent ? scriptComponent.get("content") : "";
+            const content = scriptComponent ? scriptComponent.get("content") : "";
+            return typeof content === "string" ? content : "";
           };
         }
 
