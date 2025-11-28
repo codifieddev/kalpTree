@@ -19,7 +19,7 @@ export async function GET(req: Request) {
     },
   });
 
-  const name = convertName(fileName!)
+  const name = convertName(fileName!);
 
   const command = new PutObjectCommand({
     Bucket: bucket,

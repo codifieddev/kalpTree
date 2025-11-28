@@ -1,89 +1,56 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { Search, Tag, Grid, List, Plus, X } from "lucide-react";
-import { S3Client } from "@aws-sdk/client-s3";
+import { Media } from "@/modules/website/types";
 
 export default function MediaGalleryCMS() {
-  const s3 = new S3Client({
-    region: process.env.AWS_REGION!,
-    credentials: {
-      accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
-      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
-    },
-  });
   const [viewMode, setViewMode] = useState("grid");
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [showAddModal, setShowAddModal] = useState(false);
-  const [mediaItems, setMediaItems] = useState([
-    {
-      id: 1,
-      name: "Mountain Landscape",
-      url: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400",
-      category: "Nature",
-      tags: ["landscape", "mountains", "outdoors"],
-    },
-    {
-      id: 2,
-      name: "City Skyline",
-      url: "https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?w=400",
-      category: "Urban",
-      tags: ["city", "architecture", "skyline"],
-    },
-    {
-      id: 3,
-      name: "Ocean Sunset",
-      url: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400",
-      category: "Nature",
-      tags: ["sunset", "ocean", "beach"],
-    },
-    {
-      id: 4,
-      name: "Coffee Shop",
-      url: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=400",
-      category: "Food",
-      tags: ["coffee", "cafe", "beverage"],
-    },
-    {
-      id: 5,
-      name: "Abstract Art",
-      url: "https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=400",
-      category: "Art",
-      tags: ["abstract", "colorful", "creative"],
-    },
-    {
-      id: 6,
-      name: "Forest Path",
-      url: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=400",
-      category: "Nature",
-      tags: ["forest", "trees", "path", "outdoors"],
-    },
-  ]);
+  const [mediaItems, setMediaItems] = useState<Media[]>([]);
 
-  const [mediaUpload, setMediaUpload] = useState(null);
+  const [uploadLoading, setUploadLoading] = useState(false);
+  const [submitLoading, setSubmitLoading] = useState(false);
   const [preview, setPreview] = useState(null);
 
+  useEffect(() => {
+    (async () => {
+      const res = await fetch("/api/media");
+      const json = await res.json();
+      console.log(json);
+      setMediaItems(json.items);
+    })();
+  }, []);
+
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+    try {
+      setUploadLoading(true);
+      const file = e.target.files?.[0];
+      if (!file) return;
 
-    const res = await fetch(
-      `/api/media/s3upload?fileType=${file.type}&fileName=${file.name}`
-    );
-    const { uploadUrl, fileUrl } = await res.json();
+      const res = await fetch(
+        `/api/media/s3upload?fileType=${file.type}&fileName=${file.name}`
+      );
+      const { uploadUrl, fileUrl } = await res.json();
 
-    await fetch(uploadUrl, {
-      method: "PUT",
-      body: file,
-      headers: {
-        "Content-Type": file.type,
-      },
-    });
+      await fetch(uploadUrl, {
+        method: "PUT",
+        body: file,
+        headers: {
+          "Content-Type": file.type,
+        },
+      });
 
-    setPreview(fileUrl);
-    console.log(fileUrl);
+      setPreview(fileUrl);
+      setNewMedia({ ...newMedia, url: fileUrl });
+    } catch (error) {
+      console.error(`${error} in uploading media`);
+    } finally {
+      setUploadLoading(false);
+    }
   };
 
   const [newMedia, setNewMedia] = useState({
@@ -102,9 +69,15 @@ export default function MediaGalleryCMS() {
 
   const allTags = useMemo(() => {
     const tags = new Set<string>();
-    mediaItems.forEach((item) => item.tags.forEach((t) => tags.add(t)));
+    mediaItems.forEach((item) => {
+      if (item.tags && typeof item.tags !== "string") {
+        item?.tags?.forEach((t: any) => tags.add(t));
+      }
+    });
     return Array.from(tags);
   }, [mediaItems]);
+
+  console.log(categories, allTags);
 
   const filteredMedia = useMemo(() => {
     return mediaItems.filter((item) => {
@@ -117,8 +90,8 @@ export default function MediaGalleryCMS() {
 
       const matchesTags =
         selectedTags.length === 0 ||
-        selectedTags.every((tag) => item.tags.includes(tag));
-
+        selectedTags.every((tag) => item?.tags?.includes(tag));
+      allTags;
       return matchesSearch && matchesCategory && matchesTags;
     });
   }, [mediaItems, searchTerm, selectedCategory, selectedTags]);
@@ -129,23 +102,31 @@ export default function MediaGalleryCMS() {
     );
   };
 
-  const handleAddMedia = () => {
+  const handleAddMedia = async () => {
     if (newMedia.name && newMedia.url && newMedia.category) {
-      const tags = newMedia.tags
-        .split(",")
-        .map((tag) => tag.trim())
-        .filter(Boolean);
+      setSubmitLoading(true);
 
-      setMediaItems([
-        ...mediaItems,
-        {
-          id: Date.now(),
-          name: newMedia.name,
-          url: newMedia.url,
-          category: newMedia.category,
-          tags,
+      const finalObj = {
+        name: newMedia.name,
+        url: newMedia.url,
+        category: newMedia.category,
+        tags: newMedia.tags,
+      };
+
+      const res = await fetch("/api/media", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-      ]);
+        body: JSON.stringify(finalObj),
+      });
+
+      // const {items} = await res.json()
+
+      // const tags = newMedia.tags
+      //   .split(",")
+      //   .map((tag) => tag.trim())
+      //   .filter(Boolean);
 
       setNewMedia({
         name: "",
@@ -155,12 +136,14 @@ export default function MediaGalleryCMS() {
         tenantId: "",
         websiteId: "",
       });
+      setPreview(null);
+      setSubmitLoading(false);
       setShowAddModal(false);
     }
   };
 
-  const handleDeleteMedia = (id: number) => {
-    setMediaItems(mediaItems.filter((item) => item.id !== id));
+  const handleDeleteMedia = (id: string) => {
+    setMediaItems(mediaItems.filter((item) => String(item._id) !== id));
   };
 
   return (
@@ -273,7 +256,7 @@ export default function MediaGalleryCMS() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredMedia.map((item) => (
               <div
-                key={item.id}
+                key={String(item._id)}
                 className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition"
               >
                 <div className="relative h-48 bg-gray-200">
@@ -284,7 +267,7 @@ export default function MediaGalleryCMS() {
                   />
 
                   <button
-                    onClick={() => handleDeleteMedia(item.id)}
+                    onClick={() => handleDeleteMedia(String(item._id))}
                     className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full hover:bg-red-600 transition"
                   >
                     <X size={16} />
@@ -302,14 +285,15 @@ export default function MediaGalleryCMS() {
                   </span>
 
                   <div className="flex flex-wrap gap-1 mt-2">
-                    {item.tags.map((tag) => (
-                      <span
-                        key={tag}
-                        className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded"
-                      >
-                        {tag}
-                      </span>
-                    ))}
+                    {typeof item.tags !== "string" &&
+                      item?.tags?.map((tag) => (
+                        <span
+                          key={tag}
+                          className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded"
+                        >
+                          {tag}
+                        </span>
+                      ))}
                   </div>
                 </div>
               </div>
@@ -319,7 +303,7 @@ export default function MediaGalleryCMS() {
           <div className="bg-white rounded-lg shadow-sm overflow-hidden">
             {filteredMedia.map((item) => (
               <div
-                key={item.id}
+                key={String(item._id)}
                 className="flex items-center gap-4 p-4 border-b hover:bg-gray-50 transition"
               >
                 <img
@@ -337,19 +321,20 @@ export default function MediaGalleryCMS() {
                       {item.category}
                     </span>
 
-                    {item.tags.map((tag) => (
-                      <span
-                        key={tag}
-                        className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded"
-                      >
-                        {tag}
-                      </span>
-                    ))}
+                    {typeof item.tags !== "string" &&
+                      item?.tags?.map((tag) => (
+                        <span
+                          key={tag}
+                          className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded"
+                        >
+                          {tag}
+                        </span>
+                      ))}
                   </div>
                 </div>
 
                 <button
-                  onClick={() => handleDeleteMedia(item.id)}
+                  onClick={() => handleDeleteMedia(String(item._id))}
                   className="bg-red-500 text-white p-2 rounded hover:bg-red-600 transition"
                 >
                   <X size={16} />
@@ -390,15 +375,24 @@ export default function MediaGalleryCMS() {
                 onChange={(e) =>
                   setNewMedia({ ...newMedia, name: e.target.value })
                 }
-                className="w-full px-3 py-2 border rounded-lg"
+                disabled={uploadLoading}
+                className="w-full px-3 py-2 border rounded-lg disabled:bg-gray-100 disabled:cursor-not-allowed"
               />
 
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleUpload}
-                className="w-full px-3 py-2 border rounded-lg"
-              />
+              <div className="relative">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleUpload}
+                  disabled={uploadLoading}
+                  className="w-full px-3 py-2 border rounded-lg disabled:bg-gray-100 disabled:cursor-not-allowed"
+                />
+                {uploadLoading && (
+                  <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                    <div className="w-5 h-5 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                  </div>
+                )}
+              </div>
 
               {preview && (
                 <div className="w-full">
@@ -417,7 +411,8 @@ export default function MediaGalleryCMS() {
                 onChange={(e) =>
                   setNewMedia({ ...newMedia, category: e.target.value })
                 }
-                className="w-full px-3 py-2 border rounded-lg"
+                disabled={uploadLoading}
+                className="w-full px-3 py-2 border rounded-lg disabled:bg-gray-100 disabled:cursor-not-allowed"
               />
 
               <input
@@ -427,14 +422,23 @@ export default function MediaGalleryCMS() {
                 onChange={(e) =>
                   setNewMedia({ ...newMedia, tags: e.target.value })
                 }
-                className="w-full px-3 py-2 border rounded-lg"
+                disabled={uploadLoading}
+                className="w-full px-3 py-2 border rounded-lg disabled:bg-gray-100 disabled:cursor-not-allowed"
               />
 
               <button
                 onClick={handleAddMedia}
-                className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition"
+                disabled={uploadLoading || submitLoading}
+                className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
-                Add Media
+                {submitLoading ? (
+                  <>
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    <span>Adding...</span>
+                  </>
+                ) : (
+                  "Add Media"
+                )}
               </button>
             </div>
           </div>
