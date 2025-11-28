@@ -15,9 +15,10 @@ const eslintConfig = defineConfig([
   ]),
 ]);
   
-export default {
+
+export default defineConfig({
   ...eslintConfig,
   rules: {
-    '@typescript-eslint/no-unused-vars': 'warn', // not 'error'
+    '@typescript-eslint/no-unused-vars': 'warn',
   },
-};
+});
