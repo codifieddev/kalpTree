@@ -1,5 +1,5 @@
-import { BaseDocument } from '@/types';
-import { ObjectId } from 'mongodb';
+import { BaseDocument } from "@/types";
+import { ObjectId } from "mongodb";
 
 // Pages
 export interface Page extends BaseDocument {
@@ -12,7 +12,7 @@ export interface Page extends BaseDocument {
     keywords?: string[];
     ogImage?: string;
   };
-  status: 'draft' | 'published';
+  status: "draft" | "published";
   publishedAt?: Date;
 }
 
@@ -34,7 +34,7 @@ export interface Post extends BaseDocument {
     metaDescription?: string;
     ogImage?: string;
   };
-  status: 'draft' | 'published';
+  status: "draft" | "published";
   publishedAt?: Date;
 }
 
@@ -48,14 +48,8 @@ export interface Category extends BaseDocument {
 
 // Media Library
 export interface Media extends BaseDocument {
-  filename: string;
-  originalName: string;
-  mimeType: string;
-  size: number; // bytes
+  name: string;
+  category: string;
+  tags?: string | string[]; // bytes
   url: string;
-  thumbnailUrl?: string;
-  alt?: string;
-  caption?: string;
-  uploadedBy: string; // userId
-  folderId?: ObjectId;
 }
