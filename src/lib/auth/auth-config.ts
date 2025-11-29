@@ -44,7 +44,7 @@ export const authConfig: NextAuthConfig = {
           user,
           credentials.password as string
         );
-        console.log("validddd----", isValid)
+       
         if (!isValid) {
           return null;
         }

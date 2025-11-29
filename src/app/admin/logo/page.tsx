@@ -4,7 +4,32 @@ import React, { useState } from "react";
 import { Upload, Edit2, Trash2, Plus, X, Save } from "lucide-react";
 
 export default function LogoManager() {
-  const [logos, setLogos] = useState([
+  type LogoSettings = {
+    width: number;
+    height: number;
+    opacity: number;
+    rotation: number;
+    borderRadius: number;
+    text: string;
+    textPosition: string;
+    textSize: number;
+    textColor: string;
+    backgroundColor: string;
+    padding: number;
+    shadow: number;
+  };
+
+  type Logo = {
+    id: number;
+    name: string;
+    file: string;
+    size: string;
+    uploadDate: string;
+    preview: string;
+    settings?: LogoSettings;
+  };
+
+  const [logos, setLogos] = useState<Logo[]>([
     {
       id: 1,
       name: "Primary Logo",
@@ -18,8 +43,8 @@ export default function LogoManager() {
 
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [showCustomizeModal, setShowCustomizeModal] = useState(false);
-  const [selectedLogo, setSelectedLogo] = useState(null);
-  const [uploadPreview, setUploadPreview] = useState(null);
+  const [selectedLogo, setSelectedLogo] = useState<Logo | null>(null);
+  const [uploadPreview, setUploadPreview] = useState<string | ArrayBuffer | null>(null);
   const [logoName, setLogoName] = useState("");
 
   // Customization options
@@ -37,12 +62,16 @@ export default function LogoManager() {
   const [padding, setPadding] = useState(0);
   const [shadow, setShadow] = useState(0);
 
-  const handleFileSelect = (e) => {
-    const file = e.target.files[0];
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+    const file = files[0];
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setUploadPreview(reader.result);
+        if (typeof reader.result === "string") {
+          setUploadPreview(reader.result);
+        }
       };
       reader.readAsDataURL(file);
     }
@@ -65,8 +94,8 @@ export default function LogoManager() {
   };
 
   const handleUpload = () => {
-    if (uploadPreview && logoName) {
-      const newLogo = {
+    if (uploadPreview && logoName && typeof uploadPreview === "string") {
+      const newLogo: Logo = {
         id: logos.length + 1,
         name: logoName,
         file: logoName.toLowerCase().replace(/\s+/g, "-") + ".png",
@@ -96,7 +125,7 @@ export default function LogoManager() {
     }
   };
 
-  const handleCustomize = (logo) => {
+  const handleCustomize = (logo: Logo) => {
     setSelectedLogo(logo);
     if (logo.settings) {
       setLogoWidth(logo.settings.width);
@@ -123,7 +152,7 @@ export default function LogoManager() {
   const handleSaveCustomization = () => {
     if (selectedLogo) {
       const updatedLogos = logos.map((logo) =>
-        logo.id === selectedLogo.id
+        logo.id === (selectedLogo as Logo).id
           ? {
               ...logo,
               size: `${logoWidth}x${logoHeight}`,
@@ -151,14 +180,27 @@ export default function LogoManager() {
     }
   };
 
-  const handleDelete = (id) => {
+  const handleDelete = (id: number) => {
     if (confirm("Are you sure you want to delete this logo?")) {
       setLogos(logos.filter((logo) => logo.id !== id));
     }
   };
 
-  const renderLogoPreview = (logo, settings) => {
-    const logoSettings = settings || logo.settings || {};
+  const renderLogoPreview = (logo: Logo, settings?: LogoSettings) => {
+    const logoSettings: LogoSettings = settings || logo.settings || {
+      width: 150,
+      height: 50,
+      opacity: 100,
+      rotation: 0,
+      borderRadius: 0,
+      text: "",
+      textPosition: "bottom",
+      textSize: 16,
+      textColor: "#000000",
+      backgroundColor: "transparent",
+      padding: 0,
+      shadow: 0,
+    };
     const containerStyle = {
       backgroundColor: logoSettings.backgroundColor || "transparent",
       padding: `${logoSettings.padding || 0}px`,
@@ -172,8 +214,8 @@ export default function LogoManager() {
       flexDirection:
         logoSettings.textPosition === "bottom" ||
         logoSettings.textPosition === "top"
-          ? "column"
-          : "row",
+          ? "column" as const
+          : "row" as const,
       alignItems: "center",
       gap: "8px",
     };
@@ -183,7 +225,7 @@ export default function LogoManager() {
       height: `${logoSettings.height || 50}px`,
       opacity: (logoSettings.opacity || 100) / 100,
       transform: `rotate(${logoSettings.rotation || 0}deg)`,
-      objectFit: "contain",
+      objectFit: "contain" as const,
     };
 
     const textStyle = {
@@ -366,23 +408,24 @@ export default function LogoManager() {
                           {uploadPreview ? (
                             <div>
                               <div className="flex items-center justify-center mb-4">
-                                {renderLogoPreview(
-                                  { preview: uploadPreview, name: logoName },
-                                  {
-                                    width: logoWidth,
-                                    height: logoHeight,
-                                    opacity: logoOpacity,
-                                    rotation: logoRotation,
-                                    borderRadius,
-                                    text: addText ? logoText : "",
-                                    textPosition,
-                                    textSize,
-                                    textColor,
-                                    backgroundColor,
-                                    padding,
-                                    shadow,
-                                  }
-                                )}
+                                {typeof uploadPreview === "string" &&
+                                  renderLogoPreview(
+                                    { preview: uploadPreview, name: logoName, id: 0, file: "", size: "", uploadDate: "" },
+                                    {
+                                      width: logoWidth,
+                                      height: logoHeight,
+                                      opacity: logoOpacity,
+                                      rotation: logoRotation,
+                                      borderRadius,
+                                      text: addText ? logoText : "",
+                                      textPosition,
+                                      textSize,
+                                      textColor,
+                                      backgroundColor,
+                                      padding,
+                                      shadow,
+                                    }
+                                  )}
                               </div>
                               <p className="text-sm text-gray-600">
                                 Click to change file

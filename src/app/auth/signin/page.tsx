@@ -2,8 +2,11 @@
 import { Suspense, useState } from "react";
 import { signIn } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "@/store/store";
 
 function SignInForm() {
+  const dispatch= useDispatch<AppDispatch>()
   const search = useSearchParams();
   const initialTenant = search?.get("tenant") || "demo";
   const [email, setEmail] = useState("");
@@ -17,13 +20,15 @@ function SignInForm() {
     setLoading(true);
     setError(null);
     try {
-      await signIn("credentials", {
+   await signIn("credentials", {
         redirect: true,
-        callbackUrl: "/",
+        callbackUrl: "/admin",
         email,
         password,
         tenantSlug,
       });
+     
+  
       // With redirect: true, signIn returns void; errors will navigate to the error page.
       // We keep this note for future non-redirect flows.
     } catch (err: unknown) {

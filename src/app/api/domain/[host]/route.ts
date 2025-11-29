@@ -7,6 +7,7 @@ export async function GET(
 ) {
   const { host } = await params; // 
 
+
   const db = await getDatabase();
   const collection = db.collection("websites");
 
@@ -14,6 +15,7 @@ export async function GET(
     primaryDomain: { $in: [host] },
   });
 
+  console.log("website---->",website)
   if (website) {
     return Response.json({ item: String(website._id) });
   }

@@ -323,7 +323,11 @@ function Sidebar({
                 <SelectTrigger
                   className={cn("h-9 w-full text-xs", collapsed && "px-2")}
                 >
-                  {!collapsed && <SelectValue placeholder="Select website" />}
+                  {!collapsed && (
+                    <SelectValue placeholder="Select website">
+                      {currentWebsite?.name || "Select website"}
+                    </SelectValue>
+                  )}
                   {collapsed && <Globe2 className="h-4 w-4" />}
                 </SelectTrigger>
                 <SelectContent>

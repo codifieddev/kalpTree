@@ -1,43 +1,20 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import { useEditor } from "@/hooks/use-editor";
-
-import {
-  Box,
-  Code,
-  Download,
-  Eye,
-  MousePointer,
-  Palette,
-  PanelRight,
-  Redo,
-  Save,
-  Sliders,
-  Trash2,
-  Undo,
-} from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { AttributesEditor } from "./attributes-editor/attributes-editor";
-import { BlocksManager } from "./blocks-manager/blocks-manager";
-import { CodeEditor } from "./code-editor/code-editor";
-import { DevicePreview } from "./device-preview/device-preview";
-import { InteractivityEditor } from "./interactivity/interactivity-editor";
-import { ResponsivePanel } from "./responsive-panel/responsive-panel";
-import { StyleEditor } from "./style-editor/style-editor";
-import { TemplateManager } from "./template-manager/template-manager";
+
 import { DeviceConfig } from "../../../types/editor";
+
 import TopToolbar from "./GrapesJSEditor/toolbars/TopToolbar";
+import BottomToolbar from "./GrapesJSEditor/toolbars/BottomToolbar";
+import PropertiesSidebar from "./GrapesJSEditor/sidebar/PropertiesSidebar";
+
 export default function GrapesJSEditor() {
   const containerRef = useRef<HTMLDivElement>(null);
   const { state, actions } = useEditor("gjs-editor");
+
   const [showResponsivePanel, setShowResponsivePanel] = useState(false);
   const [customDevices, setCustomDevices] = useState<DeviceConfig[]>([]);
   const [editorHtml, setEditorHtml] = useState("");
@@ -48,187 +25,173 @@ export default function GrapesJSEditor() {
   const [recentBlocks, setRecentBlocks] = useState<string[]>([]);
   const [favoriteBlocks, setFavoriteBlocks] = useState<string[]>([]);
 
-  // Extract import code modal functionality
+  // ─────────────────────────────
+  // Import HTML modal
+  // ─────────────────────────────
   const handleImportCode = () => {
-    if (state.editor) {
-      state.editor.Modal.open({
-        title: "Import Code",
-        content: `
+    if (!state.editor) return;
+
+    state.editor.Modal.open({
+      title: "Import Code",
+      content: `
         <div style="padding: 20px;">
-          <textarea id="import-code" style="width: 100%; height: 250px; padding: 10px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 4px; color:black
-          ;" placeholder="Paste your HTML code here"></textarea>
+          <textarea id="import-code" style="width: 100%; height: 250px; padding: 10px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 4px; color:black;" placeholder="Paste your HTML code here"></textarea>
           <button id="import-button" style="padding: 8px 16px; background-color: #7C3AED; color: white; border: none; border-radius: 4px; cursor: pointer;">Import</button>
         </div>
       `,
-        attributes: { class: "gjs-modal-import" },
-      });
+      attributes: { class: "gjs-modal-import" },
+    });
 
-      // Add event listener to the import button
-      setTimeout(() => {
-        const importButton = document.getElementById("import-button");
-        const importCode = document.getElementById(
-          "import-code"
-        ) as HTMLTextAreaElement;
+    setTimeout(() => {
+      const importButton = document.getElementById("import-button");
+      const importCode = document.getElementById(
+        "import-code"
+      ) as HTMLTextAreaElement | null;
 
-        if (importButton && importCode) {
-          importButton.addEventListener("click", () => {
-            const code = importCode.value;
-            actions.importCode(code);
-            state.editor.Modal.close();
-          });
-        }
-      }, 100);
-    }
+      if (importButton && importCode) {
+        importButton.addEventListener("click", () => {
+          const code = importCode.value;
+          actions.importCode(code);
+          state.editor?.Modal.close();
+        });
+      }
+    }, 100);
   };
 
-  // Device management functions
+  // ─────────────────────────────
+  // Device management
+  // ─────────────────────────────
   const handleAddDevice = (device: DeviceConfig) => {
-    setCustomDevices([...customDevices, device]);
-    if (state.editor && state.editor.DeviceManager) {
+    setCustomDevices((prev) => [...prev, device]);
+    if (state.editor?.DeviceManager) {
       state.editor.DeviceManager.add(device);
     }
   };
 
   const handleRemoveDevice = (deviceId: string) => {
-    setCustomDevices(customDevices.filter((device) => device.id !== deviceId));
-    if (state.editor && state.editor.DeviceManager) {
+    setCustomDevices((prev) => prev.filter((d) => d.id !== deviceId));
+    if (state.editor?.DeviceManager) {
       state.editor.DeviceManager.remove(deviceId);
     }
   };
-  console.log("state. blocks", state.blocks)
+
   const handleUpdateDevice = (
     deviceId: string,
     updates: Partial<DeviceConfig>
   ) => {
-    if (state.editor && state.editor.DeviceManager) {
-      // First, check if the device exists
-      const device = state.editor.DeviceManager.get(deviceId);
+    if (!state.editor?.DeviceManager) return;
 
-      if (device) {
-        // If device exists, remove it first and then add the updated version
-        state.editor.DeviceManager.remove(deviceId);
+    const device = state.editor.DeviceManager.get(deviceId);
+    if (device) {
+      state.editor.DeviceManager.remove(deviceId);
 
-        // Create updated device config
-        const updatedDevice = {
-          ...device.attributes,
-          ...updates,
-          id: deviceId,
-        };
+      const updatedDevice = {
+        ...device.attributes,
+        ...updates,
+        id: deviceId,
+      };
 
-        // Add the updated device
-        state.editor.DeviceManager.add(updatedDevice);
+      state.editor.DeviceManager.add(updatedDevice);
 
-        // If this was the current device, set it again
-        if (state.currentDevice === deviceId) {
-          state.editor.setDevice(deviceId);
-        }
-      } else {
-        // If device doesn't exist, add a new one
-        state.editor.DeviceManager.add({
-          id: deviceId,
-          name: "Custom",
-          ...updates,
-        });
-      }
-    }
-  };
-
-  // Template management functions
-  const handleSelectTemplate = (content: string, append = false) => {
-    if (state.editor) {
-      if (append) {
-        state.editor.addComponents(content);
-      } else {
-        state.editor.setComponents(content);
-      }
-    }
-  };
-  const handleClearCanvas = () => {
-    if (state.editor) {
-      try {
-        // Clear all components from the canvas
-        state.editor.setComponents("");
-
-        // Also clear any custom styles
-        state.editor.setStyle("");
-
-        // Clear any JavaScript if the editor supports it
-        if (typeof state.editor.setJs === "function") {
-          state.editor.setJs("");
-        } else if (state.editor.StorageManager) {
-          // Fallback for editors without setJs
-          state.editor.StorageManager.store({
-            jsCode: "",
-          });
-        }
-
-        // Update the editor state
-        setEditorHtml("");
-        setEditorCss("");
-        setEditorJs("");
-
-        // Refresh the editor to ensure changes take effect
-        state.editor.refresh();
-
-        console.log("Canvas cleared successfully");
-      } catch (error) {
-        console.error("Error clearing canvas:", error);
+      if (state.currentDevice === deviceId) {
+        state.editor.setDevice(deviceId);
       }
     } else {
-      console.warn("Editor not initialized");
+      state.editor.DeviceManager.add({
+        id: deviceId,
+        name: "Custom",
+        ...updates,
+      });
+    }
+  };
+
+  // ─────────────────────────────
+  // Templates
+  // ─────────────────────────────
+  const handleSelectTemplate = (content: string, append = false) => {
+    if (!state.editor) return;
+
+    if (append) {
+      state.editor.addComponents(content);
+    } else {
+      state.editor.setComponents(content);
+    }
+  };
+
+  const handleClearCanvas = () => {
+    if (!state.editor) return;
+
+    try {
+      state.editor.setComponents("");
+      state.editor.setStyle("");
+
+      if (typeof state.editor.setJs === "function") {
+        state.editor.setJs("");
+      } else if (state.editor.StorageManager) {
+        state.editor.StorageManager.store({ jsCode: "" });
+      }
+
+      setEditorHtml("");
+      setEditorCss("");
+      setEditorJs("");
+
+      state.editor.refresh();
+      console.log("Canvas cleared successfully");
+    } catch (error) {
+      console.error("Error clearing canvas:", error);
     }
   };
 
   const handleSaveTemplate = (name: string, content: string) => {
-    // In a real app, you would save this to a database
+    // later connect to backend
     console.log(`Saving template: ${name}`);
     console.log(content);
   };
 
-  // Code editor functions
+  // ─────────────────────────────
+  // Code editor sync
+  // ─────────────────────────────
   const handleUpdateHtml = (html: string) => {
-    if (state.editor) {
-      state.editor.setComponents(html);
-      setEditorHtml(html);
-    }
+    if (!state.editor) return;
+    state.editor.setComponents(html);
+    setEditorHtml(html);
   };
 
   const handleUpdateCss = (css: string) => {
-    if (state.editor) {
-      state.editor.setStyle(css);
-      setEditorCss(css);
-    }
+    if (!state.editor) return;
+    state.editor.setStyle(css);
+    setEditorCss(css);
   };
 
   const handleUpdateJs = (js: string) => {
-    if (state.editor && state.editor.setJs) {
-      state.editor.setJs(js);
-      setEditorJs(js);
-    }
+    if (!state.editor?.setJs) return;
+    state.editor.setJs(js);
+    setEditorJs(js);
   };
 
-  // UI toggle functions
+  // ─────────────────────────────
+  // UI toggles
+  // ─────────────────────────────
   const togglePreviewMode = () => {
-    if (state.editor) {
-      if (isPreviewMode) {
-        state.editor.stopCommand("preview");
-      } else {
-        state.editor.runCommand("preview");
-      }
-      setIsPreviewMode(!isPreviewMode);
+    if (!state.editor) return;
 
-      // Hide sidebar in preview mode
-      if (!isPreviewMode && showSidebar) {
-        setShowSidebar(false);
-      }
+    if (isPreviewMode) {
+      state.editor.stopCommand("preview");
+    } else {
+      state.editor.runCommand("preview");
+    }
+    setIsPreviewMode((prev) => !prev);
+
+    if (!isPreviewMode && showSidebar) {
+      setShowSidebar(false);
     }
   };
 
-  const toggleSidebar = () => {
-    setShowSidebar((prev) => !prev);
-  };
+  const toggleSidebar = () => setShowSidebar((prev) => !prev);
 
-  // Local storage functions
+  // ─────────────────────────────
+  // Local storage (recent / favorite blocks)
+  // ─────────────────────────────
   const handleRecentBlocksChange = (blocks: string[]) => {
     setRecentBlocks(blocks);
     try {
@@ -238,7 +201,6 @@ export default function GrapesJSEditor() {
     }
   };
 
-  // Handle favorite blocks updates
   const handleFavoriteBlocksChange = (blocks: string[]) => {
     setFavoriteBlocks(blocks);
     try {
@@ -248,66 +210,13 @@ export default function GrapesJSEditor() {
     }
   };
 
-  const handleSaveData = (actions:any) => {
-    console.log("Clicked", actions.savePage())
-  }
-
-  // Extract the editor initialization logic
-  const initializeEditor = () => {
-    if (state.editor) {
-      // Update editor content when editor is ready
-      setEditorHtml(state.editor.getHtml());
-      setEditorCss(state.editor.getCss());
-      setEditorJs(state.editor.getJs ? state.editor.getJs() : "");
-
-      // Set up event listeners for content changes
-      state.editor.on("component:update", () => {
-        setEditorHtml(state.editor.getHtml());
-        setEditorCss(state.editor.getCss());
-        setEditorJs(state.editor.getJs ? state.editor.getJs() : "");
-      });
-
-      // Add this new event listener to keep selections properly updated
-      state.editor.on("component:selected", (component: { get: any }) => {
-        // Only open the sidebar if we have a valid component
-        if (component && component.get) {
-          setShowSidebar(true);
-
-          // Ensure the editor is focused on this component
-          // This helps with consistent styling behavior
-          try {
-            state.editor.select(component);
-          } catch (e) {
-            console.error("Error focusing on selected component:", e);
-          }
-        }
-      });
-
-      // Fix block categories
-      if (state.editor.BlockManager) {
-        state.editor.BlockManager.getAll().forEach(
-          (block: {
-            get: (arg0: string) => any;
-            set: (arg0: string, arg1: any) => void;
-          }) => {
-            // Ensure category is a string
-            if (typeof block.get("category") === "object") {
-              const category = block.get("category");
-              block.set("category", category.label || "Basic");
-            }
-          }
-        );
-      }
-
-      // Load saved recent and favorite blocks from localStorage
-      loadSavedBlocks();
-
-      // Add a debounced window listener to refresh the editor on window resize
-      setupResizeListener();
-    }
+  const handleSaveData = () => {
+    console.log("Clicked", actions.savePage());
   };
 
-  // Load saved blocks from localStorage
+  // ─────────────────────────────
+  // Editor init + listeners
+  // ─────────────────────────────
   const loadSavedBlocks = () => {
     try {
       const savedRecentBlocks = localStorage.getItem("grapesjs-recent-blocks");
@@ -318,7 +227,6 @@ export default function GrapesJSEditor() {
       if (savedRecentBlocks) {
         setRecentBlocks(JSON.parse(savedRecentBlocks));
       }
-
       if (savedFavoriteBlocks) {
         setFavoriteBlocks(JSON.parse(savedFavoriteBlocks));
       }
@@ -327,485 +235,65 @@ export default function GrapesJSEditor() {
     }
   };
 
-  // Setup resize listener
   const setupResizeListener = () => {
     let resizeTimeout: NodeJS.Timeout;
+
     const handleResize = () => {
       clearTimeout(resizeTimeout);
       resizeTimeout = setTimeout(() => {
-        if (state.editor) {
-          state.editor.refresh();
-        }
+        state.editor?.refresh();
       }, 250);
     };
 
     window.addEventListener("resize", handleResize);
 
-    // Return cleanup function
     return () => {
       window.removeEventListener("resize", handleResize);
       clearTimeout(resizeTimeout);
     };
   };
 
-  // Render the top toolbar
-  const renderTopToolbar = () => {
-    return (
-      <div className="flex items-center justify-between h-12 px-3 border-b border-slate-800 bg-slate-900">
-        <Link href="/" className="mr-4 text-xl font-bold text-white">
-          WebBuilder
-        </Link>
+  const initializeEditor = () => {
+    if (!state.editor) return;
 
-        <div className="flex items-center space-x-1.5">
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <BlocksManager
-                blocks={state.blocks}
-                onAddBlock={(content) => actions.addComponent(content)}
-                recentBlocks={recentBlocks}
-                onRecentBlocksChange={handleRecentBlocksChange}
-                favorites={favoriteBlocks}
-                onFavoritesChange={handleFavoriteBlocksChange}
-              />
-            </TooltipTrigger>
-            <TooltipContent side="bottom">Blocks</TooltipContent>
-          </Tooltip>
+    setEditorHtml(state.editor.getHtml());
+    setEditorCss(state.editor.getCss());
+    setEditorJs(state.editor.getJs ? state.editor.getJs() : "");
 
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <TemplateManager
-                onSelectTemplate={handleSelectTemplate}
-                onSaveTemplate={handleSaveTemplate}
-                currentContent={state.editor?.getHtml()}
-              />
-            </TooltipTrigger>
-            <TooltipContent side="bottom">Templates</TooltipContent>
-          </Tooltip>
+    state.editor.on("component:update", () => {
+      setEditorHtml(state.editor!.getHtml());
+      setEditorCss(state.editor!.getCss());
+      setEditorJs(state.editor!.getJs ? state.editor!.getJs() : "");
+    });
 
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <CodeEditor
-                html={editorHtml}
-                css={editorCss}
-                js={editorJs}
-                onUpdateHtml={handleUpdateHtml}
-                onUpdateCss={handleUpdateCss}
-                onUpdateJs={handleUpdateJs}
-              />
-            </TooltipTrigger>
-            <TooltipContent side="bottom">Edit Code</TooltipContent>
-          </Tooltip>
+    state.editor.on("component:selected", (component: any) => {
+      if (component?.get) {
+        setShowSidebar(true);
+        try {
+          state.editor!.select(component);
+        } catch (e) {
+          console.error("Error focusing on selected component:", e);
+        }
+      }
+    });
 
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-8 text-xs"
-                onClick={handleImportCode}
-              >
-                <Code className="w-3.5 h-3.5 mr-1.5" />
-                Import HTML
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent side="bottom">Import HTML</TooltipContent>
-          </Tooltip>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="w-8 h-8"
-                onClick={actions.undo}
-              >
-                <Undo className="w-4 h-4" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent side="bottom">Undo</TooltipContent>
-          </Tooltip>
-
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="w-8 h-8"
-                onClick={actions.redo}
-              >
-                <Redo className="w-4 h-4" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent side="bottom">Redo</TooltipContent>
-          </Tooltip>
-
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="w-8 h-8"
-                onClick={handleClearCanvas}
-              >
-                <Trash2 className="w-4 h-4" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent side="bottom">Reset Canvas</TooltipContent>
-          </Tooltip>
-
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant={isPreviewMode ? "default" : "ghost"}
-                size="icon"
-                className="w-8 h-8"
-                onClick={togglePreviewMode}
-              >
-                <Eye className="w-4 h-4" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent side="bottom">Preview</TooltipContent>
-          </Tooltip>
-
-          {/* <Tooltip>
-            <TooltipTrigger asChild>
-              <Button variant="ghost" size="icon" className="w-8 h-8">
-                <Save className="w-4 h-4" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent side="bottom">Save Project</TooltipContent>
-          </Tooltip> */}
-
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="w-8 h-8"
-                onClick={actions.downloadHtml}
-              >
-                <Download className="w-4 h-4" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent side="bottom">Export HTML</TooltipContent>
-          </Tooltip>
-
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="w-20"
-                onClick={()=>handleSaveData(actions)}
-              >
-                <Save className="w-4 h-4" /> Save
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent side="bottom">Save</TooltipContent>
-          </Tooltip>
-
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant={showSidebar ? "default" : "ghost"}
-                size="icon"
-                className="h-8 w-8 ml-1.5"
-                onClick={toggleSidebar}
-              >
-                <PanelRight className="w-4 h-4" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent side="bottom">
-              {showSidebar ? "Hide Properties Panel" : "Show Properties Panel"}
-            </TooltipContent>
-          </Tooltip>
-        </div>
-      </div>
-    );
-  };
-
-  // Render the bottom toolbar
-  const renderBottomToolbar = () => {
-    return (
-      <div className="border-t border-slate-800 bg-slate-900">
-        <div className="flex items-center justify-between h-10 px-3">
-          <div className="flex items-center space-x-3">
-            <DevicePreview
-              currentDevice={state.currentDevice}
-              onChange={actions.setDevice}
-            />
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-7 w-7"
-                  onClick={() => setShowResponsivePanel(!showResponsivePanel)}
-                >
-                  <Sliders className="w-4 h-4" />
-                  <span className="sr-only">
-                    {showResponsivePanel
-                      ? "Hide Responsive Panel"
-                      : "Show Responsive Panel"}
-                  </span>
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent side="bottom">
-                {showResponsivePanel
-                  ? "Hide Responsive Panel"
-                  : "Show Responsive Panel"}
-              </TooltipContent>
-            </Tooltip>
-          </div>
-          <div className="flex items-center">
-            <span className="mr-2 text-xs text-slate-400">
-              Canvas: {state.currentDevice}
-            </span>
-          </div>
-        </div>
-
-        {showResponsivePanel && (
-          <ResponsivePanel
-            devices={allDevices}
-            currentDevice={state.currentDevice}
-            onDeviceChange={actions.setDevice}
-            onAddDevice={handleAddDevice}
-            onRemoveDevice={handleRemoveDevice}
-            onUpdateDevice={handleUpdateDevice}
-          />
-        )}
-      </div>
-    );
-  };
-
-  // Render the sidebar
-  const renderSidebar = () => {
-    if (!showSidebar) return null;
-
-    return (
-      <div className="w-[25%] border-l border-slate-800 flex flex-col h-full transition-all duration-300 ease-in-out">
-        <Tabs defaultValue="style" className="flex flex-col h-full">
-          <TabsList className="grid w-full h-10 grid-cols-3 border-b rounded-none bg-slate-900 border-slate-800">
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <TabsTrigger value="style" className="text-xs font-medium">
-                  <Palette className="w-4 h-4" />
-                  <span className="sr-only">Style</span>
-                </TabsTrigger>
-              </TooltipTrigger>
-              <TooltipContent side="bottom">Style</TooltipContent>
-            </Tooltip>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <TabsTrigger value="attributes" className="text-xs font-medium">
-                  <Box className="w-4 h-4" />
-                  <span className="sr-only">Attributes</span>
-                </TabsTrigger>
-              </TooltipTrigger>
-              <TooltipContent side="bottom">Attributes</TooltipContent>
-            </Tooltip>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <TabsTrigger
-                  value="interactivity"
-                  className="text-xs font-medium"
-                >
-                  <MousePointer className="w-4 h-4" />
-                  <span className="sr-only">Interactivity</span>
-                </TabsTrigger>
-              </TooltipTrigger>
-              <TooltipContent side="bottom">Interactivity</TooltipContent>
-            </Tooltip>
-            {/* <Tooltip>
-              <TooltipTrigger asChild>
-                <TabsTrigger value="settings" className="text-xs font-medium">
-                  <Settings className="w-4 h-4" />
-                  <span className="sr-only">Settings</span>
-                </TabsTrigger>
-              </TooltipTrigger>
-              <TooltipContent side="bottom">Settings</TooltipContent>
-            </Tooltip> */}
-          </TabsList>
-
-          <TabsContent value="style" className="flex-1 p-3 overflow-y-auto">
-            {renderStyleTab()}
-          </TabsContent>
-
-          <TabsContent
-            value="attributes"
-            className="flex-1 p-3 overflow-y-auto"
-          >
-            {renderAttributesTab()}
-          </TabsContent>
-
-          <TabsContent
-            value="interactivity"
-            className="flex-1 p-3 overflow-y-auto"
-          >
-            {renderInteractivityTab()}
-          </TabsContent>
-
-          {/* <TabsContent value="settings" className="flex-1 p-3 overflow-y-auto">
-            {renderSettingsTab()}
-          </TabsContent> */}
-        </Tabs>
-      </div>
-    );
-  };
-
-  // Render the style tab
-  const renderStyleTab = () => {
-    console.log("====>> Line 637 and index.tsx file main", state)
-    if (!state.selectedElement) {
-      return renderEmptySelectionMessage("Box", "properties");
+    if (state.editor.BlockManager) {
+      state.editor.BlockManager.getAll().forEach((block: any) => {
+        if (typeof block.get("category") === "object") {
+          const category = block.get("category");
+          block.set("category", category.label || "Basic");
+        }
+      });
     }
 
-    return (
-      <StyleEditor styles={state.styles} onStyleChange={actions.updateStyle} />
-    );
-  };
-
-  // Render the attributes tab
-  const renderAttributesTab = () => {
-    if (!state.selectedElement) {
-      return renderEmptySelectionMessage("Box", "attributes");
-    }
-
-    return (
-      <AttributesEditor
-        selectedElement={state.selectedElement}
-        onAttributeChange={actions.updateAttribute}
-      />
-    );
-  };
-
-  // Render the interactivity tab
-  const renderInteractivityTab = () => {
-    if (!state.selectedElement) {
-      return renderEmptySelectionMessage("MousePointer", "interactivity");
-    }
-
-    return (
-      <InteractivityEditor
-        selectedElement={state.selectedElement}
-        onInteractivityChange={actions.updateInteractivity}
-      />
-    );
-  };
-
-  // Render empty selection message
-  const renderEmptySelectionMessage = (icon: string, type: string) => {
-    const Icon =
-      icon === "Box" ? Box : icon === "MousePointer" ? MousePointer : Box;
-
-    return (
-      <div className="flex flex-col items-center justify-center h-full p-6 text-center text-slate-400">
-        <Icon className="w-10 h-10 mb-3 opacity-50" />
-        <h3 className="mb-2 text-sm font-medium">No Element Selected</h3>
-        <p className="text-xs">
-          Select an element on the canvas to edit its {type}
-        </p>
-      </div>
-    );
-  };
-
-  // Render the settings tab
-  const renderSettingsTab = () => {
-    return (
-      <div className="space-y-5">
-        <div>
-          <h3 className="mb-3 text-sm font-medium">Project Settings</h3>
-          <div className="space-y-3">
-            <div className="space-y-1.5">
-              <label className="text-xs font-medium text-slate-300">
-                Project Name
-              </label>
-              <input
-                type="text"
-                className="w-full px-2.5 py-1.5 text-xs bg-slate-800 border border-slate-700 rounded-md focus:outline-none focus:ring-1 focus:ring-indigo-500"
-                placeholder="My Awesome Website"
-              />
-            </div>
-            <div className="space-y-1.5">
-              <label className="text-xs font-medium text-slate-300">
-                Description
-              </label>
-              <textarea
-                className="w-full px-2.5 py-1.5 text-xs bg-slate-800 border border-slate-700 rounded-md focus:outline-none focus:ring-1 focus:ring-indigo-500"
-                placeholder="A brief description of your project"
-                rows={3}
-              />
-            </div>
-          </div>
-        </div>
-
-        <div>
-          <h3 className="mb-3 text-sm font-medium">Canvas Settings</h3>
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-medium text-slate-300">
-                Show Grid
-              </span>
-              <button className="relative w-8 h-4 rounded-full bg-slate-700">
-                <span className="absolute w-2 h-2 bg-white rounded-full left-1 top-1"></span>
-              </button>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-medium text-slate-300">
-                Snap to Grid
-              </span>
-              <button className="relative w-8 h-4 bg-indigo-600 rounded-full">
-                <span className="absolute w-2 h-2 bg-white rounded-full right-1 top-1"></span>
-              </button>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-medium text-slate-300">
-                Show Rulers
-              </span>
-              <button className="relative w-8 h-4 rounded-full bg-slate-700">
-                <span className="absolute w-2 h-2 bg-white rounded-full left-1 top-1"></span>
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <div>
-          <h3 className="mb-3 text-sm font-medium">Export Settings</h3>
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-medium text-slate-300">
-                Include CSS
-              </span>
-              <button className="relative w-8 h-4 bg-indigo-600 rounded-full">
-                <span className="absolute w-2 h-2 bg-white rounded-full right-1 top-1"></span>
-              </button>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-medium text-slate-300">
-                Include JS
-              </span>
-              <button className="relative w-8 h-4 bg-indigo-600 rounded-full">
-                <span className="absolute w-2 h-2 bg-white rounded-full right-1 top-1"></span>
-              </button>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-medium text-slate-300">
-                Minify Output
-              </span>
-              <button className="relative w-8 h-4 rounded-full bg-slate-700">
-                <span className="absolute w-2 h-2 bg-white rounded-full left-1 top-1"></span>
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
+    loadSavedBlocks();
   };
 
   useEffect(() => {
-    if (state.editor) {
-      initializeEditor();
-      return setupResizeListener();
-    }
+    if (!state.editor) return;
+    initializeEditor();
+    return setupResizeListener();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.editor]);
 
   const allDevices = [
@@ -817,16 +305,52 @@ export default function GrapesJSEditor() {
     ...customDevices,
   ];
 
+
+  // Fix: handleStyleChange to match expected signature
+  const handleStyleChange = (styles: any) => {
+ 
+    if (styles && styles.property && styles.value) {
+      actions.updateStyle(styles.property, styles.value);
+    }
+  } 
+
+    // Fix: handleStyleChange to match expected signature
+  const handleUpdateInteractivity= (data: any) => {
+ 
+    if (data && data.type && data.event && data.action && data.target &&data.options) {
+      actions.updateInteractivity(data.type , data.event , data.action , data.target ,data.options);
+    }
+  } 
   return (
     <div className="h-screen bg-[#0F172A] text-white overflow-hidden flex flex-col">
       <TooltipProvider delayDuration={300}>
-        {/* Top Toolbar */}
-        {renderTopToolbar()}
-        {/* <TopToolbar/> */}
+        <TopToolbar
+          blocks={state.blocks}
+          actions={actions}
+          editor={state.editor}
+          editorHtml={editorHtml}
+          editorCss={editorCss}
+          editorJs={editorJs}
+          isPreviewMode={isPreviewMode}
+          showSidebar={showSidebar}
+          recentBlocks={recentBlocks}
+          favoriteBlocks={favoriteBlocks}
+          onImportCode={handleImportCode}
+          onClearCanvas={handleClearCanvas}
+          onTogglePreview={togglePreviewMode}
+          onToggleSidebar={toggleSidebar}
+          onRecentBlocksChange={handleRecentBlocksChange}
+          onFavoriteBlocksChange={handleFavoriteBlocksChange}
+          onUpdateHtml={handleUpdateHtml}
+          onUpdateCss={handleUpdateCss}
+          onUpdateJs={handleUpdateJs}
+          onSelectTemplate={handleSelectTemplate}
+          onSaveTemplate={handleSaveTemplate}
+          onSave={handleSaveData}
+        />
 
-        {/* Main Content Area with Sidebar */}
         <div className="relative flex flex-1 overflow-hidden">
-          {/* Main Canvas */}
+          {/* Canvas */}
           <div
             className={`${
               showSidebar ? "w-[90%]" : "w-full"
@@ -834,18 +358,35 @@ export default function GrapesJSEditor() {
           >
             {state.isLoading && (
               <div className="absolute inset-0 z-10 flex items-center justify-center bg-slate-900/80">
-                <div className="w-10 h-10 border-t-2 border-b-2 border-indigo-500 rounded-full animate-spin"></div>
+                <div className="w-10 h-10 border-t-2 border-b-2 border-indigo-500 rounded-full animate-spin" />
               </div>
             )}
             <div id="gjs-editor" className="w-full h-full" ref={containerRef} />
           </div>
 
-          {/* Right Sidebar - conditionally rendered */}
-          {renderSidebar()}
+          {/* Sidebar */}
+          <PropertiesSidebar
+            showSidebar={showSidebar}
+            selectedElement={state.selectedElement}
+            styles={state.styles}
+            onStyleChange={handleStyleChange}
+            onAttributeChange={actions.updateAttribute}
+            onInteractivityChange={handleUpdateInteractivity}
+          />
         </div>
 
-        {/* Bottom Toolbar */}
-        {renderBottomToolbar()}
+        <BottomToolbar
+          currentDevice={state.currentDevice}
+          showResponsivePanel={showResponsivePanel}
+          devices={allDevices}
+          onDeviceChange={actions.setDevice}
+          onToggleResponsivePanel={() =>
+            setShowResponsivePanel((prev) => !prev)
+          }
+          onAddDevice={handleAddDevice}
+          onRemoveDevice={handleRemoveDevice}
+          onUpdateDevice={handleUpdateDevice}
+        />
       </TooltipProvider>
     </div>
   );
