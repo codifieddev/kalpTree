@@ -10,9 +10,9 @@ export default async function PageTemplate({ params }: any) {
   const host = headersList.get("host");
 
   const main = await fetch(`${API_BASE_URL}/api/domain/${host}`);
-    console.log("main---", main)
+  
   const domainData = await main.json();
-    console.log("domainData---", domainData)
+ 
   const param = await params;
 
   const slugs = !param.hasOwnProperty("slug") ? "home" : param.slug;
@@ -23,16 +23,16 @@ export default async function PageTemplate({ params }: any) {
   }).toString();
 
   
-  console.log("query ---->",query)
+ 
 
   if(!domainData.item){
     return <>404 Not Found</>
   }
   const res = await fetch(`${API_BASE_URL}/api/pages/websites?${query}`);
 
-  console.log("res-- website--", res)
+  
   const t = await res.json();
-   console.log("t----->", t)
+ 
   const html = t.item.content;
  
   const EditButton = (await import("../EditButton")).default;
