@@ -3,6 +3,10 @@
 import { useEffect, useRef, useState } from "react";
 import { EditorState, LayerItem } from "../../types/editor";
 import { createEditorConfig } from "../../utils/editor-config";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@/store/store";
+import { savePageThunk } from "./slices/pageEditSlice";
+import { toast } from "sonner";
 
 
 
@@ -91,6 +95,8 @@ export function useEditor(containerId: string) {
     },
   });
 
+  const dispatch= useDispatch<AppDispatch>()
+  const {page}= useSelector((state:RootState)=>state.pageEdit)
   useEffect(() => {
     const initEditor = async () => {
       try {
@@ -833,10 +839,30 @@ export function useEditor(containerId: string) {
       }
     },
 
-    savePage: () => {
-      console.log("yes");
-      console.log(editorRef.current?.getHtml());
-    },
+savePage: async () => {
+  console.log("save the page called")
+
+  if (!page?._id) {
+    toast.error("No page ID found. Cannot save.");
+    return;
+  }
+  if (!editorRef.current) {
+    toast.error("Editor not initialized.");
+    return;
+  }
+  const html = editorRef.current.getHtml();
+  // console.log("Saving page", page._id, html);
+  const response = await dispatch(savePageThunk({
+    id: page._id,
+    tenantId:page.tenantId,
+    content: html
+  })).unwrap();
+  console.log("console.log", response)
+  if(response.ok){
+    toast.success("Page content updated successfully!");
+  }
+  // Optionally handle response or errors here
+},
 
     exportHtml: () => {
       if (editorRef.current) {
