@@ -75,9 +75,8 @@ const TopToolbar: React.FC<TopToolbarProps> = ({
   onSave,
 }) => {
 
-  console.log("editor---",editor)
-  console.log("editorHtml---",editorHtml)
-   console.log("editorCss---",editorCss)
+
+
       //console.log("editorJs---",editorJs)
   return (
     <div className="flex items-center justify-between h-12 px-3 border-b border-slate-800 bg-slate-900">

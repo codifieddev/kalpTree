@@ -169,6 +169,7 @@ export default function GrapesJSEditor() {
   // ─────────────────────────────
   const handleUpdateHtml = (html: string) => {
     if (!state.editor) return;
+    console.log("html ---", html)
     state.editor.setComponents(html);
     setEditorHtml(html);
   };
@@ -312,20 +313,7 @@ export default function GrapesJSEditor() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.editor]);
 
-  // Sync editor HTML to Redux on change
-  useEffect(() => {
-    if (!state.editor) return;
-    const updateHandler = () => {
-      const html = state.editor.getHtml();
-      console.log("hfjhhfdhhfhfh----",html)
-     // setEditorHtml(html);
-    //  dispatch({ type: "pageEdit/setContent", payload: html });
-    };
-    state.editor.on("component:update", updateHandler);
-    return () => {
-      state.editor.off("component:update", updateHandler);
-    };
-  }, [state.editor, dispatch]);
+
 
   const allDevices = [
     ...(state.editor?.DeviceManager?.getAll()?.models?.map((model: any) => ({

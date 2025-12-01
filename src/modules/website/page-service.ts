@@ -82,20 +82,26 @@ export class PageService {
   async updatePage(
     id: string | ObjectId,
     tenantId: string | ObjectId,
-    updates: Partial<Page>
+    // updates: Partial<Page>
+    updates:string
   ): Promise<boolean> {
     const collection = await this.getCollection();
     const oid = typeof id === 'string' ? new ObjectId(id) : id;
     const tid = typeof tenantId === 'string' ? new ObjectId(tenantId) : tenantId;
-    const result = await collection.updateOne(
-      { _id: oid, tenantId: tid },
-      {
-        $set: {
-          ...updates,
-          updatedAt: new Date(),
-        },
-      }
-    );
+    // const result = await collection.updateOne(
+    //   { _id: oid, tenantId: tid },
+    //   {
+    //     $set: {
+    //       ...updates,
+    //       updatedAt: new Date(),
+    //     },
+    //   }
+    // );
+   const result= await collection.updateOne(
+   { _id: oid, tenantId: tid },
+  { $set: { content: updates } }
+)
+
     return result.modifiedCount > 0;
   }
 
