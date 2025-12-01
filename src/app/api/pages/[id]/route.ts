@@ -62,7 +62,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
   const json = await req.json();
 //   const parsed = updateSchema.safeParse(json);
 //   if (!parsed.success) return NextResponse.json({ error: 'Invalid payload', issues: parsed.error.flatten() }, { status: 400 });
-console.log("request-----", json)
+// console.log("request-----", json)
 //   const ok = await pageService.updatePage(param.id, session.user.tenantId as string, parsed.data);
 
 const ok= await pageService.updatePage(json.id, json.tenantId, json.content)
