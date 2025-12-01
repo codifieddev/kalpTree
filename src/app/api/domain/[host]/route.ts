@@ -15,7 +15,7 @@ export async function GET(
     primaryDomain: { $in: [host] },
   });
 
-  console.log("website---->",website)
+  // console.log("website---->",website)
   if (website) {
     return Response.json({ item: String(website._id) });
   }

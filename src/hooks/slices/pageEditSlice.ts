@@ -7,11 +7,13 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import { pageService } from '@/modules/website/page-service';
 interface PageEditState {
   page: PageModel|null;
+  updatePage: PageModel|null;
 }
 
 const initialState: PageEditState = {
   page: null,
-};
+  updatePage:null
+}
 // Thunk to save page via API
 export const savePageThunk = createAsyncThunk(
   'pageEdit/savePage',
@@ -51,6 +53,11 @@ export const pageEditSlice = createSlice({
     setPageEdit: (state, action) => {
       state.page = action.payload;
     },
+    updatePage:(state,action)=>{
+      state.updatePage=action.payload
+
+    },
+
     clearPageEdit: (state) => {
       state.page = null;
     },
@@ -62,5 +69,5 @@ export const pageEditSlice = createSlice({
 
 
 
-export const { setPageEdit, clearPageEdit } = pageEditSlice.actions;
+export const { setPageEdit, clearPageEdit,updatePage } = pageEditSlice.actions;
 export default pageEditSlice.reducer;

@@ -95,6 +95,7 @@ export function useEditor(containerId: string) {
     },
   });
 
+  console.log("state----",state)
   const dispatch= useDispatch<AppDispatch>()
   const {page}= useSelector((state:RootState)=>state.pageEdit)
   useEffect(() => {
@@ -857,7 +858,7 @@ savePage: async () => {
     tenantId:page.tenantId,
     content: html
   })).unwrap();
-  console.log("console.log", response)
+  // console.log("console.log", response)
   if(response.ok){
     toast.success("Page content updated successfully!");
   }
@@ -1011,6 +1012,7 @@ savePage: async () => {
 
     updateStyle: (property: string, value: string) => {
       try {
+        console.log("Selcted Editor")
         if (state.selectedElement) {
           // Create a new style object with the updated property
           const style = { [property]: value };
@@ -1186,6 +1188,8 @@ savePage: async () => {
             }
           }
         }
+        //  console.log("edit get edit---get html", state.editor.getHtml())
+        // console.log("selected Elememnt---", state.selectedElement)
       } catch (error) {
         console.error("Error updating style:", error);
       }
@@ -1242,6 +1246,7 @@ savePage: async () => {
     selectComponent: (componentId: string) => {
       if (editorRef.current) {
         const component = editorRef.current.Components.getById(componentId);
+        console.log("component---",component)
         if (component) {
           editorRef.current.select(component);
         }
