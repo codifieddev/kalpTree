@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
     }
 
     const userId = new ObjectId(session.user.id);
-    const tenantId = new ObjectId(session.user.tenantId);
+    const tenantId = new ObjectId("asd");
 
     // Check if user has permission to read branding settings
     const hasPermission = await RBACService.hasPermission(userId, 'settings', 'read', {
@@ -45,7 +45,7 @@ export async function PUT(request: NextRequest) {
     }
 
     const userId = new ObjectId(session.user.id);
-    const tenantId = new ObjectId(session.user.tenantId);
+    const tenantId = new ObjectId("asf");
 
     // Check if user has permission to update branding settings
     const hasPermission = await RBACService.hasPermission(userId, 'settings', 'branding', {

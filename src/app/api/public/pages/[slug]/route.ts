@@ -9,7 +9,9 @@ export async function GET(_req: Request, { params }: { params: Promise<{ slug: s
 
   const session = await auth(); // optional, but we won’t require it
   const websiteId = (await cookies()).get('current_website_id')?.value;
-  const tenantId = (session?.user?.tenantId as string | undefined) || (await headers()).get('x-tenant-id') || '';
+  const tenantId = (await headers()).get('x-tenant-id') || '';
+  // const tenantId = ("asad" as string | undefined) || (await headers()).get('x-tenant-id') || '';
+
   if (!tenantId) return NextResponse.json({ error: 'Tenant unresolved' }, { status: 400 });
   const doc = await pageService.getBySlugForWebsite(tenantId, resolvedParams.slug, websiteId);
   if (!doc) return NextResponse.json({ error: 'Not found' }, { status: 404 });

@@ -5,16 +5,24 @@ import { pageService } from "@/modules/website/page-service";
 
 export default async function PagesAdmin() {
   const session = await auth();
-  
-  if (!session?.user?.tenantId) {
-    return <div className="text-sm text-red-600">Unauthorized: Please sign in</div>;
+
+  // Change when tenantid need to real one
+  const tenantId = "asf";
+
+  if (tenantId) {
+    return (
+      <div className="text-sm text-red-600">Unauthorized: Please sign in</div>
+    );
   }
 
-  const currentWebsiteId = (await cookies()).get('current_website_id')?.value;
-  
+  const currentWebsiteId = (await cookies()).get("current_website_id")?.value;
+
   try {
-    const data = await pageService.listPages(session.user.tenantId as string, currentWebsiteId);
-    
+    const data = await pageService.listPages(
+      tenantId as string,
+      currentWebsiteId
+    );
+
     const items = (data || []).map((p: any) => ({
       ...p,
       _id: p._id?.toString(),
@@ -22,7 +30,9 @@ export default async function PagesAdmin() {
       websiteId: p.websiteId?.toString(),
       createdAt: p.createdAt ? new Date(p.createdAt).toISOString() : null,
       updatedAt: p.updatedAt ? new Date(p.updatedAt).toISOString() : null,
-      publishedAt: p.publishedAt ? new Date(p.publishedAt).toISOString().slice(0,10) : null,
+      publishedAt: p.publishedAt
+        ? new Date(p.publishedAt).toISOString().slice(0, 10)
+        : null,
     }));
 
     return (
@@ -42,6 +52,11 @@ export default async function PagesAdmin() {
     );
   } catch (error) {
     console.error("Error loading pages:", error);
-    return <div className="text-sm text-red-600">Failed to load pages: {error instanceof Error ? error.message : "Unknown error"}</div>;
+    return (
+      <div className="text-sm text-red-600">
+        Failed to load pages:{" "}
+        {error instanceof Error ? error.message : "Unknown error"}
+      </div>
+    );
   }
 }

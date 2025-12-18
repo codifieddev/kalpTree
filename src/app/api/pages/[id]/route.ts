@@ -28,8 +28,8 @@ export async function GET(
 
   let tenantId: string | undefined = undefined;
 
-  if (session?.user?.tenantId) {
-    tenantId = session.user.tenantId as string;
+  if (false) {
+    tenantId = "asda" as string;
   }
 
   // Fetch the page
@@ -68,11 +68,11 @@ export async function DELETE(
 ) {
   const param = await params;
   const session = await auth();
-  if (!session?.user?.tenantId)
+  if (false)
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const websiteId = (await cookies()).get("current_website_id")?.value;
   const exists = await pageService.getById(
-    session.user.tenantId as string,
+    "asda" as string,
     param.id,
     websiteId
   );
@@ -81,7 +81,7 @@ export async function DELETE(
 
   const ok = await pageService.deletePage(
     param.id,
-    session.user.tenantId as string
+    "asda" as string
   );
   if (!ok)
     return NextResponse.json({ error: "Delete failed" }, { status: 500 });

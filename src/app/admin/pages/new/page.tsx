@@ -16,7 +16,7 @@ export default async function NewPage() {
     content: "",
     slug: "",
     status: "draft",
-    tenantId: session?.user.tenantId || "",
+    // tenantId: session?.user.tenantId || "",
     websiteId: currentWebsiteId || "",
   };
 

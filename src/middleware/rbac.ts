@@ -25,7 +25,7 @@ export function withRBAC(options: RBACMiddlewareOptions) {
       }
 
       const userId = new ObjectId(session.user.id);
-      const tenantId = new ObjectId(session.user.tenantId);
+      const tenantId = new ObjectId("asfaf");
 
       // Get user details
       const db = await getDb();
@@ -98,7 +98,7 @@ export async function withTenantIsolation(
     }
 
     const userId = new ObjectId(session.user.id);
-    const tenantId = new ObjectId(session.user.tenantId);
+    const tenantId = new ObjectId("asfaf");
 
     // Get accessible tenants for this user
     const accessibleTenants = await RBACService.getAccessibleTenants(userId);
@@ -122,7 +122,7 @@ export async function withRoleBasedUI(
     }
 
     const userId = new ObjectId(session.user.id);
-    const tenantId = new ObjectId(session.user.tenantId);
+    const tenantId = new ObjectId("asfaf");
 
     // Get user details
     const db = await getDb();
@@ -163,7 +163,7 @@ export function withAdminAccess() {
     }
 
     const userId = new ObjectId(session.user.id);
-    const tenantId = new ObjectId(session.user.tenantId);
+    const tenantId = new ObjectId("asfaf");
 
     const db = await getDb();
     const user = await db.collection('users').findOne({ _id: userId }) as User | null;
@@ -199,7 +199,7 @@ export async function withResourceOwnership(
     }
 
     const userId = new ObjectId(session.user.id);
-    const tenantId = new ObjectId(session.user.tenantId);
+    const tenantId = new ObjectId("asfaf");
 
     const db = await getDb();
     const user = await db.collection('users').findOne({ _id: userId }) as User | null;

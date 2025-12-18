@@ -12,11 +12,16 @@ export default async function PageDetail({
 }) {
   const param = await params;
   const pageId = param.id;
-  
+
+  // Change when tenantid need to real one
+  const tenantId = "asf";
+
   const session = await auth();
-  
-  if (!session?.user?.tenantId) {
-    return <div className="text-sm text-red-600">Unauthorized: Please sign in</div>;
+
+  if (tenantId) {
+    return (
+      <div className="text-sm text-red-600">Unauthorized: Please sign in</div>
+    );
   }
 
   const cookies = await cookiesFn();
@@ -24,8 +29,9 @@ export default async function PageDetail({
 
   try {
     // Get page data directly from service
+    // Change when tenantid need to real one
     const item = await pageService.getById(
-      session.user.tenantId as string, 
+      tenantId as string,
       pageId,
       websiteId
     );
@@ -42,7 +48,9 @@ export default async function PageDetail({
       websiteId: item.websiteId?.toString(),
       createdAt: item.createdAt ? new Date(item.createdAt).toISOString() : null,
       updatedAt: item.updatedAt ? new Date(item.updatedAt).toISOString() : null,
-      publishedAt: item.publishedAt ? new Date(item.publishedAt).toISOString() : null,
+      publishedAt: item.publishedAt
+        ? new Date(item.publishedAt).toISOString()
+        : null,
     };
 
     // Get website data if websiteId exists
@@ -50,15 +58,21 @@ export default async function PageDetail({
     if (websiteId) {
       const db = await getDatabase();
       const websitesCollection = db.collection("websites");
-      const websiteData = await websitesCollection.findOne({ _id: new ObjectId(websiteId) });
-      
+      const websiteData = await websitesCollection.findOne({
+        _id: new ObjectId(websiteId),
+      });
+
       if (websiteData) {
         serializedWebsite = {
           ...websiteData,
           _id: websiteData._id?.toString(),
           tenantId: websiteData.tenantId?.toString(),
-          createdAt: websiteData.createdAt ? new Date(websiteData.createdAt).toISOString() : null,
-          updatedAt: websiteData.updatedAt ? new Date(websiteData.updatedAt).toISOString() : null,
+          createdAt: websiteData.createdAt
+            ? new Date(websiteData.createdAt).toISOString()
+            : null,
+          updatedAt: websiteData.updatedAt
+            ? new Date(websiteData.updatedAt).toISOString()
+            : null,
         };
       }
     }
@@ -124,11 +138,21 @@ export default async function PageDetail({
     return (
       <div className="space-y-4">
         <h2 className="text-xl font-medium">Edit Page</h2>
-        <PageEditor viewUrl={serializedWebsite} id={pageId} item={serializedItem} fields={fieldConfig} />
+        <PageEditor
+          viewUrl={serializedWebsite}
+          id={pageId}
+          item={serializedItem}
+          fields={fieldConfig}
+        />
       </div>
     );
   } catch (error) {
     console.error("Error loading page:", error);
-    return <div className="text-sm text-red-600">Failed to load page: {error instanceof Error ? error.message : "Unknown error"}</div>;
+    return (
+      <div className="text-sm text-red-600">
+        Failed to load page:{" "}
+        {error instanceof Error ? error.message : "Unknown error"}
+      </div>
+    );
   }
 }

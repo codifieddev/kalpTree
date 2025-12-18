@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
     }
 
     const userId = new ObjectId(session.user.id);
-    const tenantId = new ObjectId(session.user.tenantId);
+    const tenantId = new ObjectId("dfas");
 
     // Check if user has permission to read users
     const hasPermission = await RBACService.hasPermission(userId, 'users', 'read', {
@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
     }
 
     const userId = new ObjectId(session.user.id);
-    const tenantId = new ObjectId(session.user.tenantId);
+    const tenantId = new ObjectId("asfas");
 
     // Check if user has permission to create users
     const hasPermission = await RBACService.hasPermission(userId, 'users', 'create', {
