@@ -1,20 +1,17 @@
-import { ObjectId } from 'mongodb';
+import { ObjectId } from "mongodb";
 
 // Base document with multi-tenant support
 export interface BaseDocument {
   _id: ObjectId;
-  tenantId: ObjectId;
+  tenantId?: ObjectId;
   // Optional website scope for multi-website tenants
   websiteId?: ObjectId;
   createdAt: Date;
   updatedAt: Date;
 }
 
-// Enhanced Role System
-export type UserRole = 'A' | 'F' | 'B' | 'C' | 'D' | 'E' | 'G';
-
 export interface RoleDefinition {
-  code: UserRole;
+  code: string;
   name: string;
   description: string;
   level: number; // Hierarchy level (lower number = higher authority)
@@ -59,17 +56,17 @@ export interface BrandingSettings {
 }
 
 // Tenant (franchise/client) - Enhanced
-export interface Tenant extends Omit<BaseDocument, 'tenantId'> {
-
+export interface Tenant extends Omit<BaseDocument, "tenantId"> {
   slug: string; // subdomain: "franchise1"
   name: string; // "Franchise Store 1"
   email: string;
   phone?: string;
-  
+  userId: string |  ObjectId
+
   // Tenant type and hierarchy
-  type: 'platform' | 'franchise' | 'business' | 'client';
+  type: "platform" | "franchise" | "business" | "client";
   parentTenantId?: ObjectId; // For franchise hierarchy
-  
+
   // Enhanced whitelabel settings
   branding: BrandingSettings;
 
@@ -78,8 +75,8 @@ export interface Tenant extends Omit<BaseDocument, 'tenantId'> {
   customDomainVerified: boolean;
 
   // Billing & subscription
-  plan: 'trial' | 'basic' | 'pro' | 'enterprise';
-  subscriptionStatus: 'active' | 'suspended' | 'cancelled';
+  plan: "trial" | "basic" | "pro" | "enterprise";
+  subscriptionStatus: "active" | "suspended" | "cancelled";
   subscriptionEndsAt?: Date;
 
   // Payment gateway credentials (encrypted)
@@ -116,17 +113,17 @@ export interface Tenant extends Omit<BaseDocument, 'tenantId'> {
   };
 
   // Status
-  status: 'active' | 'suspended' | 'pending';
+  status: "active" | "suspended" | "pending";
 }
 
 // Enhanced User with comprehensive role system
 export interface User extends BaseDocument {
   email: string;
   passwordHash: string;
-  name: string;
-  role: UserRole;
+  // name: string;
+  role: string;
   avatar?: string;
-  status: 'active' | 'invited' | 'suspended';
+  status: "active" | "invited" | "suspended";
   lastLoginAt?: Date;
 
   // Enhanced permissions with granular control
@@ -139,7 +136,7 @@ export interface User extends BaseDocument {
     orders: string[];
     content: string[];
     settings: string[];
-    
+
     // Franchise-specific permissions
     franchise?: {
       createClients: boolean;
@@ -147,14 +144,14 @@ export interface User extends BaseDocument {
       whiteLabel: boolean;
       viewAnalytics: boolean;
     };
-    
+
     // Business-specific permissions
     business?: {
       manageInventory: boolean;
       processOrders: boolean;
       viewReports: boolean;
     };
-    
+
     // Client-specific permissions
     client?: {
       viewOwnData: boolean;
@@ -162,7 +159,7 @@ export interface User extends BaseDocument {
       placeOrders: boolean;
     };
   };
-  
+
   // User metadata
   metadata?: {
     department?: string;
@@ -179,7 +176,7 @@ export interface SuperAdmin {
   email: string;
   passwordHash: string;
   name: string;
-  role: 'super_admin';
+  role: string;
   permissions: {
     platformManagement: boolean;
     tenantManagement: boolean;
@@ -195,23 +192,23 @@ export interface SuperAdmin {
 export interface UIConfiguration {
   _id: ObjectId;
   tenantId: ObjectId;
-  role: UserRole;
-  
+  role: string;
+
   // Navigation configuration
   navigation: {
     items: NavigationItem[];
-    layout: 'sidebar' | 'topbar' | 'hybrid';
+    layout: "sidebar" | "topbar" | "hybrid";
   };
-  
+
   // Dashboard configuration
   dashboard: {
     widgets: DashboardWidget[];
-    layout: 'grid' | 'list' | 'custom';
+    layout: "grid" | "list" | "custom";
   };
-  
+
   // Theme and styling
   theme: BrandingSettings;
-  
+
   createdAt: Date;
   updatedAt: Date;
 }
@@ -223,31 +220,31 @@ export interface NavigationItem {
   href?: string;
   children?: NavigationItem[];
   permissions: string[]; // Required permissions to see this item
-  roles: UserRole[]; // Roles that can see this item
+  roles: string[]; // Roles that can see this item
 }
 
 export interface DashboardWidget {
   id: string;
-  type: 'chart' | 'stat' | 'table' | 'custom';
+  type: "chart" | "stat" | "table" | "custom";
   title: string;
-  size: 'small' | 'medium' | 'large' | 'full';
+  size: "small" | "medium" | "large" | "full";
   position: { x: number; y: number; w: number; h: number };
   config: Record<string, unknown>;
   permissions: string[];
-  roles: UserRole[];
+  roles: string[];
 }
 
 // Franchise-Client Relationship
 export interface FranchiseClient extends BaseDocument {
   franchiseId: ObjectId; // Parent franchise
   clientTenantId: ObjectId; // Client's tenant
-  
+
   // Relationship metadata
-  relationshipType: 'direct' | 'referral' | 'partnership';
+  relationshipType: "direct" | "referral" | "partnership";
   commissionRate?: number; // If applicable
-  
+
   // Status and settings
-  status: 'active' | 'suspended' | 'terminated';
+  status: "active" | "suspended" | "terminated";
   settings: {
     allowDirectAccess: boolean;
     shareAnalytics: boolean;
@@ -260,19 +257,19 @@ export interface ActivityLog {
   _id: ObjectId;
   tenantId: ObjectId;
   userId: ObjectId;
-  
+
   action: string; // 'create', 'update', 'delete', 'login', etc.
   resource: string; // 'user', 'product', 'order', etc.
   resourceId?: ObjectId;
-  
+
   details: {
     before?: Record<string, unknown>;
     after?: Record<string, unknown>;
     metadata?: Record<string, unknown>;
   };
-  
+
   ipAddress?: string;
   userAgent?: string;
-  
+
   createdAt: Date;
 }

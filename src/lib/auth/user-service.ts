@@ -19,7 +19,7 @@ export class UserService {
       // tenantId: tid,
       email: email.toLowerCase(),
     });
-    console.log("respsne user---", response)
+  
     return response
   }
 
@@ -29,18 +29,19 @@ export class UserService {
     return collection.findOne({ _id: objectId });
   }
 
+  
   async createUser(data: {
-    tenantId: string | ObjectId;
+    // tenantId: string | ObjectId;
     email: string;
     password: string;
-    name: string;
-    role: User['role'];
+    // name: string;
+    role: string
+    // role: User['role'];
   }): Promise<User> {
     const collection = await this.getCollection();
-    const tid = typeof data.tenantId === 'string' ? new ObjectId(data.tenantId) : data.tenantId;
 
-    // Check if user already exists
-    const existing = await this.getUserByEmail(tid, data.email);
+    const existing = await this.getUserByEmail(data.email);
+
     if (existing) {
       throw new Error('User with this email already exists');
     }
@@ -49,10 +50,10 @@ export class UserService {
     const passwordHash = await bcrypt.hash(data.password, 10);
 
     const user: Omit<User, '_id'> = {
-      tenantId: tid,
+      // tenantId: tid,
       email: data.email.toLowerCase(),
       passwordHash,
-      name: data.name,
+      // name: data.name,
       role: data.role,
       status: 'active',
       createdAt: new Date(),

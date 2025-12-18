@@ -28,10 +28,10 @@ const baseSchema = z.object({
   tenantName: z.string().min(3).max(80),
   adminEmail: z.string().email(),
   adminPassword: z.string().min(6).max(100),
-  websiteName: z.string().min(2).max(80),
-
+  // websiteName: z.string().min(2).max(80),
   serviceType: z.enum(["WEBSITE_ONLY", "ECOMMERCE"]),
   role: z.string().min(3).max(80),
+  website_name: z.string().min(3).max(80),
 });
 
 // export async function POST(req: Request) {
@@ -125,6 +125,9 @@ export async function POST(req: Request) {
 
     const data: Payload = parsed.data;
 
+
+    console.log(data)
+
     // Superadmin flow
     if (data.role === "superadmin") {
       if (!data.adminEmail || !data.adminPassword) {
@@ -147,8 +150,8 @@ export async function POST(req: Request) {
       !data.tenantName ||
       !data.adminEmail ||
       !data.adminPassword ||
-      !data.websiteName ||
-      !data.tenantSlug
+      !data.tenantSlug ||
+      !data.role || !data.website_name
     ) {
       return NextResponse.json(
         { ok: false, error: "Missing required tenant fields" },
@@ -156,25 +159,25 @@ export async function POST(req: Request) {
       );
     }
 
+    const t = await userService.createUser({
+      email: data.adminEmail,
+      password: data.adminPassword,
+      // name: `${data.tenantName} Owner`,
+      role: data.role,
+    });
+
     const tenant = await tenantService.createTenant({
       slug: data.tenantSlug,
       name: data.tenantName,
       email: data.adminEmail,
       plan: "trial",
-    });
-
-    await userService.createUser({
-      tenantId: tenant._id,
-      email: data.adminEmail,
-      password: data.adminPassword,
-      name: `${data.tenantName} Owner`,
-      role: "A",
+      userId: t._id,
     });
 
     const website = await websiteService.create({
       tenantId: tenant._id,
       tenantSlug: tenant.slug,
-      name: data.websiteName,
+      name: data.website_name,
       serviceType: data.serviceType ?? "WEBSITE_ONLY",
     });
 
@@ -182,8 +185,8 @@ export async function POST(req: Request) {
       ok: true,
       tenantId: String(tenant._id),
       tenantSlug: tenant.slug,
-      websiteId: website.websiteId,
-      systemSubdomain: website.systemSubdomain,
+      // websiteId: website.websiteId,
+      // systemSubdomain: website.systemSubdomain,
     });
   } catch (e: unknown) {
     return NextResponse.json(

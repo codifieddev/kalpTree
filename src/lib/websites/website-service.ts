@@ -67,13 +67,26 @@ export class WebsiteService {
       ),
     ]);
   }
-  
 
   async listByTenant(tenantId: string | ObjectId) {
     const c = await this.col();
     const tid =
       typeof tenantId === "string" ? new ObjectId(tenantId) : tenantId;
     return c.find({ tenantId: tid }).sort({ createdAt: -1 }).toArray();
+  }
+
+  async listByUserId(tenantId: string | ObjectId) {
+    const c = await getDatabase();
+    const coll = await c.collection("tenants");
+    const userId = new ObjectId(tenantId);
+    const c1 = await this.col();
+    const getTenants = await coll.find({ franchise: userId }).toArray();
+
+    return getTenants
+
+    // const tid =
+    //   typeof tenantId === "string" ? new ObjectId(tenantId) : tenantId;
+    // return c1.find({ tenantId: tenId }).sort({ createdAt: -1 }).toArray();
   }
 
   async listforSuperadmin(tenantId: string | ObjectId) {
