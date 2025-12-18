@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Mail, Plus, Users, MailCheck, AlertCircle } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Email Accounts | KalpTree Admin",
+  title: "Email Accounts | Dzinly Admin",
   description: "Manage email accounts and mailboxes",
 };
 

@@ -851,12 +851,22 @@ savePage: async () => {
     toast.error("Editor not initialized.");
     return;
   }
-  const html = editorRef.current.getHtml();
+
+    const html = editorRef.current.getHtml();
+  const css = editorRef.current.getCss?.() || "";
+
+  // Option A: store CSS inline with HTML
+  const fullHtml = `
+    <style>
+      ${css}
+    </style>
+    ${html}
+  `;
   // console.log("Saving page", page._id, html);
   const response = await dispatch(savePageThunk({
     id: page._id,
     tenantId:page.tenantId,
-    content: html
+    content: fullHtml
   })).unwrap();
   // console.log("console.log", response)
   if(response.ok){

@@ -8,6 +8,7 @@ export async function GET() {
     const db = await getDatabase();
     const collections = [
       'tenants','users','custom_roles',
+      "category", "brrand", "segment", "attribute",
       'websites',
       'pages','posts','categories','blog_tags','media','media_folders',
       'products','product_categories','product_variants','carts','orders',

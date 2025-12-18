@@ -47,6 +47,9 @@ export class RBACService {
     
     if (!user) return false;
 
+    // Ensure role exists on the user object
+    if (!user.role) return false;
+
     // Check role-based permissions
     const hasRolePermission = RoleManager.hasPermission(
       user.role,

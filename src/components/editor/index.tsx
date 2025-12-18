@@ -44,10 +44,10 @@ export default function GrapesJSEditor() {
   useEffect(() => {
   if (state.editor && page?.content) {
     state.editor.setComponents(page.content);
-    setEditorHtml(page.content);
-    const css= extractCssFromHtml(page.content)
-    console.log("css---", css)
-    state.editor.setStyle(css)
+     setEditorHtml(page.content);
+    // const css= extractCssFromHtml(page.content)
+    // console.log("css---", css)
+    // state.editor.setStyle(css)
   }else{
     // dispatch(clearPageEdit())
     //   state.editor.setComponents("");

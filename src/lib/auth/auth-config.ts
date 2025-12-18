@@ -4,6 +4,8 @@ import { userService } from './user-service';
 import { tenantService } from '../tenant/tenant-service';
 
 export const authConfig: NextAuthConfig = {
+  // Dynamically set the base URL based on environment
+  trustHost: true,
   providers: [
     CredentialsProvider({
       name: 'Credentials',

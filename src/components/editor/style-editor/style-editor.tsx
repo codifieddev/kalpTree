@@ -967,7 +967,7 @@ function LayoutSection({ styles, onStyleChange }: SectionProps) {
 
 
 function DisplayStyleControl({ styles, onStyleChange }: SectionProps) {
-  console.log("===>>>", styles)
+
   return (
     <div className="space-y-1.5">
       <Label className="text-xs">Display</Label>

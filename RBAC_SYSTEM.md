@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document describes the comprehensive Role-Based Access Control (RBAC) system implemented for the KalpTree admin dashboard. The system provides dynamic user management, franchise white-labeling capabilities, and granular permission control across multiple tenant levels.
+This document describes the comprehensive Role-Based Access Control (RBAC) system implemented for the Dzinly admin dashboard. The system provides dynamic user management, franchise white-labeling capabilities, and granular permission control across multiple tenant levels.
 
 ## Role Hierarchy
 

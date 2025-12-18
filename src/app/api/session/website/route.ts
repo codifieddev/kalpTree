@@ -31,6 +31,7 @@ export async function POST(req: Request) {
   if (!found) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
   const res = NextResponse.json({ ok: true, websiteId: found.websiteId });
+
   const thirtyDays = 30 * 24 * 60 * 60; // seconds
   res.cookies.set("current_website_id", String(found["_id"]), {
     httpOnly: true,

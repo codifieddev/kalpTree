@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 export const metadata: Metadata = {
-  title: "Security | KalpTree Admin",
+  title: "Security | Dzinly Admin",
   description: "Manage security settings and configuration",
 };
 

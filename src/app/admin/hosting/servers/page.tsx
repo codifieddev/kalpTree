@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Server, Activity, HardDrive, Cpu, MemoryStick, Plus } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Server Management | KalpTree Admin",
+  title: "Server Management | Dzinly Admin",
   description: "Manage your hosting servers and infrastructure",
 };
 

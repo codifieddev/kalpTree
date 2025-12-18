@@ -4,7 +4,13 @@ import bcrypt from 'bcryptjs';
 
 function loadEnvDotLocal() {
   try {
-    const raw = readFileSync(new URL('../.env.local', import.meta.url)).toString();
+    // Try .env.local first, then fall back to .env
+    let raw;
+    try {
+      raw = readFileSync(new URL('../.env.local', import.meta.url)).toString();
+    } catch (e) {
+      raw = readFileSync(new URL('../.env', import.meta.url)).toString();
+    }
     for (const line of raw.split(/\r?\n/)) {
       const m = line.match(/^([A-Z0-9_]+)=(.*)$/);
       if (m) {
@@ -22,7 +28,7 @@ function loadEnvDotLocal() {
 async function main() {
   loadEnvDotLocal();
   const uri = process.env.MONGODB_URI;
-  const dbName = process.env.MONGODB_DB || 'kalpdee';
+  const dbName = process.env.MONGODB_DB || 'dzinly';
   if (!uri) throw new Error('Missing MONGODB_URI');
 
   const client = new MongoClient(uri);
@@ -88,7 +94,7 @@ async function main() {
         tenantId: new ObjectId(tenantId),
         slug: '/',
         title: 'Home',
-        content: '<h1>Welcome to KalpTree Demo</h1>',
+        content: '<h1>Welcome to Dzinly Demo</h1>',
         seo: {},
         status: 'published',
         createdAt: now,
@@ -147,9 +153,9 @@ async function main() {
       $set: {
         tenantId: new ObjectId(tenantId),
         slug: 'getting-started',
-        title: 'Getting Started with KalpTree',
+        title: 'Getting Started with Dzinly',
         excerpt: 'A quick intro to your new SaaS.',
-        content: '<p>Welcome to KalpTree!</p>',
+        content: '<p>Welcome to Dzinly!</p>',
         categoryId: 'guides',
         tags: ['welcome'],
         author: { userId: String(adminUserId), name: 'Demo Admin' },

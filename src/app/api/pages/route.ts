@@ -29,6 +29,7 @@ const createSchema = z.object({
 
 export async function GET(req: Request) {
   const session = await auth();
+  console.log(session)
   if (!session?.user?.tenantId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const { searchParams } = new URL(req.url);
   const skip = toNumber(searchParams.get("skip"), 0, 0, 10000);

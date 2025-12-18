@@ -91,7 +91,7 @@ export class WebsiteService {
     tenantSlug: string,
     websiteName: string
   ) {
-    const base = process.env.SYSTEM_BASE_DOMAIN || "kalptree.xyz";
+    const base = process.env.SYSTEM_BASE_DOMAIN || "Dzinly.xyz";
     const left = `${slugify(tenantSlug)}-${slugify(websiteName)}`.slice(0, 60);
     const candidate = `${left}.${base}`;
     const c = await this.col();
