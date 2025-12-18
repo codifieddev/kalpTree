@@ -10,6 +10,9 @@ import { DeviceConfig } from "../../../types/editor";
 import TopToolbar from "./GrapesJSEditor/toolbars/TopToolbar";
 import BottomToolbar from "./GrapesJSEditor/toolbars/BottomToolbar";
 import PropertiesSidebar from "./GrapesJSEditor/sidebar/PropertiesSidebar";
+import { useSelector } from "react-redux";
+import { RootState } from "@/store/store";
+import { clearPageEdit } from "@/hooks/slices/pageEditSlice";
 
 export default function GrapesJSEditor() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -25,6 +28,51 @@ export default function GrapesJSEditor() {
   const [recentBlocks, setRecentBlocks] = useState<string[]>([]);
   const [favoriteBlocks, setFavoriteBlocks] = useState<string[]>([]);
 
+  const dispatch = require("react-redux").useDispatch();
+  const { page } = useSelector((state: RootState) => state.pageEdit);
+
+  function extractCssFromHtml(html: string): string {
+  const matches = html.match(/<style[^>]*>([\s\S]*?)<\/style>/gi);
+  if (!matches) return "";
+  return matches.map(styleTag => {
+    const inner = styleTag.match(/<style[^>]*>([\s\S]*?)<\/style>/i);
+    return inner ? inner[1] : "";
+  }).join("\n");
+}
+
+  // update the page content into editor
+  useEffect(() => {
+  if (state.editor && page?.content) {
+    state.editor.setComponents(page.content);
+     setEditorHtml(page.content);
+    // const css= extractCssFromHtml(page.content)
+    // console.log("css---", css)
+    // state.editor.setStyle(css)
+  }else{
+    // dispatch(clearPageEdit())
+    //   state.editor.setComponents("");
+    // setEditorHtml("");
+  }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, [state.editor, page?.content]);
+
+
+
+  useEffect(() => {
+    if (!state.editor) return;
+    const updateHandler = () => {
+      const html = state.editor.getHtml();
+      
+      // console.log("hfjhhfdhhfhfh----",html)
+      
+     // setEditorHtml(html);
+    //  dispatch({ type: "pageEdit/setContent", payload: html });
+    };
+    state.editor.on("component:update", updateHandler);
+    return () => {
+      state.editor.off("component:update", updateHandler);
+    };
+  }, [state.editor, dispatch]);
   // ─────────────────────────────
   // Import HTML modal
   // ─────────────────────────────
@@ -152,7 +200,9 @@ export default function GrapesJSEditor() {
   // Code editor sync
   // ─────────────────────────────
   const handleUpdateHtml = (html: string) => {
+    console.log("update html")
     if (!state.editor) return;
+    console.log("html ---", html)
     state.editor.setComponents(html);
     setEditorHtml(html);
   };
@@ -160,7 +210,7 @@ export default function GrapesJSEditor() {
   const handleUpdateCss = (css: string) => {
     if (!state.editor) return;
     state.editor.setStyle(css);
-    setEditorCss(css);
+   // setEditorCss(css);
   };
 
   const handleUpdateJs = (js: string) => {
@@ -296,6 +346,8 @@ export default function GrapesJSEditor() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.editor]);
 
+
+
   const allDevices = [
     ...(state.editor?.DeviceManager?.getAll()?.models?.map((model: any) => ({
       id: model.id,
@@ -307,10 +359,10 @@ export default function GrapesJSEditor() {
 
 
   // Fix: handleStyleChange to match expected signature
-  const handleStyleChange = (styles: any) => {
- 
-    if (styles && styles.property && styles.value) {
-      actions.updateStyle(styles.property, styles.value);
+  const handleStyleChange = (property:string, value:string) => {
+  
+    if (property && value) {
+      actions.updateStyle(property, value);
     }
   } 
 

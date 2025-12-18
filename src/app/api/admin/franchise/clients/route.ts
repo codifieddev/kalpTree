@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
     }
 
     const userId = new ObjectId(session.user.id);
-    const tenantId = new ObjectId(session.user.tenantId);
+    const tenantId = new ObjectId("asfas");
 
     // Check if user has franchise permissions
     const hasPermission = await RBACService.hasPermission(userId, 'franchise', 'manage_clients', {
@@ -57,7 +57,7 @@ export async function POST(request: NextRequest) {
     }
 
     const userId = new ObjectId(session.user.id);
-    const franchiseTenantId = new ObjectId(session.user.tenantId);
+    const franchiseTenantId = new ObjectId("asd");
 
     // Check if user has franchise permissions to create clients
     const hasPermission = await RBACService.hasPermission(userId, 'franchise', 'create_clients', {

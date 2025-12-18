@@ -1,6 +1,9 @@
-import { cookies as cookiesFn, headers as headersFn } from "next/headers";
+import { cookies as cookiesFn } from "next/headers";
 import PageEditor, { FieldConfig } from "@/components/admin/Editor";
-
+import { auth } from "@/auth";
+import { pageService } from "@/modules/website/page-service";
+import { getDatabase } from "@/lib/db/mongodb";
+import { ObjectId } from "mongodb";
 
 export default async function PageDetail({
   params,
@@ -8,94 +11,148 @@ export default async function PageDetail({
   params: Promise<{ id: string }>;
 }) {
   const param = await params;
-  const t = param.id;
-  const cookies = await cookiesFn(); // no await
-  const headers = await headersFn(); // no await
-  const cookie = cookies.toString();
-  const host = headers.get("x-forwarded-host") ?? headers.get("host");
-  const proto = headers.get("x-forwarded-proto") ?? "http";
-  const baseUrl = `${proto}://${host}`;
+  const pageId = param.id;
 
-  const res = await fetch(`${baseUrl}/api/pages/${t}`, {
-    cache: "no-store",
-    headers: { cookie },
-  });
+  // Change when tenantid need to real one
+  const tenantId = "asf";
 
-  const websiteId = cookies.get("current_website_id")?.value
+  const session = await auth();
 
-  const viewwebsiteurl = await fetch(`${baseUrl}/api/domain/website?id=${websiteId}`, {
-    cache: "no-store",
-  });
+  if (tenantId) {
+    return (
+      <div className="text-sm text-red-600">Unauthorized: Please sign in</div>
+    );
+  }
 
-  const website = await viewwebsiteurl.json()
+  const cookies = await cookiesFn();
+  const websiteId = cookies.get("current_website_id")?.value;
 
-  if (!res.ok) return <div className="text-sm text-red-600">Not found</div>;
+  try {
+    // Get page data directly from service
+    // Change when tenantid need to real one
+    const item = await pageService.getById(
+      tenantId as string,
+      pageId,
+      websiteId
+    );
 
-  
-  const { item } = await res.json();
+    if (!item) {
+      return <div className="text-sm text-red-600">Page not found</div>;
+    }
 
-  const fieldConfig: FieldConfig[] = [
-    // Readonly fields (shown at top)
-    { name: "slug", label: "Slug", type: "readonly", side: "NA" },
-    { name: "createdAt", label: "CreatedAt", type: "readonly", side: "NA" },
-    { name: "updatedAt", label: "UpdatedAt", type: "readonly", side: "NA" },
+    // Serialize the item to plain object
+    const serializedItem = {
+      ...item,
+      _id: item._id?.toString(),
+      tenantId: item.tenantId?.toString(),
+      websiteId: item.websiteId?.toString(),
+      createdAt: item.createdAt ? new Date(item.createdAt).toISOString() : null,
+      updatedAt: item.updatedAt ? new Date(item.updatedAt).toISOString() : null,
+      publishedAt: item.publishedAt
+        ? new Date(item.publishedAt).toISOString()
+        : null,
+    };
 
-    // Left side (8/12 width) - Main content
-    {
-      name: "title",
-      label: "Title",
-      type: "text",
-      side: "left",
-      placeholder: "Enter page title",
-    },
-    {
-      name: "content",
-      label: "Content",
-      type: "textarea",
-      side: "left",
-      rows: 10,
-    },
+    // Get website data if websiteId exists
+    let serializedWebsite = null;
+    if (websiteId) {
+      const db = await getDatabase();
+      const websitesCollection = db.collection("websites");
+      const websiteData = await websitesCollection.findOne({
+        _id: new ObjectId(websiteId),
+      });
 
-    // Right side (4/12 width) - Metadata
-    {
-      name: "slug",
-      label: "Slug",
-      type: "text",
-      side: "right",
-      placeholder: "page-slug",
-    },
-    {
-      name: "status",
-      label: "Status",
-      type: "select",
-      side: "right",
-      options: [
-        { value: "draft", label: "draft" },
-        { value: "published", label: "published" },
-      ],
-    },
-    {
-      name: "tenantId",
-      label: "Tenant",
-      type: "text",
-      side: "right",
-      placeholder: "tenant-id",
-      readOnly: true
-    },
-     {
-      name: "websiteId",
-      label: "Website",
-      type: "text",
-      side: "right",
-      placeholder: "website-id",
-      readOnly: true
-    },
-  ];
+      if (websiteData) {
+        serializedWebsite = {
+          ...websiteData,
+          _id: websiteData._id?.toString(),
+          tenantId: websiteData.tenantId?.toString(),
+          createdAt: websiteData.createdAt
+            ? new Date(websiteData.createdAt).toISOString()
+            : null,
+          updatedAt: websiteData.updatedAt
+            ? new Date(websiteData.updatedAt).toISOString()
+            : null,
+        };
+      }
+    }
 
-  return (
-    <div className="space-y-4">
-      <h2 className="text-xl font-medium">Edit Page</h2>
-      <PageEditor viewUrl={website} id={t} item={item} fields={fieldConfig} />
-    </div>
-  );
+    const fieldConfig: FieldConfig[] = [
+      // Readonly fields (shown at top)
+      { name: "slug", label: "Slug", type: "readonly", side: "NA" },
+      { name: "createdAt", label: "CreatedAt", type: "readonly", side: "NA" },
+      { name: "updatedAt", label: "UpdatedAt", type: "readonly", side: "NA" },
+
+      // Left side (8/12 width) - Main content
+      {
+        name: "title",
+        label: "Title",
+        type: "text",
+        side: "left",
+        placeholder: "Enter page title",
+      },
+      {
+        name: "content",
+        label: "Content",
+        type: "textarea",
+        side: "left",
+        rows: 10,
+      },
+
+      // Right side (4/12 width) - Metadata
+      {
+        name: "slug",
+        label: "Slug",
+        type: "text",
+        side: "right",
+        placeholder: "page-slug",
+      },
+      {
+        name: "status",
+        label: "Status",
+        type: "select",
+        side: "right",
+        options: [
+          { value: "draft", label: "draft" },
+          { value: "published", label: "published" },
+        ],
+      },
+      {
+        name: "tenantId",
+        label: "Tenant",
+        type: "text",
+        side: "right",
+        placeholder: "tenant-id",
+        readOnly: true,
+      },
+      {
+        name: "websiteId",
+        label: "Website",
+        type: "text",
+        side: "right",
+        placeholder: "website-id",
+        readOnly: true,
+      },
+    ];
+
+    return (
+      <div className="space-y-4">
+        <h2 className="text-xl font-medium">Edit Page</h2>
+        <PageEditor
+          viewUrl={serializedWebsite}
+          id={pageId}
+          item={serializedItem}
+          fields={fieldConfig}
+        />
+      </div>
+    );
+  } catch (error) {
+    console.error("Error loading page:", error);
+    return (
+      <div className="text-sm text-red-600">
+        Failed to load page:{" "}
+        {error instanceof Error ? error.message : "Unknown error"}
+      </div>
+    );
+  }
 }

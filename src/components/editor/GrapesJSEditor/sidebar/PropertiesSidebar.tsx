@@ -18,7 +18,7 @@ type PropertiesSidebarProps = {
   showSidebar: boolean;
   selectedElement: any;
   styles: any;
-  onStyleChange: (styles: any) => void;
+  onStyleChange: (property: string, value: string) => void;
   onAttributeChange: (name: string, value: any) => void;
   onInteractivityChange: (config: any) => void;
 };

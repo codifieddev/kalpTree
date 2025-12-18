@@ -1,4 +1,3 @@
-
 "use client";
 import { useParams, usePathname, useRouter } from "next/navigation";
 import { useMemo, useState, useEffect } from "react";
@@ -28,7 +27,15 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { ChevronUp, ChevronDown, ListFilter, Columns, Eye, Trash2, Edit2 } from "lucide-react";
+import {
+  ChevronUp,
+  ChevronDown,
+  ListFilter,
+  Columns,
+  Eye,
+  Trash2,
+  Edit2,
+} from "lucide-react";
 
 export type ColumnConfig = {
   key: string;
@@ -86,7 +93,7 @@ export function DataTableExt({
   const [sortDir, setSortDir] = useState<SortDir>("asc");
   const [columnVisibility, setColumnVisibility] = useState<
     Record<string, boolean>
-  >({content:false, _id:false});
+  >({ content: false, _id: false });
   const [enumFilters, setEnumFilters] = useState<Record<string, string | null>>(
     {}
   );
@@ -97,11 +104,11 @@ export function DataTableExt({
   const [dateFilters, setDateFilters] = useState<
     Record<string, { from?: string; to?: string }>
   >({});
+
   const router = useRouter();
 
-const path = usePathname()
-const lastSegment = path.split("/").filter(Boolean).pop();
-
+  const path = usePathname();
+  const lastSegment = path.split("/").filter(Boolean).pop();
 
   // derive columns
   const columns = useMemo(() => {
@@ -310,21 +317,45 @@ const lastSegment = path.split("/").filter(Boolean).pop();
     }
   }
 
+  function handleViewPage(
+    e: React.MouseEvent,
+    row: {
+      slug?: string;
+      primaryDomain?: string[];
+    }
+  ) {
+    e.preventDefault();
+    if (path.includes("domain")) {
+      if (!row.primaryDomain?.length) return;
 
-  function handleViewPage(e:React.MouseEvent, row:any){
-    router.push(`/${row.slug}`)
+      const isLocalHost = window.location.hostname.includes("localhost");
+
+      const domain = row.primaryDomain.find((d) =>
+        isLocalHost ? d.includes("localhost") : !d.includes("localhost")
+      );
+
+      if (!domain) return;
+
+      const url = isLocalHost ? `http://${domain}` : `https://${domain}`;
+
+      window.location.href = url;
+    } else {
+      if (!row.slug) return;
+
+      router.push(`/${row.slug}`);
+    }
   }
 
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <div className="text-xl font-semibold">{title}</div>
+        <div className="text-xl font-semibold">{title} </div>
         <div className="flex items-center gap-2">
-          {createHref && (
+          {/* {createHref && (
             <Link href={createHref} className="text-sm">
               <Button size="sm">Create New</Button>
             </Link>
-          )}
+          )} */}
         </div>
       </div>
 
@@ -337,11 +368,12 @@ const lastSegment = path.split("/").filter(Boolean).pop();
               setQuery(e.target.value);
               setPage(1);
             }}
+            className="bg-white h-10 text-xl"
           />
         </div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" size="sm" className="gap-2">
+            <Button variant="outline" size="lg" className="gap-2">
               <Columns className="h-4 w-4" /> Columns
             </Button>
           </DropdownMenuTrigger>
@@ -363,7 +395,7 @@ const lastSegment = path.split("/").filter(Boolean).pop();
         </DropdownMenu>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" size="sm" className="gap-2">
+            <Button variant="outline" size="lg" className="gap-2">
               <ListFilter className="h-4 w-4" /> Filters
             </Button>
           </DropdownMenuTrigger>
@@ -407,7 +439,7 @@ const lastSegment = path.split("/").filter(Boolean).pop();
                     </Select>
                   ) : type === "string" ? (
                     <Input
-                      className="h-8"
+                      className="h-8 bg-white"
                       placeholder="contains..."
                       value={textFilters[c.key] ?? ""}
                       onChange={(e) =>
@@ -522,7 +554,7 @@ const lastSegment = path.split("/").filter(Boolean).pop();
         </DropdownMenu>
       </div>
 
-      <div className="border rounded-md">
+      <div className="border rounded-md bg-white p-4 border-gray-300">
         <Table>
           <TableHeader>
             <TableRow>
@@ -545,12 +577,13 @@ const lastSegment = path.split("/").filter(Boolean).pop();
                     </button>
                   </TableHead>
                 ))}
-              <TableHead className="whitespace-nowrap text-right">Actions</TableHead>
+              <TableHead className="whitespace-nowrap text-right">
+                Actions
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {pageRows.map((row, i) => {
-          
               return (
                 <TableRow
                   key={row._id ?? i}
@@ -585,7 +618,7 @@ const lastSegment = path.split("/").filter(Boolean).pop();
                     })}
                   <TableCell className="py-2 text-right">
                     <div className="flex items-center justify-end gap-2">
-                       <Button
+                      <Button
                         variant="ghost"
                         size="sm"
                         className="h-8 w-8 p-0 text-green-500 hover:text-destructive"
@@ -612,7 +645,6 @@ const lastSegment = path.split("/").filter(Boolean).pop();
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>
-                     
                     </div>
                   </TableCell>
                 </TableRow>
@@ -646,7 +678,7 @@ const lastSegment = path.split("/").filter(Boolean).pop();
               setPage(1);
             }}
           >
-            <SelectTrigger className="h-8 w-[90px]">
+            <SelectTrigger className="h-8 w-[90px] bg-white">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>

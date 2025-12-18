@@ -12,7 +12,10 @@ export async function POST(request: NextRequest) {
     }
 
     const userId = new ObjectId(session.user.id);
-    const tenantId = new ObjectId(session.user.tenantId);
+    const tenantId = new ObjectId(
+      // "asda"
+      "asfas"
+    );
 
     // Check if user has permission to update branding settings
     const hasPermission = await RBACService.hasPermission(userId, 'settings', 'branding', {

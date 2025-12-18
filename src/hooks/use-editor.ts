@@ -3,6 +3,10 @@
 import { useEffect, useRef, useState } from "react";
 import { EditorState, LayerItem } from "../../types/editor";
 import { createEditorConfig } from "../../utils/editor-config";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@/store/store";
+import { savePageThunk } from "./slices/pageEditSlice";
+import { toast } from "sonner";
 
 
 
@@ -91,6 +95,9 @@ export function useEditor(containerId: string) {
     },
   });
 
+  console.log("state----",state)
+  const dispatch= useDispatch<AppDispatch>()
+  const {page}= useSelector((state:RootState)=>state.pageEdit)
   useEffect(() => {
     const initEditor = async () => {
       try {
@@ -833,10 +840,40 @@ export function useEditor(containerId: string) {
       }
     },
 
-    savePage: () => {
-      console.log("yes");
-      console.log(editorRef.current?.getHtml());
-    },
+savePage: async () => {
+  console.log("save the page called")
+
+  if (!page?._id) {
+    toast.error("No page ID found. Cannot save.");
+    return;
+  }
+  if (!editorRef.current) {
+    toast.error("Editor not initialized.");
+    return;
+  }
+
+    const html = editorRef.current.getHtml();
+  const css = editorRef.current.getCss?.() || "";
+
+  // Option A: store CSS inline with HTML
+  const fullHtml = `
+    <style>
+      ${css}
+    </style>
+    ${html}
+  `;
+  // console.log("Saving page", page._id, html);
+  const response = await dispatch(savePageThunk({
+    id: page._id,
+    tenantId:page.tenantId,
+    content: fullHtml
+  })).unwrap();
+  // console.log("console.log", response)
+  if(response.ok){
+    toast.success("Page content updated successfully!");
+  }
+  // Optionally handle response or errors here
+},
 
     exportHtml: () => {
       if (editorRef.current) {
@@ -985,6 +1022,7 @@ export function useEditor(containerId: string) {
 
     updateStyle: (property: string, value: string) => {
       try {
+        console.log("Selcted Editor")
         if (state.selectedElement) {
           // Create a new style object with the updated property
           const style = { [property]: value };
@@ -1160,6 +1198,8 @@ export function useEditor(containerId: string) {
             }
           }
         }
+        //  console.log("edit get edit---get html", state.editor.getHtml())
+        // console.log("selected Elememnt---", state.selectedElement)
       } catch (error) {
         console.error("Error updating style:", error);
       }
@@ -1216,6 +1256,7 @@ export function useEditor(containerId: string) {
     selectComponent: (componentId: string) => {
       if (editorRef.current) {
         const component = editorRef.current.Components.getById(componentId);
+        console.log("component---",component)
         if (component) {
           editorRef.current.select(component);
         }

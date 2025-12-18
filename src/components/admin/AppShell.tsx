@@ -1,5 +1,3 @@
-
-
 "use client";
 
 import * as React from "react";
@@ -9,58 +7,14 @@ import { AnimatePresence, motion } from "framer-motion";
 import {
   LayoutDashboard,
   Globe2,
-  Server,
-  Shield,
   FileText,
   Type,
-  ShoppingBag,
-  BarChart3,
-  Code2,
-  Settings,
-  Users,
-  CreditCard,
-  Menu,
-  Sparkles,
-  Package,
   Tags,
-  ShoppingCart,
   Building2,
   Bell,
   Search,
-  ChevronDown,
-  Database,
-  FolderOpen,
-  HardDrive,
-  Lock,
-  Mail,
-  Forward,
-  MessageSquare,
-  Zap,
-  Activity,
-  TrendingUp,
-  Gauge,
-  FileBarChart,
-  Puzzle,
-  Webhook,
-  HelpCircle,
-  BookOpen,
-  MessageCircle,
-  Video,
-  Phone,
-  Wifi,
-  CloudCog,
-  Key,
-  Eye,
-  AlertTriangle,
-  Timer,
-  Cpu,
-  MemoryStick,
-  Network,
-  Layers,
-  GitBranch,
-  Plug2,
-  Store,
-  ExternalLink,
+  Menu,
+  Sparkles,
   Images,
   RectangleHorizontal,
   RectangleVertical,
@@ -70,7 +24,76 @@ import {
   Share2,
   LayoutTemplate,
   Globe,
+  ChevronDown,
+  ChevronRight,
+  Settings2,
+  CreditCard,
+  Activity,
+  Blocks,
+  Webhook,
+  Download,
+  ShieldCheck,
+  Users,
+  Fingerprint,
+  UsersRound,
+  UserPlus,
+  History,
+  KeyRound,
+  ImagePlus, 
+  ScanSearch, 
+  Paintbrush, 
+  Bot,
+  Network ,
+  Compass ,
+  Tag,
+  Terminal, 
+  Heart, 
+  GalleryVerticalEnd, 
+  Cpu,
+  Image as ImageIcon,
+  Megaphone,
+  BookOpen,
+  TicketPercent,
+  MailPlus,
+  Zap,
+  ShoppingBag,
+  BarChart4,
+  ShoppingCart,
+  RefreshCcw,
+  ReceiptIndianRupee, // or Banknote / Percent
+  Truck,
+  Settings,
+  Package,
+  LayoutGrid,
+  Award,
+  Layers,
+  ListTree,
+  Hash,
+  Component,
+  Boxes,
+  CircleDollarSign,
+  Briefcase,
+  Image,
+  SwatchBook,
+
+
+  BarChart3, 
+
+  HeartPulse, 
+
+  FileCode2, 
+  Newspaper, 
+
+  PanelTop, 
+  PanelBottom, 
+
+  ClipboardList, 
+  ArrowLeftRight, 
+
+
+
 } from "lucide-react";
+import { FaChevronCircleLeft,FaChevronCircleRight } from "react-icons/fa";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -86,7 +109,6 @@ import {
   SheetContent,
   SheetHeader,
   SheetTitle,
-  SheetTrigger,
 } from "@/components/ui/sheet";
 import {
   Select,
@@ -106,6 +128,12 @@ import {
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { signOut } from "next-auth/react";
+import { useDispatch } from "react-redux";
+import { store } from "@/store/store";
+import { clearAttributes } from "@/hooks/slices/attribute/AttributeSlice";
+import { clearBrands } from "@/hooks/slices/brand/BrandSlice";
+import { clearSegments } from "@/hooks/slices/segment/SegmentSlice";
+import { clearCategories } from "@/hooks/slices/category/CategorySlice";
 
 // ---------------------------------------------------------------------------
 // Types & interfaces
@@ -115,7 +143,7 @@ export type Website = {
   _id: string;
   websiteId: string;
   name: string;
-  primaryDomain?: string []|string | null;
+  primaryDomain?: string[] | string | null;
   systemSubdomain: string;
   serviceType: "WEBSITE_ONLY" | "ECOMMERCE";
   status?: "active" | "paused" | "error";
@@ -125,9 +153,10 @@ export type User = {
   id: string;
   email: string;
   name: string;
-  tenantId: string;
-  tenantSlug: string;
+  tenantId?: string;
+  tenantSlug?: string;
   role: string;
+  permissions?: string[];
 };
 
 type AppShellProps = {
@@ -142,7 +171,7 @@ type NavItem = {
   label: string;
   href: string;
   icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
-  permission?: string;
+  permission?: string | string[];
   badge?: string;
 };
 
@@ -154,87 +183,519 @@ type NavSection = {
 };
 
 // ---------------------------------------------------------------------------
-// Navigation structure
+// Navigation structure (same as you)
 // ---------------------------------------------------------------------------
 
 const currentWebsiteSections: NavSection[] = [
   {
-    id: "website-overview",
+    id: "dashboard-overview",
+    label: "Overview",
+    items: [
+      { label: "Dashboard", href: "/admin/pages", icon: LayoutDashboard },
+      { label: "Analytics", href: "/admin/analytics", icon: BarChart3, permission: "websites:update" },
+      { label: "Activity Log", href: "/admin/activity-log", icon: Activity, permission: "analytics:view" },
+      { label: "Notifications", href: "/admin/notifications", icon: Bell, permission: "security:read" },
+      { label: "System Health", href: "/admin/system-health", icon: HeartPulse, permission: "security:read" },
+      { label: "Quick Actions", href: "/admin/quick-actions", icon: Zap, permission: "security:read" },
+    ],
+  },
+
+  {
+    id: "websites",
     label: "Websites",
     items: [
-      {
-        label: "Pages",
-        href: "/admin/pages",
-        icon: LayoutDashboard,
-      },
+      { label: "Pages", href: "/admin/pages", icon: FileCode2 },
       {
         label: "Posts",
         href: "/admin/posts",
-        icon: FileText,
+        icon: Newspaper,
         permission: "websites:update",
       },
       {
         label: "Media",
         href: "/admin/media",
-        icon: Images,
+        icon: ImageIcon,
         permission: "analytics:view",
       },
       {
         label: "Header",
         href: "/admin/header",
-        icon: RectangleHorizontal,
+        icon: PanelTop,
         permission: "security:read",
       },
       {
         label: "Footer",
         href: "/admin/footer",
-        icon: RectangleVertical,
+        icon: PanelBottom,
         permission: "security:read",
       },
       {
         label: "Navigation",
         href: "/admin/navigation",
-        icon: Navigation,
+        icon: Compass,
+        permission: "security:read",
+      },
+      {
+        label: "Forms",
+        href: "/admin/forms",
+        icon: ClipboardList,
+        permission: "security:read",
+      },
+      {
+        label: "Redirects",
+        href: "/admin/redirects",
+        icon: ArrowLeftRight,
+        permission: "security:read",
+      },
+      {
+        label: "Domain Settings",
+        href: "/admin/domains",
+        icon: Globe2,
         permission: "security:read",
       },
     ],
   },
+
   {
     id: "branding",
     label: "Branding & Design",
     items: [
+      { 
+        label: "Brand Profile", 
+        href: "/admin/branding/brand-profile", 
+        icon: LayoutGrid, 
+        permission: ["content:read", "content:update", "content:delete"] 
+      },
       {
         label: "Logo",
-        href: "/admin/logo",
-        icon: BadgeCent,
-        permission: "content:read",
+        href: "/admin/branding/logo",
+        icon: Image,
+        permission: ["content:read", "content:update", "content:delete"],
       },
       {
-        label: "Color Pallet",
-        href: "/admin/color-pallet",
+        label: "Colors",
+        href: "/admin/branding/colors",
         icon: Palette,
-        permission: "content:read",
-      },
-      {
-        label: "Social Links",
-        href: "/admin/social-links",
-        icon: Share2,
-        permission: "content:read",
-      },
-      {
-        label: "Layout Settings",
-        href: "/admin/layout-settings",
-        icon: LayoutTemplate,
-        permission: "content:read",
+        permission: ["content:read", "content:update", "content:delete"],
       },
       {
         label: "Typography",
-        href: "/admin/typography",
+        href: "/admin/branding/typography",
         icon: Type,
-        permission: "content:update",
+        permission: ["content:read", "content:update", "content:delete"],
+      },
+      {
+        label: "Layout Settings",
+        href: "/admin/branding/layout-settings",
+        icon: LayoutTemplate,
+        permission: ["content:read", "content:update", "content:delete"],
+      },
+      {
+        label: "Theme Presets",
+        href: "/admin/branding/theme-presets",
+        icon: SwatchBook,
+        permission: ["content:read", "content:update", "content:delete"],
       },
     ],
   },
+
+  {
+    id: "products",
+    label: "Products",
+    items: [
+      {
+        label: "Products",
+        href: "/admin/products",
+        icon: Package,
+        permission: ["content:read", "content:update", "content:delete"],
+      },
+      {
+        label: "Category",
+        href: "/admin/category",
+        icon: LayoutGrid,
+        permission: ["content:read", "content:update", "content:delete"],
+      },
+      {
+        label: "Brand",
+        href: "/admin/brand",
+        icon: Award,
+        permission: ["content:read", "content:update", "content:delete"],
+      },
+      {
+        label: "Segment",
+        href: "/admin/segment",
+        icon: Layers,
+        permission: ["content:read", "content:update", "content:delete"],
+      },
+      {
+        label: "Attribute",
+        href: "/admin/attribute",
+        icon: ListTree,
+        permission: ["content:read", "content:update", "content:delete"],
+      },
+      {
+        label: "Styles",
+        href: "/admin/styles",
+        icon: Palette,
+        permission: ["content:read", "content:update", "content:delete"],
+      },
+      {
+        label: "Tags",
+        href: "/admin/tags",
+        icon: Hash,
+        permission: ["content:read", "content:update", "content:delete"],
+      },
+      {
+        label: "Attributes",
+        href: "/admin/attributes-list",
+        icon: Component,
+        permission: ["content:read", "content:update", "content:delete"],
+      },
+      {
+        label: "Variants",
+        href: "/admin/variants",
+        icon: Boxes,
+        permission: ["content:read", "content:update", "content:delete"],
+      },
+      {
+        label: "Pricing Rules",
+        href: "/admin/pricing-rules",
+        icon: CircleDollarSign,
+        permission: ["content:read", "content:update", "content:delete"],
+      },
+    ],
+  },
+
+  {
+    id: "ecommerce",
+    label: "E-Commerce",
+    items: [
+      {
+        label: "Orders",
+        href: "/admin/ecommerce/orders",
+        icon: ShoppingBag,
+        permission: ["content:read", "content:update", "content:delete"],
+      },
+      {
+        label: "Customers",
+        href: "/admin/ecommerce/customers",
+        icon: Users,
+        permission: ["content:read", "content:update", "content:delete"],
+      },
+      {
+        label: "Reports",
+        href: "/admin/ecommerce/reports",
+        icon: BarChart4,
+        permission: ["content:read", "content:update", "content:delete"],
+      },
+      {
+        label: "Abandoned Carts",
+        href: "/admin/ecommerce/abandoned-carts",
+        icon: ShoppingCart,
+        permission: ["content:read", "content:update", "content:delete"],
+      },
+      {
+        label: "Subscriptions",
+        href: "/admin/ecommerce/subscriptions",
+        icon: RefreshCcw,
+        permission: ["content:read", "content:update", "content:delete"],
+      },
+      {
+        label: "Taxes",
+        href: "/admin/ecommerce/taxes",
+        icon: ReceiptIndianRupee,
+        permission: ["content:read", "content:update", "content:delete"],
+      },
+      {
+        label: "Shipping",
+        href: "/admin/ecommerce/shipping",
+        icon: Truck,
+        permission: ["content:read", "content:update", "content:delete"],
+      },
+      {
+        label: "Payments",
+        href: "/admin/ecommerce/payments",
+        icon: CreditCard,
+        permission: ["content:read", "content:update", "content:delete"],
+      },
+      {
+        label: "Invoices",
+        href: "/admin/ecommerce/invoices",
+        icon: FileText,
+        permission: ["content:read", "content:update", "content:delete"],
+      },
+      {
+        label: "Settings",
+        href: "/admin/ecommerce/settings",
+        icon: Settings,
+        permission: ["content:read", "content:update", "content:delete"],
+      },
+    ],
+  },
+
+  {
+    id: "marketing",
+    label: "Marketing",
+    items: [
+      {
+        label: "Banners",
+        href: "/admin/marketing/banners",
+        icon: ImageIcon,
+        permission: ["content:read", "content:update", "content:delete"],
+      },
+      {
+        label: "Campaigns",
+        href: "/admin/marketing/campaigns",
+        icon: Megaphone,
+        permission: ["content:read", "content:update", "content:delete"],
+      },
+      {
+        label: "Catalog Generation",
+        href: "/admin/marketing/catalog-generation",
+        icon: BookOpen,
+        permission: ["content:read", "content:update", "content:delete"],
+      },
+      {
+        label: "Quotations",
+        href: "/admin/marketing/quotations",
+        icon: FileText,
+        permission: ["content:read", "content:update", "content:delete"],
+      },
+      {
+        label: "Coupons",
+        href: "/admin/marketing/coupons",
+        icon: TicketPercent,
+        permission: ["content:read", "content:update", "content:delete"],
+      },
+      {
+        label: "Email Templates",
+        href: "/admin/marketing/email-templates",
+        icon: MailPlus,
+        permission: ["content:read", "content:update", "content:delete"],
+      },
+      {
+        label: "Integrations",
+        href: "/admin/marketing/integrations",
+        icon: Share2,
+        permission: ["content:read", "content:update", "content:delete"],
+      },
+      {
+        label: "Automation Rules",
+        href: "/admin/marketing/automation-rules",
+        icon: Zap,
+        permission: ["content:read", "content:update", "content:delete"],
+      },
+    ],
+},
+
+  {
+      id: "ai-studio",
+      label: "AI Studio", 
+      items: [
+        { 
+          label: "Image Uploads", 
+          href: "/admin/ai-studio/image-uploads", 
+          icon: ImagePlus, 
+          permission: ["content:read", "content:update", "content:delete"] 
+        },
+        { 
+          label: "Segment Detection", 
+          href: "/admin/ai-studio/segment-detection", 
+          icon: ScanSearch, 
+          permission: ["content:read", "content:update", "content:delete"] 
+        },
+        { 
+          label: "Material Application", 
+          href: "/admin/ai-studio/material-application", 
+          icon: Paintbrush, 
+          permission: ["content:read", "content:update", "content:delete"] 
+        },
+        { 
+          label: "Prompt Library", 
+          href: "/admin/ai-studio/prompt-library", 
+          icon: Terminal, 
+          permission: ["content:read", "content:update", "content:delete"] 
+        },
+        { 
+          label: "Render History", 
+          href: "/admin/ai-studio/render-history", 
+          icon: History, 
+          permission: ["content:read", "content:update", "content:delete"] 
+        },
+        { 
+          label: "Saved Designs", 
+          href: "/admin/ai-studio/saved-designs", 
+          icon: Heart, 
+          permission: ["content:read", "content:update", "content:delete"] 
+        },
+        { 
+          label: "Reference Images", 
+          href: "/admin/ai-studio/reference-images", 
+          icon: GalleryVerticalEnd, 
+          permission: ["content:read", "content:update", "content:delete"] 
+        },
+        { 
+          label: "AI Settings", 
+          href: "/admin/ai-studio/ai-settings", 
+          icon: Cpu, 
+          permission: ["content:read", "content:update", "content:delete"] 
+        },
+      ],
+  },
+
+  {
+    id: "ai-studio",
+    label: "AI Studio",
+    items: [
+      {
+        label: "Image Uploads",
+        href: "/admin/ai-studio/banners",
+        icon: ImagePlus,
+        permission: ["content:read", "content:update", "content:delete"],
+      },
+      {
+        label: "Segment Detection",
+        href: "/admin/ai-studio/campaigns",
+        icon: ScanSearch,
+        permission: ["content:read", "content:update", "content:delete"],
+      },
+      {
+        label: "Material Application",
+        href: "/admin/ai-studio/catalog-generation",
+        icon: Paintbrush,
+        permission: ["content:read", "content:update", "content:delete"],
+      },
+      {
+        label: "Prompt Library",
+        href: "/admin/ai-studio/quotations",
+        icon: Terminal,
+        permission: ["content:read", "content:update", "content:delete"],
+      },
+      {
+        label: "Render History",
+        href: "/admin/ai-studio/coupons",
+        icon: History,
+        permission: ["content:read", "content:update", "content:delete"],
+      },
+      {
+        label: "Saved Designs",
+        href: "/admin/ai-studio/email-templates",
+        icon: Heart,
+        permission: ["content:read", "content:update", "content:delete"],
+      },
+      {
+        label: "Reference Images",
+        href: "/admin/ai-studio/integrations",
+        icon: GalleryVerticalEnd,
+        permission: ["content:read", "content:update", "content:delete"],
+      },
+      {
+        label: "AI Settings",
+        href: "/admin/ai-studio/automation-rules",
+        icon: Cpu,
+        permission: ["content:read", "content:update", "content:delete"],
+      },
+    ],
+  },
+
+  {
+    id: "users",
+    label: "Users",
+    items: [
+      {
+        label: "All Users",
+        href: "/admin/users/all-users",
+        icon: Users,
+        permission: ["content:read", "content:update", "content:delete"],
+      },
+      {
+        label: "Roles & Permissions",
+        href: "/admin/users/roles-permissions",
+        icon: Fingerprint,
+        permission: ["content:read", "content:update", "content:delete"],
+      },
+      {
+        label: "Teams",
+        href: "/admin/users/teams",
+        icon: UsersRound,
+        permission: ["content:read", "content:update", "content:delete"],
+      },
+      {
+        label: "Invitations",
+        href: "/admin/users/invitations",
+        icon: UserPlus,
+        permission: ["content:read", "content:update", "content:delete"],
+      },
+      {
+        label: "Activity Logs",
+        href: "/admin/users/activity-logs",
+        icon: History,
+        permission: ["content:read", "content:update", "content:delete"],
+      },
+      {
+        label: "API Access",
+        href: "/admin/users/api-access",
+        icon: KeyRound,
+        permission: ["content:read", "content:update", "content:delete"],
+      },
+    ],
+  },
+
+  {
+    id: "settings",
+    label: "Settings",
+    items: [
+      {
+        label: "General",
+        href: "/admin/settings/general",
+        icon: Settings2,
+        permission: ["content:read", "content:update", "content:delete"],
+      },
+      {
+        label: "Domain & DNS",
+        href: "/admin/settings/domain-dns",
+        icon: Globe,
+        permission: ["content:read", "content:update", "content:delete"],
+      },
+      {
+        label: "Billing & Plans",
+        href: "/admin/settings/billing-plans",
+        icon: CreditCard,
+        permission: ["content:read", "content:update", "content:delete"],
+      },
+      {
+        label: "Usage & Limits",
+        href: "/admin/settings/usage-limits",
+        icon: Activity,
+        permission: ["content:read", "content:update", "content:delete"],
+      },
+      {
+        label: "Integrations",
+        href: "/admin/settings/integrations",
+        icon: Blocks,
+        permission: ["content:read", "content:update", "content:delete"],
+      },
+      {
+        label: "Webhooks",
+        href: "/admin/settings/webhooks",
+        icon: Webhook,
+        permission: ["content:read", "content:update", "content:delete"],
+      },
+      {
+        label: "Data Export",
+        href: "/admin/settings/data-export",
+        icon: Download,
+        permission: ["content:read", "content:update", "content:delete"],
+      },
+      {
+        label: "Security",
+        href: "/admin/settings/security",
+        icon: ShieldCheck,
+        permission: ["content:read", "content:update", "content:delete"],
+      },
+    ],
+  },
+
   {
     id: "domains",
     label: "Domain & Hosting",
@@ -250,7 +711,45 @@ const currentWebsiteSections: NavSection[] = [
 ];
 
 // ---------------------------------------------------------------------------
-// Sidebar components
+// Helpers
+// ---------------------------------------------------------------------------
+
+const ease = [0.22, 1, 0.36, 1] as const;
+
+function useHasPermission(user: User | null) {
+  return React.useCallback(
+    (permission?: string | string[]) => {
+      if (!permission) return true;
+      if (!user) return true;
+
+      const required = Array.isArray(permission) ? permission : [permission];
+      if (!user.permissions) return true;
+
+      return required.some((p) => user.permissions?.includes(p));
+    },
+    [user]
+  );
+}
+
+// Section "header icon" like screenshot (one icon per group)
+const sectionIconMap: Record<
+  string,
+  React.ComponentType<React.SVGProps<SVGSVGElement>>
+> = {
+  "dashboard-overview": LayoutGrid,
+  websites: Globe,
+  branding: Palette,
+  products: Tags,
+  ecommerce: ShoppingCart,
+  marketing: Megaphone,
+  "ai-studio": Bot,
+  users: Users,
+  settings: Settings,
+  domains: Network,
+};
+
+// ---------------------------------------------------------------------------
+// Sidebar (Desktop) — matches screenshot style
 // ---------------------------------------------------------------------------
 
 type SidebarProps = {
@@ -267,113 +766,374 @@ function Sidebar({
   currentWebsite,
   user,
   onWebsiteChange,
-  collapsed,
+  collapsed = false,
   onToggleCollapse,
 }: SidebarProps) {
   const pathname = usePathname();
-  const [hoveredId, setHoveredId] = React.useState<string | null>(null);
+  const hasPermission = useHasPermission(user);
 
-  // Helper function to check if user has permission (simplified for now)
-  const hasPermission = (permission?: string) => {
-    if (!permission || !user) return true;
-    // TODO: Integrate with actual RBAC service
-    return true;
-  };
+  const filteredWebsiteSections = React.useMemo(() => {
+    return currentWebsiteSections
+      .map((section) => ({
+        ...section,
+        items: section.items.filter((item) => hasPermission(item.permission)),
+      }))
+      .filter((section) => section.items.length > 0);
+  }, [hasPermission]);
 
-  const filteredWebsiteSections = currentWebsiteSections
-    .map((section) => ({
-      ...section,
-      items: section.items.filter((item) => hasPermission(item.permission)),
-    }))
-    .filter((section) => section.items.length > 0);
+  //  const filteredWebsiteSections = React.useMemo(() => {
+  //   return currentWebsiteSections
+  //     .map((section) => ({
+  //       ...section,
+  //       items: section.items.filter((item) => hasPermission(true)),
+  //     }))
+  //     .filter((section) => section.items.length > 0);
+  // }, [hasPermission]);
+
+  // open/close groups (dropdown like "Income" in screenshot)
+  const [openGroups, setOpenGroups] = React.useState<Record<string, boolean>>(
+    () => {
+      const init: Record<string, boolean> = {};
+      filteredWebsiteSections.forEach((s, idx) => (init[s.id] = idx === 0)); // first group open by default
+      return init;
+    }
+  );
+
+  React.useEffect(() => {
+    setOpenGroups((prev) => {
+      const next = { ...prev };
+      filteredWebsiteSections.forEach((s, idx) => {
+        if (typeof next[s.id] === "undefined") next[s.id] = idx === 0;
+      });
+      return next;
+    });
+  }, [filteredWebsiteSections]);
+
+  const toggleGroup = (id: string) =>
+    setOpenGroups((p) => ({ ...p, [id]: !p[id] }));
+
+  // collapsed hover floating panel (like screenshot right)
+  const [hoverGroupId, setHoverGroupId] = React.useState<string | null>(null);
 
   return (
     <TooltipProvider>
       <div
         className={cn(
-          "relative hidden border-r bg-background border-2 h-screen md:flex",
-          collapsed ? "w-[72px]" : "w-64"
+          "relative hidden md:flex h-screen",
+          collapsed ? "w-[84px]" : "w-[320px]"
         )}
       >
-        <div className="flex h-full flex-1 flex-col gap-2">
-          {/* Logo / brand */}
-          <div className="flex items-center gap-2 px-4 pt-4 pb-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-xs font-bold text-primary-foreground">
-              KT
-            </div>
-            {!collapsed && (
-              <div>
-                <div className="text-sm font-semibold tracking-tight">
-                  KalpTree
-                </div>
-                <div className="text-[11px] text-muted-foreground">
-                  Multi-tenant CMS
-                </div>
-              </div>
+        {/* ✅ soft container like screenshot */}
+        <div className="w-full ">
+          <div
+            className={cn(
+              "h-full  border bg-[#f5f6f7] text-[#111]",
+              "shadow-[0_10px_35px_rgba(0,0,0,0.08)]"
             )}
-          </div>
-
-          {/* Website selector */}
-          {websites.length > 0 && (
-            <div className="px-3">
-              <Select
-                value={currentWebsite?.websiteId || ""}
-                onValueChange={onWebsiteChange}
-              >
-                <SelectTrigger
-                  className={cn("h-9 w-full text-xs", collapsed && "px-2")}
-                >
-                  {!collapsed && (
-                    <SelectValue placeholder="Select website">
-                      {currentWebsite?.name || "Select website"}
-                    </SelectValue>
-                  )}
-                  {collapsed && <Globe2 className="h-4 w-4" />}
-                </SelectTrigger>
-                <SelectContent>
-                  {websites.map((site) => (
-                    <SelectItem key={site._id} value={site._id}>
-                      <div className="flex flex-col">
-                        <span className="text-xs font-medium">{site.name}</span>
-                        <span className="text-[11px] text-muted-foreground">
-                          {site.primaryDomain || site.systemSubdomain}
-                        </span>
+          >
+            <div className="flex h-full flex-col">
+              <div className="border-b pb-4">
+                {/* Brand row */}
+                <div className={cn("px-4 pt-4 pb-0", collapsed && "px-3")}>
+                  <div className="flex items-center gap-3">
+                    <div className="grid h-10 w-10 place-items-center rounded-md">
+                      <img
+                        src="../dzinly-favicon.svg"
+                        className="w-10 h-10"
+                      ></img>
+                    </div>
+                    {!collapsed && (
+                      <div className="leading-tight">
+                        <div className="text-sm font-semibold">Dzinly</div>
+                        <div className="text-[11px] text-black/45">
+                          Admin panel
+                        </div>
                       </div>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                    )}
+                  </div>
+                </div>
+
+                {/* Website selector */}
+                {websites.length > 0 && (
+                  <div className={cn("px-3 pt-2", collapsed && "px-2")}>
+                    <Select
+                      value={currentWebsite?._id || ""}
+                      onValueChange={onWebsiteChange}
+                    >
+                      <SelectTrigger
+                        className={cn(
+                          "py-6 w-full rounded-md bg-white text-start shadow",
+                          collapsed && "justify-start px-2"
+                        )}
+                      >
+                        {!collapsed ? (
+                          <SelectValue placeholder="Select website" />
+                        ) : (
+                          <Globe2 className="h-4 w-4 text-black/70" />
+                        )}
+                      </SelectTrigger>
+                      <SelectContent>
+                        {websites.map((site) => (
+                          <SelectItem key={site._id} value={site._id}>
+                            <div className="flex flex-col">
+                              <span className="text-xs font-medium uppercase">
+                                {site.name}
+                              </span>
+                              <span className="text-[11px] text-muted-foreground">
+                                {site.primaryDomain || site.systemSubdomain}
+                              </span>
+                            </div>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+              </div>
+
+              <ScrollArea
+                className={cn("mt-3 flex-1 px-2 pb-3", collapsed && "px-2")}
+              >
+
+                {/* Change true to current website to change logic */}
+                <div className="space-y-2">
+                  {!true ? (
+                    <div
+                      className={cn(
+                        "px-3 py-6 text-sm text-black/45",
+                        collapsed && "text-center px-1"
+                      )}
+                    >
+                      Select website
+                    </div>
+                  ) : (
+                    filteredWebsiteSections.map((section) => {
+                      const HeaderIcon =
+                        sectionIconMap[section.id] || LayoutDashboard;
+                      const isOpen = !!openGroups[section.id];
+
+                      // if collapsed: icon only + hover opens floating panel
+                      if (collapsed) {
+                        return (
+                          <div
+                            key={section.id}
+                            className="relative"
+                            onMouseEnter={() => setHoverGroupId(section.id)}
+                            onMouseLeave={() => setHoverGroupId(null)}
+                          >
+                            <Tooltip delayDuration={150}>
+                              <TooltipTrigger asChild>
+                                <button
+                                  type="button" 
+                                  className={cn(
+                                    "w-full flex items-center justify-center",
+                                    "h-11 rounded-md bg-white/70 hover:bg-white transition",
+                                    "border border-black/5 shadow-sm"
+                                  )}
+                                >
+                                 <HeaderIcon className="h-5 w-5 text-black/70" />
+                                </button>
+                              </TooltipTrigger>
+                              <TooltipContent side="right">
+                                {section.label}
+                              </TooltipContent>
+                            </Tooltip>
+
+                            {/* floating panel like screenshot */}
+                            <AnimatePresence>
+                              {hoverGroupId === section.id && (
+                                <motion.div
+                                  initial={{ opacity: 0, x: 10, y: 0 }}
+                                  animate={{
+                                    opacity: 1,
+                                    x: 0,
+                                    transition: { duration: 0.18, ease },
+                                  }}
+                                  exit={{
+                                    opacity: 0,
+                                    x: 10,
+                                    transition: { duration: 0.14, ease },
+                                  }}
+                                  className="absolute left-[92px] top-0 z-50 w-[240px]"
+                                >
+                                  <div className="rounded-md bg-white border shadow-[0_25px_60px_rgba(0,0,0,0.18)] p-3">
+                                    <div className="flex items-center justify-between px-2 pb-2">
+                                      <div className="text-sm font-semibold text-black/80">
+                                        {section.label}
+                                      </div>
+                                      <FiCloseHint />
+                                    </div>
+
+                                    <div className="space-y-1">
+                                      {section.items.map((item) => {
+                                        const Icon = item.icon;
+                                        const active =
+                                          pathname === item.href ||
+                                          pathname?.startsWith(item.href + "/");
+
+                                        return (
+                                          <Link
+                                            key={item.href}
+                                            href={item.href}
+                                            className="block"
+                                          >
+                                            <div
+                                              className={cn(
+                                                "flex items-center gap-3 rounded-md px-3 py-2 text-sm",
+                                                active
+                                                  ? "bg-[#f2f3f4] text-black shadow-sm"
+                                                  : "text-black/70 hover:bg-[#f6f7f8]"
+                                              )}
+                                            >
+                                              <Icon className="h-4 w-4" />
+                                              <span className="truncate flex-1">
+                                                {item.label}
+                                              </span>
+                                              {item.badge && (
+                                                <span className="text-[11px] rounded-lg bg-black/5 px-2 py-0.5">
+                                                  {item.badge}
+                                                </span>
+                                              )}
+                                              <ChevronRight className="h-4 w-4 opacity-40" />
+                                            </div>
+                                          </Link>
+                                        );
+                                      })}
+                                    </div>
+                                  </div>
+                                </motion.div>
+                              )}
+                            </AnimatePresence>
+                          </div>
+                        );
+                      }
+
+                      // normal expanded sidebar
+                      return (
+                        <div key={section.id} className="rounded-md">
+                          {/* Group header row (like “Income” in screenshot) */}
+                          <button
+                            type="button"
+                            onClick={() => toggleGroup(section.id)}
+                            className={cn(
+                              "w-full flex items-center gap-3 rounded-md px-3 py-2.5",
+                              "text-left bg-white/70 border border-black/5 shadow-sm",
+                              "hover:bg-white transition"
+                            )}
+                          >
+                            <div className="grid h-9 w-9 place-items-center rounded-md bg-white border shadow-sm">
+                              <HeaderIcon className="h-4 w-4 text-black/70 "/>
+                            </div>
+
+                            <div className="flex-1">
+                              <div className="text-[13px] font-semibold text-black/80">
+                                {section.label}
+                              </div>
+                            </div>
+
+                            <div className="text-black/40">
+                              {isOpen ? (
+                                <ChevronDown className="h-4 w-4" />
+                              ) : (
+                                <ChevronRight className="h-4 w-4" />
+                              )}
+                            </div>
+                          </button>
+
+                          {/* Items (nested, with subtle left line like screenshot) */}
+                          <AnimatePresence initial={false}>
+                            {isOpen && (
+                              <motion.div
+                                initial={{ height: 0, opacity: 0 }}
+                                animate={{
+                                  height: "auto",
+                                  opacity: 1,
+                                  transition: { duration: 0.22, ease },
+                                }}
+                                exit={{
+                                  height: 0,
+                                  opacity: 0,
+                                  transition: { duration: 0.16, ease },
+                                }}
+                                className="overflow-hidden"
+                              >
+                                <div className="pl-[22px] pr-1 pt-2 pb-2">
+                                  <div className="relative pl-5">
+                                    <div className="absolute left-2 top-2 bottom-2 w-px bg-black/10" />
+                                    <div className="space-y-1">
+                                      {section.items.map((item) => {
+                                        const Icon = item.icon;
+                                        const active =
+                                          pathname === item.href ||
+                                          pathname?.startsWith(item.href + "/");
+
+                                        return (
+                                          <Link
+                                            key={item.href}
+                                            href={item.href}
+                                            className="block"
+                                          >
+                                            <div
+                                              className={cn(
+                                                "group flex items-center gap-3 rounded-md px-3 py-2",
+                                                active
+                                                  ? "bg-[#fff] text-black shadow-sm"
+                                                  : "text-black/70 hover:bg-[#f6f7f8]"
+                                              )}
+                                            >
+                                              <Icon className="h-4 w-4 text-black/55" />
+                                              <span className="text-[13px] font-medium truncate flex-1">
+                                                {item.label}
+                                              </span>
+
+                                              {item.badge && (
+                                                <span className="text-[11px] rounded-lg bg-[#dff4e7] text-[#146b3a] px-2 py-0.5 font-semibold">
+                                                  {item.badge}
+                                                </span>
+                                              )}
+                                              <ChevronRight className="h-4 w-4 opacity-0 group-hover:opacity-40 transition" />
+                                            </div>
+                                          </Link>
+                                        );
+                                      })}
+                                    </div>
+                                  </div>
+                                </div>
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
+              </ScrollArea>
+
+              {/* collapse button */}
+             <div className="border-t border-black/10 p-3">
+              <Button
+                variant="ghost"
+
+                className="w-full rounded-md justify-between bg-white/60 hover:bg-white border border-black/5 shadow-sm text-black/70"
+                onClick={onToggleCollapse}
+              >
+                {!collapsed && (
+                  <>
+                    <span className="text-xs font-medium">Collapse</span>
+                    <FaChevronCircleLeft className="h-8 w-8" />
+                  </>
+                )}
+
+                {collapsed && (
+                  <>
+                    <span className="text-xs font-medium">Expand</span>
+                    <FaChevronCircleRight className="h-8 w-8" />
+                  </>
+                )}
+              </Button>
             </div>
-          )}
 
-          <ScrollArea className="mt-2 flex-1 px-1">
-            <nav className="flex flex-col gap-4 pb-8">
-              {/* Current website sections - only show if website is selected */}
-              {currentWebsite &&
-                filteredWebsiteSections.map((section) => (
-                  <SidebarSection
-                    key={section.id}
-                    section={section}
-                    pathname={pathname}
-                    collapsed={collapsed}
-                    hoveredId={hoveredId}
-                    setHoveredId={setHoveredId}
-                  />
-                ))}
-            </nav>
-          </ScrollArea>
-
-          {/* Collapse button */}
-          <div className="border-t px-3 py-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              className="w-full justify-between text-xs text-muted-foreground hover:bg-muted hover:text-foreground"
-              onClick={onToggleCollapse}
-            >
-              {!collapsed && <span>Collapse sidebar</span>}
-              <span className={cn(collapsed && "mx-auto")}>⟷</span>
-            </Button>
+            </div>
           </div>
         </div>
       </div>
@@ -381,100 +1141,13 @@ function Sidebar({
   );
 }
 
-type SidebarSectionProps = {
-  section: NavSection;
-  pathname: string;
-  collapsed?: boolean;
-  hoveredId: string | null;
-  setHoveredId: (id: string | null) => void;
-};
-
-function SidebarSection({
-  section,
-  pathname,
-  collapsed,
-  hoveredId,
-  setHoveredId,
-}: SidebarSectionProps) {
-  return (
-    <div className="px-2">
-      {!collapsed && (
-        <div className="mb-1 px-2 text-[10px] font-medium uppercase tracking-[0.16em] text-muted-foreground">
-          {section.label}
-        </div>
-      )}
-      <div className="space-y-1">
-        {section.items.map((item) => {
-          const Icon = item.icon;
-          const isActive =
-            pathname === item.href || pathname?.startsWith(item.href + "/");
-          const id = `${section.id}-${item.href}`;
-          const showLabel = !collapsed;
-
-          return (
-            <Tooltip key={id} delayDuration={collapsed ? 250 : 0}>
-              <TooltipTrigger asChild>
-                <Link
-                  href={item.href}
-                  className="relative block"
-                  onMouseEnter={() => setHoveredId(id)}
-                  onMouseLeave={() => setHoveredId(null)}
-                >
-                  <div
-                    className={cn(
-                      "group flex items-center gap-2 rounded-lg px-2 py-1.5 text-[13px] text-muted-foreground transition-colors hover:bg-muted hover:text-foreground",
-                      collapsed && "justify-center",
-                      isActive && "text-foreground bg-muted"
-                    )}
-                  >
-                    <div className="relative flex h-8 w-8 items-center justify-center">
-                      <AnimatePresence>
-                        {isActive && (
-                          <motion.span
-                            layoutId="sidebar-active-pill"
-                            className="absolute inset-0 rounded-lg bg-primary/10"
-                            initial={{ opacity: 0, scale: 0.9 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            exit={{ opacity: 0, scale: 0.9 }}
-                            transition={{
-                              type: "spring",
-                              stiffness: 260,
-                              damping: 25,
-                            }}
-                          />
-                        )}
-                      </AnimatePresence>
-                      <Icon className="relative h-4 w-4" />
-                    </div>
-                    {showLabel && (
-                      <div className="flex items-center gap-2 flex-1">
-                        <span className="truncate">{item.label}</span>
-                        {item.badge && (
-                          <Badge
-                            variant="secondary"
-                            className="text-[10px] px-1 py-0"
-                          >
-                            {item.badge}
-                          </Badge>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                </Link>
-              </TooltipTrigger>
-              {collapsed && (
-                <TooltipContent side="right">{item.label}</TooltipContent>
-              )}
-            </Tooltip>
-          );
-        })}
-      </div>
-    </div>
-  );
+// small helper icon for floating panel (optional)
+function FiCloseHint() {
+  return <div className="text-[11px] text-black/35">hover</div>;
 }
 
 // ---------------------------------------------------------------------------
-// Mobile Sidebar
+// Mobile Sidebar (kept simple, same style)
 // ---------------------------------------------------------------------------
 
 type MobileSidebarProps = {
@@ -491,31 +1164,34 @@ function MobileSidebar({
   onWebsiteChange,
 }: MobileSidebarProps) {
   const pathname = usePathname();
+  const hasPermission = useHasPermission(user);
 
-  // Helper function to check if user has permission (simplified for now)
-  const hasPermission = (permission?: string) => {
-    if (!permission || !user) return true;
-    // TODO: Integrate with actual RBAC service
-    return true;
-  };
+  const filteredWebsiteSections = React.useMemo(() => {
+    return currentWebsiteSections
+      .map((section) => ({
+        ...section,
+        items: section.items.filter((item) => hasPermission(item.permission)),
+      }))
+      .filter((section) => section.items.length > 0);
+  }, [hasPermission]);
 
-  const filteredWebsiteSections = currentWebsiteSections
-    .map((section) => ({
-      ...section,
-      items: section.items.filter((item) => hasPermission(item.permission)),
-    }))
-    .filter((section) => section.items.length > 0);
+  const [openGroups, setOpenGroups] = React.useState<Record<string, boolean>>(
+    () => {
+      const init: Record<string, boolean> = {};
+      filteredWebsiteSections.forEach((s, idx) => (init[s.id] = idx === 0));
+      return init;
+    }
+  );
 
   return (
     <div className="flex flex-col h-full">
-      {/* Website selector */}
       {websites.length > 0 && (
         <div className="p-3 border-b">
           <Select
-            value={currentWebsite?.websiteId || ""}
+            value={currentWebsite?._id || ""}
             onValueChange={onWebsiteChange}
           >
-            <SelectTrigger className="h-9 w-full text-xs">
+            <SelectTrigger className="h-10 w-full rounded-md">
               <SelectValue placeholder="Select website" />
             </SelectTrigger>
             <SelectContent>
@@ -535,54 +1211,113 @@ function MobileSidebar({
       )}
 
       <ScrollArea className="flex-1">
-        <nav className="flex flex-col gap-4 p-3 pb-8">
-          {/* Current website sections - only show if website is selected */}
-          {currentWebsite &&
-            filteredWebsiteSections.map((section) => (
-              <div key={section.id}>
-                <div className="mb-2 px-2 text-[10px] font-medium uppercase tracking-[0.16em] text-muted-foreground">
-                  {section.label}
-                </div>
-                <div className="space-y-1">
-                  {section.items.map((item) => {
-                    const Icon = item.icon;
-                    const isActive =
-                      pathname === item.href ||
-                      pathname?.startsWith(item.href + "/");
+        <div className="p-3 space-y-3">
+          {!currentWebsite ? (
+            <div className="text-sm text-muted-foreground px-2 py-4">
+              Select website
+            </div>
+          ) : (
+            filteredWebsiteSections.map((section) => {
+              const HeaderIcon = sectionIconMap[section.id] || LayoutDashboard;
+              const isOpen = !!openGroups[section.id];
 
-                    return (
-                      <Link
-                        key={item.href}
-                        href={item.href}
-                        className={cn(
-                          "flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground",
-                          isActive && "bg-muted text-foreground font-medium"
-                        )}
+              return (
+                <div
+                  key={section.id}
+                  className="rounded-md border bg-muted/10 overflow-hidden"
+                >
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setOpenGroups((p) => ({ ...p, [section.id]: !isOpen }))
+                    }
+                    className="w-full flex items-center justify-between px-3 py-3"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="grid h-9 w-9 place-items-center rounded-md bg-background border">
+                       <LayoutGrid className="h-4 w-4 text-black/70" />
+
+                      </div>
+                      <div className="text-sm font-semibold">
+                        {section.label}
+                      </div>
+                    </div>
+                    {isOpen ? (
+                      <ChevronDown className="h-4 w-4 opacity-60" />
+                    ) : (
+                      <ChevronRight className="h-4 w-4 opacity-60" />
+                    )}
+                  </button>
+
+                  <AnimatePresence initial={false}>
+                    {isOpen && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{
+                          height: "auto",
+                          opacity: 1,
+                          transition: { duration: 0.2, ease },
+                        }}
+                        exit={{
+                          height: 0,
+                          opacity: 0,
+                          transition: { duration: 0.14, ease },
+                        }}
+                        className="overflow-hidden"
                       >
-                        <Icon className="h-4 w-4" />
-                        <span className="truncate">{item.label}</span>
-                        {item.badge && (
-                          <Badge
-                            variant="secondary"
-                            className="ml-auto text-[10px] px-1 py-0"
-                          >
-                            {item.badge}
-                          </Badge>
-                        )}
-                      </Link>
-                    );
-                  })}
+                        <div className="px-3 pb-3 space-y-1">
+                          {section.items.map((item) => {
+                            const Icon = item.icon;
+                            const active =
+                              pathname === item.href ||
+                              pathname?.startsWith(item.href + "/");
+
+                            return (
+                              <Link
+                                key={item.href}
+                                href={item.href}
+                                className="block"
+                              >
+                                <div
+                                  className={cn(
+                                    "flex items-center gap-3 rounded-md px-3 py-2 text-sm",
+                                    active
+                                      ? "bg-background shadow-sm"
+                                      : "hover:bg-muted"
+                                  )}
+                                >
+                                  <Icon className="h-4 w-4 opacity-70" />
+                                  <span className="truncate flex-1">
+                                    {item.label}
+                                  </span>
+                                  {item.badge && (
+                                    <Badge
+                                      variant="secondary"
+                                      className="text-[10px] px-1 py-0"
+                                    >
+                                      {item.badge}
+                                    </Badge>
+                                  )}
+                                </div>
+                              </Link>
+                            );
+                          })}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
-              </div>
-            ))}
-        </nav>
+              );
+            })
+          )}
+        </div>
       </ScrollArea>
     </div>
   );
 }
 
 // ---------------------------------------------------------------------------
-// Topbar
+// Topbar (same as yours, unchanged logic)
 // ---------------------------------------------------------------------------
 
 type TopbarProps = {
@@ -592,10 +1327,38 @@ type TopbarProps = {
 };
 
 function Topbar({ currentWebsite, user, onToggleMobileSidebar }: TopbarProps) {
+  const dispatch = useDispatch();
+
+  const handleSignOut = async () => {
+    try {
+      // Clear Redux store by resetting to initial state
+      // Reset each slice to its initial state
+      // store.dispatch({ type: 'user/setUser', payload: null });
+      // store.dispatch({ type: 'pageEdit/resetState' });
+      // store.dispatch({ type: 'category/resetState' });
+      // store.dispatch({ type: 'brand/resetState' });
+      // store.dispatch({ type: 'websites/resetState' });
+      resetRedux();
+      // Clear localStorage and sessionStorage
+      localStorage.clear();
+      sessionStorage.clear();
+
+      await signOut({ callbackUrl: "/", redirect: true });
+    } catch (error) {
+      console.error("Error during sign out:", error);
+      await signOut({ callbackUrl: "/" });
+    }
+  };
+
+  const resetRedux = () => {
+    dispatch(clearAttributes());
+    dispatch(clearBrands());
+    dispatch(clearSegments());
+    dispatch(clearCategories());
+  };
   return (
-    <header className="flex h-14 items-center justify-between border-b bg-background/80 px-3 pl-2 pr-4 backdrop-blur md:h-16">
+    <header className="flex h-14 items-center justify-between border-b bg-background/80 px-8 backdrop-blur md:h-16 shadow-sm">
       <div className="flex items-center gap-2 md:gap-3">
-        {/* Mobile menu */}
         <div className="md:hidden">
           <Button
             variant="outline"
@@ -606,9 +1369,10 @@ function Topbar({ currentWebsite, user, onToggleMobileSidebar }: TopbarProps) {
             <Menu className="h-4 w-4" />
           </Button>
         </div>
-        <div className="hidden text-sm font-medium text-muted-foreground md:inline">
+        <div className="hidden text-sm font-medium text-black md:inline">
           Dashboard
         </div>
+
         {currentWebsite && (
           <div className="flex items-center gap-2 rounded-full border bg-muted/60 px-3 py-1 text-xs text-muted-foreground">
             <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-primary/15 text-[10px] font-semibold text-primary">
@@ -638,6 +1402,7 @@ function Topbar({ currentWebsite, user, onToggleMobileSidebar }: TopbarProps) {
           <Sparkles className="h-3 w-3 mr-1" />
           Upgrade
         </Button>
+
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
@@ -652,6 +1417,7 @@ function Topbar({ currentWebsite, user, onToggleMobileSidebar }: TopbarProps) {
               </Avatar>
             </Button>
           </DropdownMenuTrigger>
+
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>
               {user?.name || "User"}
@@ -664,7 +1430,7 @@ function Topbar({ currentWebsite, user, onToggleMobileSidebar }: TopbarProps) {
             <DropdownMenuItem>Account settings</DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem
-              onClick={() => signOut()}
+              onClick={handleSignOut}
               className="text-destructive"
             >
               Sign out
@@ -691,8 +1457,7 @@ export function AppShell({
   const [sidebarCollapsed, setSidebarCollapsed] = React.useState(false);
 
   return (
-    <div className="flex min-h-screen bg-background text-foreground overflow-hidden">
-      {/* Desktop sidebar */}
+    <div className="flex min-h-screen bg-[#e8e9eb] text-foreground overflow-hidden">
       <Sidebar
         websites={websites}
         currentWebsite={currentWebsite}
@@ -702,7 +1467,6 @@ export function AppShell({
         onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
       />
 
-      {/* Main area */}
       <div className="flex flex-1 min-h-screen flex-col overflow-hidden">
         <Topbar
           currentWebsite={currentWebsite}
@@ -714,9 +1478,8 @@ export function AppShell({
         </main>
       </div>
 
-      {/* Mobile sidebar sheet */}
       <Sheet open={mobileSidebarOpen} onOpenChange={setMobileSidebarOpen}>
-        <SheetContent side="left" className="p-0 w-64">
+        <SheetContent side="left" className="p-0 w-72">
           <SheetHeader className="border-b px-4 py-3">
             <SheetTitle className="text-sm font-semibold">
               Navigation

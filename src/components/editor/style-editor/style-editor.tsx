@@ -28,6 +28,7 @@ import {
   Underline,
 } from "lucide-react";
 import { StyleState } from "../../../../types/editor";
+import { useState } from "react";
 
 // Common interfaces
 interface StyleEditorProps {
@@ -79,12 +80,21 @@ function ColorsSection({ styles, onStyleChange }: SectionProps) {
 
 // Typography Controls
 function FontFamilyControl({ styles, onStyleChange }: SectionProps) {
+  const [fontFamilyvalue, setFontFamilyValue]= useState<string>("")
+
+  const hadleFontFamily=(data:string)=>{
+    setFontFamilyValue(data)
+  onStyleChange("font-family", data)
+   
+  }
   return (
     <div className="space-y-1.5">
       <Label className="text-xs">Font Family</Label>
       <Select
-        value={styles.typography.fontFamily || "Arial, sans-serif"}
-        onValueChange={(value) => onStyleChange("font-family", value)}
+      value={fontFamilyvalue}
+        // value={styles.typography.fontFamily || "Arial, sans-serif"}
+        // onValueChange={(value) => onStyleChange("font-family", value)}
+        onValueChange={(value)=>hadleFontFamily(value)}
       >
         <SelectTrigger className="text-xs h-7 bg-slate-800 border-slate-700">
           <SelectValue placeholder="Select font" />
@@ -957,7 +967,7 @@ function LayoutSection({ styles, onStyleChange }: SectionProps) {
 
 
 function DisplayStyleControl({ styles, onStyleChange }: SectionProps) {
-  console.log("===>>>", styles)
+
   return (
     <div className="space-y-1.5">
       <Label className="text-xs">Display</Label>
@@ -983,6 +993,8 @@ function DisplayStyleControl({ styles, onStyleChange }: SectionProps) {
 
 // Main StyleEditor component
 export function StyleEditor({ styles, onStyleChange }: StyleEditorProps) {
+  
+  console.log("styles,styles",styles)
   return (
     <Accordion
       type="single"

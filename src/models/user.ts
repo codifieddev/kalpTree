@@ -1,3 +1,4 @@
+import { ObjectId } from "mongodb";
 
 export interface IUser  {
   tenantId?: string
@@ -5,6 +6,7 @@ export interface IUser  {
   passwordHash?: string;
   name?: string;
   role?: string;
+ 
   status?: string;
   createdAt?: Date;
   updatedAt?: Date;

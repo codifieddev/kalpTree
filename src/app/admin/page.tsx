@@ -27,13 +27,7 @@ export default async function AdminIndex() {
     fetchCount("/api/blog_tags"),
   ]);
 
-  // const cards = [
-  //   { title: "Pages", count: pages, href: "/admin/pages" },
-  //   { title: "Posts", count: posts, href: "/admin/posts" },
-  //   { title: "Products", count: products, href: "/admin/products" },
-  //   { title: "Orders", count: orders, href: "/admin/orders" },
-  //   { title: "Categories", count: categories, href: "/admin/categories" },
-  //   { title: "Tags", count: tags, href: "/admin/tags" },
+
   // ];
 
   return (
@@ -43,19 +37,7 @@ export default async function AdminIndex() {
         <p className="text-sm text-muted-foreground">Quick overview</p>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {/* {cards.map((c) => (
-          <Link key={c.title} href={c.href} className="block">
-            <Card className="hover:shadow-sm transition">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-base">{c.title}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-3xl font-bold">{c.count}</div>
-                <div className="text-xs text-muted-foreground mt-1">View all</div>
-              </CardContent>
-            </Card>
-          </Link>
-        ))} */}
+        
       </div>
     </div>
   );

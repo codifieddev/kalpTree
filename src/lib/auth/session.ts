@@ -20,9 +20,9 @@ export async function requireAuth() {
   return session.user as {
     id: string;
     email: string;
-    name: string;
-    tenantId: string;
-    tenantSlug: string;
+    // name: string;
+    // tenantId: string;
+    // tenantSlug: string;
     role: string;
   };
 }

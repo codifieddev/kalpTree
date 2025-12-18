@@ -67,8 +67,16 @@ export class WebsiteService {
       ),
     ]);
   }
+  
 
   async listByTenant(tenantId: string | ObjectId) {
+    const c = await this.col();
+    const tid =
+      typeof tenantId === "string" ? new ObjectId(tenantId) : tenantId;
+    return c.find({ tenantId: tid }).sort({ createdAt: -1 }).toArray();
+  }
+
+  async listforSuperadmin(tenantId: string | ObjectId) {
     const c = await this.col();
     const tid =
       typeof tenantId === "string" ? new ObjectId(tenantId) : tenantId;
@@ -91,7 +99,7 @@ export class WebsiteService {
     tenantSlug: string,
     websiteName: string
   ) {
-    const base = process.env.SYSTEM_BASE_DOMAIN || "kalptree.xyz";
+    const base = process.env.SYSTEM_BASE_DOMAIN || "Dzinly.xyz";
     const left = `${slugify(tenantSlug)}-${slugify(websiteName)}`.slice(0, 60);
     const candidate = `${left}.${base}`;
     const c = await this.col();
