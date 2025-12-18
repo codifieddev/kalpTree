@@ -153,8 +153,8 @@ export type User = {
   id: string;
   email: string;
   name: string;
-  tenantId: string;
-  tenantSlug: string;
+  tenantId?: string;
+  tenantSlug?: string;
   role: string;
   permissions?: string[];
 };
@@ -781,6 +781,15 @@ function Sidebar({
       .filter((section) => section.items.length > 0);
   }, [hasPermission]);
 
+  //  const filteredWebsiteSections = React.useMemo(() => {
+  //   return currentWebsiteSections
+  //     .map((section) => ({
+  //       ...section,
+  //       items: section.items.filter((item) => hasPermission(true)),
+  //     }))
+  //     .filter((section) => section.items.length > 0);
+  // }, [hasPermission]);
+
   // open/close groups (dropdown like "Income" in screenshot)
   const [openGroups, setOpenGroups] = React.useState<Record<string, boolean>>(
     () => {
@@ -885,8 +894,10 @@ function Sidebar({
               <ScrollArea
                 className={cn("mt-3 flex-1 px-2 pb-3", collapsed && "px-2")}
               >
+
+                {/* Change true to current website to change logic */}
                 <div className="space-y-2">
-                  {!currentWebsite ? (
+                  {!true ? (
                     <div
                       className={cn(
                         "px-3 py-6 text-sm text-black/45",

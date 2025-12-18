@@ -16,8 +16,8 @@ export async function AppShellProvider({ children }: AppShellProviderProps) {
         id: session.user.id || "",
         email: session.user.email || "",
         name: session.user.name || "",
-        tenantId: session.user.tenantId || "",
-        tenantSlug: session.user.tenantSlug || "",
+        // tenantId: session.user.tenantId || "",
+        // tenantSlug: session.user.tenantSlug || "",
         role: session.user.role || "",
         // forward permissions if present on the session user
         permissions: Array.isArray((session.user as any).permissions)
@@ -25,6 +25,7 @@ export async function AppShellProvider({ children }: AppShellProviderProps) {
           : undefined,
       }
     : null;
+
 
   // Get websites for the current tenant
   let websites: Website[] = [];

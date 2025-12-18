@@ -77,8 +77,6 @@ export function AppShellClient({
   //   }
   // }, []);
 
-  
-
   // When client receives server-provided websites, save them to Redux
   useEffect(() => {
     if (websites && websites.length > 0) {

@@ -10,13 +10,13 @@ export class UserService {
   }
 
   async getUserByEmail(
-    tenantId: string | ObjectId,
+    // tenantId: string | ObjectId,
     email: string
   ): Promise<User | null> {
     const collection = await this.getCollection();
-    const tid = typeof tenantId === 'string' ? new ObjectId(tenantId) : tenantId;
+    // const tid = typeof tenantId === 'string' ? new ObjectId(tenantId) : tenantId;
     const response = await collection.findOne({
-      tenantId: tid,
+      // tenantId: tid,
       email: email.toLowerCase(),
     });
     console.log("respsne user---", response)
@@ -54,6 +54,36 @@ export class UserService {
       passwordHash,
       name: data.name,
       role: data.role,
+      status: 'active',
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      permissions: {
+        dashboard: true,
+        users: [],
+        tenants: [],
+        products: [],
+        orders: [],
+        content: [],
+        settings: [],
+      },
+    };
+
+    const result = await collection.insertOne(user as User);
+    return { ...user, _id: result.insertedId } as User;
+  }
+
+  async createsuperadminUser(data: {
+    email: string;
+    password: string;
+  }): Promise<User> {
+    const collection = await this.getCollection();
+    // Hash password
+    const passwordHash = await bcrypt.hash(data.password, 10);
+
+    const user: Omit<any, '_id'> = {
+      email: data.email.toLowerCase(),
+      passwordHash,
+      role: "superadmin",
       status: 'active',
       createdAt: new Date(),
       updatedAt: new Date(),

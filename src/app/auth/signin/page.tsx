@@ -29,7 +29,7 @@ function SignInForm() {
         callbackUrl: "/admin",
         email,
         password,
-        tenantSlug,
+        // tenantSlug,
       });
 
       if (result && (result as any).error) {
@@ -101,7 +101,7 @@ function SignInForm() {
 
           <form onSubmit={onSubmit} className="space-y-5">
             {/* Tenant Slug Input */}
-            <div>
+            {/* <div>
               <label className="block text-sm font-bold text-foreground mb-2">Tenant Slug</label>
               <div className="relative">
                 <Globe className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
@@ -112,7 +112,7 @@ function SignInForm() {
                   placeholder="e.g. demo-store"
                 />
               </div>
-            </div>
+            </div> */}
 
             {/* Email Input */}
             <div>

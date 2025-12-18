@@ -9,9 +9,18 @@ export async function proxy(req: NextRequest) {
   // Auth guard for admin and protected APIs (exclude /api/public/* and /api/auth/*)
   const isProtectedApi = /^\/api\/(?!(public|auth)\b)/.test(pathname);
   const isProtected = pathname.startsWith("/admin") || isProtectedApi;
- 
-  if(!token){
+
+  if (!token) {
     return NextResponse.next();
+  }
+
+  if (pathname.includes("signup")) {
+    const check = await fetch(`${process.env.NEXTAUTH_URL}/api/dev/check`);
+    const res = await check.json();
+    if (!res.check) {
+      const signInUp = new URL("/auth/signup", req.url);
+      return NextResponse.redirect(signInUp);
+    }
   }
 
   if (isProtected && !token) {
@@ -22,6 +31,7 @@ export async function proxy(req: NextRequest) {
   // For public content (non-/api and non-/admin), resolve website by host and set cookie
   const isPublicContent =
     !pathname.startsWith("/api") && !pathname.startsWith("/admin");
+
   if (isPublicContent) {
     try {
       const hostHeader = req.headers.get("host") || "";
@@ -33,10 +43,10 @@ export async function proxy(req: NextRequest) {
           headers: { host: hostHeader },
           cache: "no-store",
         });
- 
+
         if (r.ok) {
           const data = await r.json();
-          console.log("===>>>>in proxy", data)
+
           if (data?.matched && data.websiteId) {
             const current = req.cookies.get("current_website_id")?.value;
             if (current !== data.websiteId) {

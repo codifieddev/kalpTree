@@ -128,7 +128,7 @@ export interface User extends BaseDocument {
   avatar?: string;
   status: 'active' | 'invited' | 'suspended';
   lastLoginAt?: Date;
-  
+
   // Enhanced permissions with granular control
   permissions: {
     // Core permissions

@@ -75,6 +75,13 @@ export class WebsiteService {
     return c.find({ tenantId: tid }).sort({ createdAt: -1 }).toArray();
   }
 
+  async listforSuperadmin(tenantId: string | ObjectId) {
+    const c = await this.col();
+    const tid =
+      typeof tenantId === "string" ? new ObjectId(tenantId) : tenantId;
+    return c.find({ tenantId: tid }).sort({ createdAt: -1 }).toArray();
+  }
+
   async getByHost(host: string) {
     const c = await this.col();
     const doc = await c.findOne({
