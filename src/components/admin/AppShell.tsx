@@ -163,6 +163,9 @@ type AppShellProps = {
   currentWebsite?: Website | null;
   user?: User | null;
   onWebsiteChange?: (websiteId: string) => void;
+  tenants: any[];
+  currentTenant: any | null;
+  onTenantChange?: (tenantId: string) => void;
 };
 
 type NavItem = {
@@ -721,10 +724,15 @@ const sectionIconMap: Record<
 // ---------------------------------------------------------------------------
 
 type SidebarProps = {
+  tenants: any[];
+  currentTenant: any | null;
+  onTenantChange: (tenantId: string) => void;
+
   websites: Website[];
   currentWebsite: Website | null;
-  user: User | null;
   onWebsiteChange: (websiteId: string) => void;
+
+  user: User | null;
   collapsed?: boolean;
   onToggleCollapse?: () => void;
 };
@@ -736,6 +744,9 @@ function Sidebar({
   onWebsiteChange,
   collapsed = false,
   onToggleCollapse,
+  tenants,
+  currentTenant,
+  onTenantChange,
 }: SidebarProps) {
   const pathname = usePathname();
   const hasPermission = useHasPermission(user);
@@ -812,62 +823,44 @@ function Sidebar({
                       )}
                     </div>
                   </div>
-
-                  {/* Website selector */}
-                  {websites.length > 0 && (
+                  {tenants.length > 0 && (
                     <div className={cn("px-3 pt-2", collapsed && "px-2")}>
                       <Select
-                        value={currentWebsite?._id || ""}
-                        onValueChange={onWebsiteChange}
+                        value={currentTenant?._id || ""}
+                        onValueChange={onTenantChange}
+                        disabled={user?.role=="business"}
                       >
-                        {/* Trigger */}
                         <SelectTrigger
                           className={cn(
                             "h-12 w-full rounded-md bg-white shadow border border-black/5",
-                            "flex items-center justify-between px-3",
-                            "[&>svg]:hidden", // 👈 DEFAULT SELECT ICON REMOVED
+                            "[&>svg]:hidden",
                             collapsed && "justify-center px-2"
                           )}
                         >
                           {!collapsed ? (
                             <div className="flex items-center gap-2">
-                              {/* Your custom icon */}
-                              <ChevronsUpDown className="h-4 w-4 text-black/50" />
+                              <Building2 className="h-4 w-4 text-black/60" />
+                              <span className="text-sm font-medium truncate">
+                                {currentTenant?.name || "Select Tenant"}
+                              </span>
                             </div>
                           ) : (
-                            <Globe2 className="h-4 w-4 text-black/70" />
+                            <Building2 className="h-4 w-4 text-black/70" />
                           )}
                         </SelectTrigger>
 
-                        {/* Dropdown */}
                         <SelectContent className="w-[260px] rounded-lg border shadow-lg">
                           <div className="px-3 py-2 text-xs font-medium text-muted-foreground">
-                            Websites
+                            Tenants
                           </div>
 
-                          {websites.map((site, index) => (
-                            <SelectItem key={site._id} value={site._id}>
-                              <div className="flex items-center justify-between w-full">
-                                <div className="flex items-center gap-2">
-                                  <div className="h-7 w-7 rounded-md border bg-white flex items-center justify-center">
-                                    <Globe2 className="h-4 w-4 text-black/60" />
-                                  </div>
-
-                                  <div className="flex flex-col">
-                                    <span className="text-sm font-medium">
-                                      {site.name}
-                                    </span>
-                                    <span className="text-[11px] text-muted-foreground">
-                                      {site.primaryDomain ||
-                                        site.systemSubdomain}
-                                    </span>
-                                  </div>
-                                </div>
-
-                                {/* Shortcut hint (UI only) */}
-                                {/* <span className="text-[11px] text-muted-foreground">
-                                ⌘{index + 1}
-                              </span> */}
+                          {tenants.map((tenant) => (
+                            <SelectItem key={tenant._id} value={tenant._id}>
+                              <div className="flex items-center gap-2">
+                                <Building2 className="h-4 w-4 text-black/60" />
+                                <span className="text-sm font-medium">
+                                  {tenant.name}
+                                </span>
                               </div>
                             </SelectItem>
                           ))}
@@ -877,70 +870,52 @@ function Sidebar({
                   )}
                 </div>
 
-               
-
-                  {websites.length > 0 && (
-                    <div className={cn("px-3 pt-2", collapsed && "px-2")}>
-                      <Select
-                        value={currentWebsite?._id || ""}
-                        onValueChange={onWebsiteChange}
+                {websites.length > 0 && (
+                  <div className={cn("px-3 pt-2", collapsed && "px-2")}>
+                    <Select
+                      value={currentWebsite?._id || ""}
+                      onValueChange={onWebsiteChange}
+                    >
+                      <SelectTrigger
+                        className={cn(
+                          "h-12 w-full rounded-md bg-white shadow border border-black/5",
+                          "[&>svg]:hidden",
+                          collapsed && "justify-center px-2"
+                        )}
                       >
-                        {/* Trigger */}
-                        <SelectTrigger
-                          className={cn(
-                            "h-12 w-full rounded-md bg-white shadow border border-black/5",
-                            "flex items-center justify-between px-3",
-                            "[&>svg]:hidden", // 👈 DEFAULT SELECT ICON REMOVED
-                            collapsed && "justify-center px-2"
-                          )}
-                        >
-                          {!collapsed ? (
-                            <div className="flex items-center gap-2">
-                              {/* Your custom icon */}
-                              <ChevronsUpDown className="h-4 w-4 text-black/50" />
-                            </div>
-                          ) : (
-                            <Globe2 className="h-4 w-4 text-black/70" />
-                          )}
-                        </SelectTrigger>
-
-                        {/* Dropdown */}
-                        <SelectContent className="w-[260px] rounded-lg border shadow-lg">
-                          <div className="px-3 py-2 text-xs font-medium text-muted-foreground">
-                            Websites
+                        {!collapsed ? (
+                          <div className="flex items-center gap-2">
+                            <Globe2 className="h-4 w-4 text-black/60" />
+                            <span className="text-sm font-medium truncate">
+                              {currentWebsite?.name || "Select Website"}
+                            </span>
                           </div>
+                        ) : (
+                          <Globe2 className="h-4 w-4 text-black/70" />
+                        )}
+                      </SelectTrigger>
 
-                          {websites.map((site, index) => (
-                            <SelectItem key={site._id} value={site._id}>
-                              <div className="flex items-center justify-between w-full">
-                                <div className="flex items-center gap-2">
-                                  <div className="h-7 w-7 rounded-md border bg-white flex items-center justify-center">
-                                    <Globe2 className="h-4 w-4 text-black/60" />
-                                  </div>
+                      <SelectContent className="w-[260px] rounded-lg border shadow-lg">
+                        <div className="px-3 py-2 text-xs font-medium text-muted-foreground">
+                          Websites
+                        </div>
 
-                                  <div className="flex flex-col">
-                                    <span className="text-sm font-medium">
-                                      {site.name}
-                                    </span>
-                                    <span className="text-[11px] text-muted-foreground">
-                                      {site.primaryDomain ||
-                                        site.systemSubdomain}
-                                    </span>
-                                  </div>
-                                </div>
-
-                                {/* Shortcut hint (UI only) */}
-                                {/* <span className="text-[11px] text-muted-foreground">
-                                ⌘{index + 1}
-                              </span> */}
-                              </div>
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  )}
-       
+                        {websites.map((site) => (
+                          <SelectItem key={site._id} value={site._id}>
+                            <div className="flex flex-col">
+                              <span className="text-sm font-medium">
+                                {site.name}
+                              </span>
+                              <span className="text-[11px] text-muted-foreground">
+                                {site.primaryDomain || site.systemSubdomain}
+                              </span>
+                            </div>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
               </div>
 
               <ScrollArea
@@ -1545,7 +1520,7 @@ function Topbar({
             >
               <Avatar className="h-7 w-7">
                 <AvatarFallback>
-                  {user?.name?.charAt(0).toUpperCase() || "U"}
+                  {user?.email?.charAt(0).toUpperCase() || "U"}
                 </AvatarFallback>
               </Avatar>
             </Button>
@@ -1553,10 +1528,8 @@ function Topbar({
 
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>
-              {user?.name || "User"}
-              <div className="text-xs text-muted-foreground font-normal">
-                {user?.email}
-              </div>
+              {user?.email || "User"}
+             
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem>Profile</DropdownMenuItem>
@@ -1586,7 +1559,8 @@ export function AppShell({
   user = null,
   onWebsiteChange = () => {},
   onTenantChange = () => {},
-  
+  tenants = [],
+  currentTenant = null,
 }: AppShellProps) {
   const [mobileSidebarOpen, setMobileSidebarOpen] = React.useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = React.useState(false);
@@ -1594,6 +1568,9 @@ export function AppShell({
   return (
     <div className="flex min-h-screen bg-[#e8e9eb] text-foreground overflow-hidden">
       <Sidebar
+        tenants={tenants}
+        currentTenant={currentTenant}
+        onTenantChange={onTenantChange}
         websites={websites}
         currentWebsite={currentWebsite}
         user={user}

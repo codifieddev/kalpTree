@@ -1,12 +1,12 @@
-import { ObjectId } from 'mongodb';
-import { getDatabase } from '../db/mongodb';
-import type { Tenant } from '@/types';
-import { TenantModel } from '@/models/tenant';
+import { ObjectId } from "mongodb";
+import { getDatabase } from "../db/mongodb";
+import type { Tenant } from "@/types";
+import { TenantModel } from "@/models/tenant";
 
 export class TenantService {
   private async getCollection() {
     const db = await getDatabase();
-    return db.collection<Tenant>('tenants');
+    return db.collection<Tenant>("tenants");
   }
 
   async getTenantBySlug(slug: string): Promise<Tenant | null> {
@@ -16,7 +16,7 @@ export class TenantService {
 
   async getTenantById(id: string | ObjectId): Promise<Tenant | null> {
     const collection = await this.getCollection();
-    const objectId = typeof id === 'string' ? new ObjectId(id) : id;
+    const objectId = typeof id === "string" ? new ObjectId(id) : id;
     return collection.findOne({ _id: objectId });
   }
 
@@ -32,15 +32,16 @@ export class TenantService {
     slug: string;
     name: string;
     email: string;
-    plan?: Tenant['plan'];
-    userId?: ObjectId | string
+    plan?: Tenant["plan"];
+    userId?: ObjectId | string;
+    createdById: ObjectId | string;
   }): Promise<Tenant> {
     const collection = await this.getCollection();
 
     // Check if slug already exists
     const existing = await this.getTenantBySlug(data.slug);
     if (existing) {
-      throw new Error('Tenant slug already exists');
+      throw new Error("Tenant slug already exists");
     }
 
     const tenant: Omit<TenantModel, "_id"> = {
@@ -48,13 +49,14 @@ export class TenantService {
       name: data.name,
       email: data.email,
       userId: data.userId!,
-      plan: data.plan || 'trial',
-      subscriptionStatus: 'active',
+      franchise: new ObjectId(data.createdById),
+      plan: data.plan || "trial",
+      subscriptionStatus: "active",
       customDomainVerified: false,
       branding: {
         colors: {
-          primary: '#3b82f6',
-          secondary: '#f4e04f',
+          primary: "#3b82f6",
+          secondary: "#f4e04f",
         },
       },
       paymentGateways: {},
@@ -65,11 +67,11 @@ export class TenantService {
         invoicesEnabled: true,
       },
       settings: {
-        locale: 'en-US',
-        currency: 'USD',
-        timezone: 'UTC',
+        locale: "en-US",
+        currency: "USD",
+        timezone: "UTC",
       },
-      status: 'active',
+      status: "active",
       createdAt: new Date(),
       updatedAt: new Date(),
     };
@@ -83,7 +85,7 @@ export class TenantService {
     updates: Partial<Tenant>
   ): Promise<boolean> {
     const collection = await this.getCollection();
-    const objectId = typeof id === 'string' ? new ObjectId(id) : id;
+    const objectId = typeof id === "string" ? new ObjectId(id) : id;
 
     const result = await collection.updateOne(
       { _id: objectId },
@@ -98,11 +100,11 @@ export class TenantService {
   }
 
   async suspendTenant(id: string | ObjectId): Promise<boolean> {
-    return this.updateTenant(id, { status: 'suspended' });
+    return this.updateTenant(id, { status: "suspended" });
   }
 
   async activateTenant(id: string | ObjectId): Promise<boolean> {
-    return this.updateTenant(id, { status: 'active' });
+    return this.updateTenant(id, { status: "active" });
   }
 
   async verifyCustomDomain(
@@ -118,10 +120,10 @@ export class TenantService {
   async listTenants(options?: {
     skip?: number;
     limit?: number;
-    status?: Tenant['status'];
+    status?: Tenant["status"];
   }): Promise<Tenant[]> {
     const collection = await this.getCollection();
-    const query: Partial<Pick<Tenant, 'status'>> = {};
+    const query: Partial<Pick<Tenant, "status">> = {};
     if (options?.status) {
       query.status = options.status;
     }

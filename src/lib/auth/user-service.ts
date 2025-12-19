@@ -1,12 +1,12 @@
-import { ObjectId } from 'mongodb';
-import bcrypt from 'bcryptjs';
-import { getDatabase } from '../db/mongodb';
-import type { User } from '@/types';
+import { ObjectId } from "mongodb";
+import bcrypt from "bcryptjs";
+import { getDatabase } from "../db/mongodb";
+import type { User } from "@/types";
 
 export class UserService {
   private async getCollection() {
     const db = await getDatabase();
-    return db.collection<User>('users');
+    return db.collection<User>("users");
   }
 
   async getUserByEmail(
@@ -19,43 +19,43 @@ export class UserService {
       // tenantId: tid,
       email: email.toLowerCase(),
     });
-  
-    return response
+
+    return response;
   }
 
   async getUserById(id: string | ObjectId): Promise<User | null> {
     const collection = await this.getCollection();
-    const objectId = typeof id === 'string' ? new ObjectId(id) : id;
+    const objectId = typeof id === "string" ? new ObjectId(id) : id;
     return collection.findOne({ _id: objectId });
   }
 
-  
   async createUser(data: {
     // tenantId: string | ObjectId;
     email: string;
     password: string;
     // name: string;
-    role: string
+    role: string;
     // role: User['role'];
+    createdById: string;
   }): Promise<User> {
     const collection = await this.getCollection();
 
     const existing = await this.getUserByEmail(data.email);
 
     if (existing) {
-      throw new Error('User with this email already exists');
+      throw new Error("User with this email already exists");
     }
 
     // Hash password
     const passwordHash = await bcrypt.hash(data.password, 10);
 
-    const user: Omit<User, '_id'> = {
+    const user: Omit<User, "_id"> = {
       // tenantId: tid,
       email: data.email.toLowerCase(),
       passwordHash,
       // name: data.name,
       role: data.role,
-      status: 'active',
+      status: "active",
       createdAt: new Date(),
       updatedAt: new Date(),
       permissions: {
@@ -69,6 +69,11 @@ export class UserService {
       },
     };
 
+    if (data.role == "business") {
+      const franchiseId = new ObjectId(data.createdById)
+      user.franchise = franchiseId
+    }
+
     const result = await collection.insertOne(user as User);
     return { ...user, _id: result.insertedId } as User;
   }
@@ -81,11 +86,11 @@ export class UserService {
     // Hash password
     const passwordHash = await bcrypt.hash(data.password, 10);
 
-    const user: Omit<any, '_id'> = {
+    const user: Omit<any, "_id"> = {
       email: data.email.toLowerCase(),
       passwordHash,
       role: "superadmin",
-      status: 'active',
+      status: "active",
       createdAt: new Date(),
       updatedAt: new Date(),
       permissions: {
@@ -109,7 +114,7 @@ export class UserService {
 
   async updateLastLogin(userId: string | ObjectId): Promise<void> {
     const collection = await this.getCollection();
-    const id = typeof userId === 'string' ? new ObjectId(userId) : userId;
+    const id = typeof userId === "string" ? new ObjectId(userId) : userId;
 
     await collection.updateOne(
       { _id: id },
@@ -124,11 +129,9 @@ export class UserService {
 
   async listUsers(tenantId: string | ObjectId): Promise<User[]> {
     const collection = await this.getCollection();
-    const tid = typeof tenantId === 'string' ? new ObjectId(tenantId) : tenantId;
-    return collection
-      .find({ tenantId: tid })
-      .sort({ createdAt: -1 })
-      .toArray();
+    const tid =
+      typeof tenantId === "string" ? new ObjectId(tenantId) : tenantId;
+    return collection.find({ tenantId: tid }).sort({ createdAt: -1 }).toArray();
   }
 }
 

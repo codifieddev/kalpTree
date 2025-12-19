@@ -3,6 +3,7 @@ import { z } from "zod";
 import { tenantService } from "@/lib/tenant/tenant-service";
 import { userService } from "@/lib/auth/user-service";
 import { websiteService } from "@/lib/websites/website-service";
+import { cookies } from "next/headers";
 
 // const schema = z.object({
 //   tenantSlug: z
@@ -32,6 +33,7 @@ const baseSchema = z.object({
   serviceType: z.enum(["WEBSITE_ONLY", "ECOMMERCE"]),
   role: z.string().min(3).max(80),
   website_name: z.string().min(3).max(80),
+  createdById: z.string().min(3).max(80),
 });
 
 // export async function POST(req: Request) {
@@ -113,7 +115,6 @@ export async function POST(req: Request) {
     const schema = baseSchema.partial();
     const json = await req.json();
     const parsed = schema.safeParse(json);
-
     type Payload = z.infer<typeof schema>;
 
     if (!parsed.success) {
@@ -124,9 +125,6 @@ export async function POST(req: Request) {
     }
 
     const data: Payload = parsed.data;
-
-
-    console.log(data)
 
     // Superadmin flow
     if (data.role === "superadmin") {
@@ -151,7 +149,9 @@ export async function POST(req: Request) {
       !data.adminEmail ||
       !data.adminPassword ||
       !data.tenantSlug ||
-      !data.role || !data.website_name
+      !data.role ||
+      !data.website_name ||
+      !data.createdById
     ) {
       return NextResponse.json(
         { ok: false, error: "Missing required tenant fields" },
@@ -164,6 +164,7 @@ export async function POST(req: Request) {
       password: data.adminPassword,
       // name: `${data.tenantName} Owner`,
       role: data.role,
+      createdById: data.createdById,
     });
 
     const tenant = await tenantService.createTenant({
@@ -172,6 +173,7 @@ export async function POST(req: Request) {
       email: data.adminEmail,
       plan: "trial",
       userId: t._id,
+      createdById: data.createdById,
     });
 
     const website = await websiteService.create({

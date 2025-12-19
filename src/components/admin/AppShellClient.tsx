@@ -79,19 +79,21 @@ export function AppShellClient({
     }
   };
 
-    const handleTenantChange = async (tenantId: string) => {
+  const handleTenantChange = async (tenantId: string) => {
+    console.log(tenantId);
     const newTenant = tenants.find((w) => w._id === tenantId) || null;
     setCurrentTenant(newTenant);
     try {
       // Call API to update the current website cookie
-      const response = await fetch("/api/session/website", {
+      const response = await fetch("/api/session/tenant", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ websiteId }),
+        body: JSON.stringify({ tenantId }),
       });
       if (response.ok) {
+        const json = await response.json();
         // Clear Redux state first to prevent old data from being used
         resetRedux();
         // Navigate to /admin (which will load fresh data for new website)
@@ -107,7 +109,6 @@ export function AppShellClient({
       setCurrentTenant(initialCurrentTenant);
     }
   };
-
 
   // useEffect(() => {
   //   if (initialCurrentWebsite) {
@@ -142,6 +143,8 @@ export function AppShellClient({
       user={user}
       onWebsiteChange={handleWebsiteChange}
       onTenantChange={handleTenantChange}
+      tenants={tenants}
+      currentTenant={currentTenant}
     >
       {children}
     </AppShell>

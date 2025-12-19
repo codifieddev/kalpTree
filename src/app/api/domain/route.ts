@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { auth } from '@/auth';
 import { websiteService } from '@/lib/websites/website-service';
 import { tenantService } from '@/lib/tenant/tenant-service';
+import { cookies } from 'next/headers';
 
 const createSchema = z.object({
   name: z.string().min(1),
@@ -14,8 +15,10 @@ const createSchema = z.object({
 
 export async function GET() {
   const session = await auth();
-  if (false) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  const items = await websiteService.listByTenant("asda");
+  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const cookie = (await cookies()).get("current_selected_tenant_id")?.value
+  if(!cookie) return
+  const items = await websiteService.listByTenant(cookie);
   return NextResponse.json({ items });
 }
 

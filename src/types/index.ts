@@ -61,7 +61,7 @@ export interface Tenant extends Omit<BaseDocument, "tenantId"> {
   name: string; // "Franchise Store 1"
   email: string;
   phone?: string;
-  userId: string |  ObjectId
+  userId: string | ObjectId;
 
   // Tenant type and hierarchy
   type: "platform" | "franchise" | "business" | "client";
@@ -125,7 +125,7 @@ export interface User extends BaseDocument {
   avatar?: string;
   status: "active" | "invited" | "suspended";
   lastLoginAt?: Date;
-
+  franchise?: ObjectId;
   // Enhanced permissions with granular control
   permissions: {
     // Core permissions
@@ -138,12 +138,6 @@ export interface User extends BaseDocument {
     settings: string[];
 
     // Franchise-specific permissions
-    franchise?: {
-      createClients: boolean;
-      manageClients: boolean;
-      whiteLabel: boolean;
-      viewAnalytics: boolean;
-    };
 
     // Business-specific permissions
     business?: {

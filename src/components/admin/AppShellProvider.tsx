@@ -176,6 +176,7 @@ export async function AppShellProvider({ children }: AppShellProviderProps) {
   let websites: Website[] = [];
   let currentWebsite: Website | null = null;
 
+
   // ---------------- FRANCHISE USER ----------------
   if (user?.role === "franchise") {
     try {
@@ -237,7 +238,66 @@ export async function AppShellProvider({ children }: AppShellProviderProps) {
       console.error("Failed to load franchise data:", error);
     }
   }
+  else if (user?.role === "business") {
+    try {
+      // 1. Load tenants for franchise
+      const tenantDocs = await websiteService.listByUserId(user.id, user.role);
 
+      tenants = tenantDocs.map((doc: any) => ({
+        _id: doc._id.toString(),
+        name: doc.name,
+        email: doc.email,
+        slug: doc.slug,
+        userId: doc.userId.toString(),
+        franchise: doc.franchise?.toString(),
+      }));
+
+      const cookieStore = await cookies();
+      const currentTenantId = cookieStore.get(
+        "current_selected_tenant_id"
+      )?.value;
+
+      if (currentTenantId) {
+        currentTenant = tenants.find((t) => t._id === currentTenantId) || null;
+      }
+
+      if (!currentTenant && tenants.length > 0) {
+        currentTenant = tenants[0];
+      }
+
+      // 2. Load websites for selected tenant
+      if (currentTenant?._id) {
+        const websiteDocs = await websiteService.listByTenant(
+          currentTenant._id
+        );
+
+        websites = websiteDocs.map((doc) => ({
+          _id: doc._id.toString(),
+          websiteId: doc.websiteId,
+          name: doc.name,
+          primaryDomain: Array.isArray(doc.primaryDomain)
+            ? doc.primaryDomain[0] ?? null
+            : doc.primaryDomain,
+          systemSubdomain: doc.systemSubdomain,
+          serviceType: doc.serviceType,
+          status: "active" as const,
+        }));
+
+        const currentWebsiteId = cookieStore.get("current_website_id")?.value;
+
+        if (currentWebsiteId) {
+          currentWebsite =
+            websites.find((w) => w._id === currentWebsiteId) || null;
+        }
+
+        if (!currentWebsite && websites.length > 0) {
+          currentWebsite = websites[0];
+        }
+      }
+    } catch (error) {
+      console.error("Failed to load franchise data:", error);
+    }
+  }
 
   return (
     <AppShellClient

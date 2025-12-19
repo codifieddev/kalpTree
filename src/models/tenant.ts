@@ -11,6 +11,7 @@ export interface TenantModel {
   subscriptionStatus: "active" | "suspended" | "cancelled";
   branding: BrandingSettings;
   paymentGateways: Record<string, unknown>;
+  franchise?: string | ObjectId
   features: {
     websiteEnabled: boolean;
     ecommerceEnabled: boolean;
