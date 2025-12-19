@@ -34,6 +34,7 @@ const baseSchema = z.object({
   role: z.string().min(3).max(80),
   website_name: z.string().min(3).max(80),
   createdById: z.string().min(3).max(80),
+  website_url: z.string().min(3).max(80),
 });
 
 // export async function POST(req: Request) {
@@ -151,7 +152,7 @@ export async function POST(req: Request) {
       !data.tenantSlug ||
       !data.role ||
       !data.website_name ||
-      !data.createdById
+      !data.createdById || !data.website_url
     ) {
       return NextResponse.json(
         { ok: false, error: "Missing required tenant fields" },
@@ -176,11 +177,14 @@ export async function POST(req: Request) {
       createdById: data.createdById,
     });
 
+    const primaryDomain = [data.website_url]
+
     const website = await websiteService.create({
       tenantId: tenant._id,
       tenantSlug: tenant.slug,
       name: data.website_name,
       serviceType: data.serviceType ?? "WEBSITE_ONLY",
+      primaryDomain: primaryDomain
     });
 
     return NextResponse.json({

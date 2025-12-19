@@ -30,6 +30,7 @@ export default function UsersPage({ user }: any) {
     role: "business",
     service: "ECOMMERCE",
     website_name: "",
+    website_url: ""
   });
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -84,6 +85,7 @@ export default function UsersPage({ user }: any) {
           serviceType: formData.service,
           website_name: formData.website_name,
           createdById: user.id,
+          website_url: `${formData.website_url}.kalptree.com`
         }),
       });
 
@@ -99,6 +101,7 @@ export default function UsersPage({ user }: any) {
           role: "business",
           service: "ECOMMERCE",
           website_name: "",
+          website_url: ""
         });
         fetchUsers();
       } else {
@@ -308,15 +311,15 @@ export default function UsersPage({ user }: any) {
               <div className="flex items-center w-full border border-gray-300 rounded-xl overflow-hidden focus-within:ring-2 focus-within:ring-purple-500 focus-within:border-transparent transition-all">
                 <input
                   type="text"
-                  name="website_name"
-                  value={formData.website_name}
+                  name="website_url"
+                  value={formData.website_url}
                   onChange={handleInputChange}
                   required
                   className="flex-1 px-4 py-3 outline-none text-gray-900"
                   placeholder="shadcnstudio"
                 />
                 <span className="px-4 py-3 bg-gray-100 text-gray-600 text-sm border-l border-gray-300">
-                  .com
+                  .kalptree.com
                 </span>
               </div>
             </div>
