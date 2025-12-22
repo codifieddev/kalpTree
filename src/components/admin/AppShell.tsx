@@ -139,8 +139,10 @@ import { Input } from "../ui/input";
 // ---------------------------------------------------------------------------
 
 export type Website = {
+  
   _id: string;
-  websiteId: string;
+  tenantId?:string;
+  websiteId?: string;
   name: string;
   primaryDomain?: string[] | string | null;
   systemSubdomain: string;
@@ -665,6 +667,13 @@ const currentWebsiteSections: NavSection[] = [
         permission: ["content:read", "content:update", "content:delete"],
       },
     ],
+  },
+    {
+     id: "block-manager",
+    label: "Block Manager",
+    items: [
+          { label: "Blocks", href: "/admin/block-manager/blocks", icon: Blocks, permission: ["content:read", "content:update", "content:delete"], },
+    ]
   },
 
   {

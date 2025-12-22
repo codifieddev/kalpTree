@@ -28,27 +28,25 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   
   const json = await req.json();
-
   console.log(json)
   const parsed = createSchema.safeParse(json);
-  
-  if (!parsed.success) 
+  if (!parsed.success)
     return NextResponse.json({ error: 'Invalid payload', issues: parsed.error.flatten() }, { status: 400 });
-  
-  const tenant = await tenantService.getTenantById("asda");
-  if (!tenant || tenant.status !== 'active') 
-    return NextResponse.json({ error: 'Tenant inactive' }, { status: 403 });
-  
+
+  // Get tenantId from cookie (or session)
+  const cookie = (await cookies()).get("current_selected_tenant_id")?.value;
+  if (!cookie)
+    return NextResponse.json({ error: 'Missing tenantId' }, { status: 400 });
+
+  console.log("cookies", cookies)
   const created = await websiteService.create({
-    tenantId: "asda",
-    tenantSlug: "asf",
+    tenantId: cookie,
+    // tenantSlug: "asf",
     name: parsed.data.name,
     serviceType: parsed.data.serviceType,
-    // Handle array properly - check if it exists and has items
-    ...(parsed.data.primaryDomain && parsed.data.primaryDomain.length > 0 
-      ? { primaryDomain: parsed.data.primaryDomain } 
+    ...(parsed.data.primaryDomain && parsed.data.primaryDomain.length > 0
+      ? { primaryDomain: parsed.data.primaryDomain }
       : {}),
   });
-  
   return NextResponse.json(created, { status: 201 });
 }

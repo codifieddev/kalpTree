@@ -1,8 +1,16 @@
 
 "use client";
+import { Website } from "@/components/admin/AppShell";
 import { DataTableExt } from "@/components/admin/DataTableExt";
 
-export default function WebsitesExtTable({ items, currentId }: { items: any[]; currentId: string | null }) {
+
+type Props = {
+  items: any[];
+  currentId: string | null;
+  deleteData?: (data: Website) => void;
+};
+
+export default function WebsitesExtTable({ items, currentId, deleteData }: Props) {
   const rows = (items || []).map((w) => ({
     ...w,
     isCurrent: currentId === w.websiteId,
@@ -56,6 +64,7 @@ export default function WebsitesExtTable({ items, currentId }: { items: any[]; c
           label: "Current" 
         },
       ]}
+      onDelete={deleteData}
     />
   );
 }

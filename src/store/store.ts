@@ -9,6 +9,8 @@ import segmentReducer from "../hooks/slices/segment/SegmentSlice";
 import productReducer from "../hooks/slices/product/ProductSlice";
 import tenantsReducer from "../hooks/slices/tenants/TenantSlice";
 import llmSettingReducer from "../hooks/slices/setting/llmSetting/LLMSettingSlice";
+import BlockReducer from "../hooks/slices/blocks/BlockSlice"
+
 
 export const store = configureStore({
   reducer: {
@@ -22,6 +24,7 @@ export const store = configureStore({
     websites: websitesReducer,
     tenants: tenantsReducer,
     llmSetting: llmSettingReducer,
+     block:BlockReducer
   },
 });
 
