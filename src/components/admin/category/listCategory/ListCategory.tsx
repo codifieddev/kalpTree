@@ -73,7 +73,7 @@ const ListCategory = () => {
     router.push(`/admin/category/${id}`);
   };
 
-  console.log("list cate", listCategory)
+
 
   const initialColumns = [
     { key: "_id", label: "ID", hidden: true },

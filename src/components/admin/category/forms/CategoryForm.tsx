@@ -1,6 +1,8 @@
 "use client";
 
 import React from "react";
+import { IconSVG } from "@/components/ui/icon-display";
+import { businessTypeIcons } from "./businessTypeIcons";
 import { MaterialCategory } from "../types/CategoryModel";
 
 type CategoryFormProps = {
@@ -33,16 +35,17 @@ export default function CategoryForm({
       <div>
         <label className="block text-sm font-medium">Icon</label>
         <div className="mt-1 flex gap-2">
-          {["tag", "star", "folder", "bookmark", "grid"].map((ic) => (
+          {Object.entries(businessTypeIcons).map(([type, svg]) => (
             <button
-              key={ic}
+              key={type}
               type="button"
-              onClick={() => setCategory({ ...category, icon: ic })}
+              onClick={() => setCategory({ ...category, icon: type })}
               className={`px-2 py-1 rounded border ${
-                category.icon === ic ? "bg-accent text-white" : ""
-              }`}
+                category.icon === type ? "bg-accent text-white" : ""
+              } flex items-center gap-1`}
             >
-              {ic}
+              <IconSVG svg={svg} />
+              <span className="text-xs">{type}</span>
             </button>
           ))}
         </div>

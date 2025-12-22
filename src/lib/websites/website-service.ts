@@ -157,7 +157,7 @@ export class WebsiteService {
 
   async create(params: {
     tenantId: string | ObjectId;
-    tenantSlug: string;
+    // tenantSlug: string;
     name: string;
     serviceType: ServiceType;
     primaryDomain?: string[] | null;

@@ -19,7 +19,7 @@ export class UserService {
       // tenantId: tid,
       email: email.toLowerCase(),
     });
-
+   console.log("get user by Emnmails---", response)
     return response;
   }
 
@@ -48,17 +48,19 @@ export class UserService {
 
     // Hash password
     const passwordHash = await bcrypt.hash(data.password, 10);
-
+  const createdByObjectId = new ObjectId(data.createdById);
     const user: Omit<User, "_id"> = {
       // tenantId: tid,
       email: data.email.toLowerCase(),
       passwordHash,
       name: data.name!,
       role: data.role,
+    
       status: "active",
       createdAt: new Date(),
       updatedAt: new Date(),
       permissions: [],
+        createdById: createdByObjectId, 
     };
 
     if (data.role == "business") {

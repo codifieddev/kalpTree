@@ -1,6 +1,8 @@
 import { NextAuthConfig } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { userService } from "./user-service";
+import { tenantService } from "../tenant/tenant-service";
+import { ObjectId } from "mongodb";
 
 export const authConfig: NextAuthConfig = {
   trustHost: true,
@@ -66,6 +68,8 @@ export const authConfig: NextAuthConfig = {
         token.userId = user.id;
         token.email = user.email;
         token.name = user.name;
+        token.tenantId = user?.tenantId as string;
+        // token.tenantSlug = user.tenantSlug;
         token.role = user.role;
         token.permissions = user.permissions;
         token.tenantId = user.tenantId;

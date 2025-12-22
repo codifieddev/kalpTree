@@ -1,45 +1,41 @@
-"use client";
-import { useEffect, useState } from "react";
+  "use client";
+import { useEffect, useMemo, useState } from "react";
 import { Globe, Plus, X } from "lucide-react";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@/store/store";
+import { createWebsite, deleteWebsite, getAllWebsites } from "@/hooks/slices/websites/WebsiteSlice";
+import { toast } from "sonner";
+import { Website } from "@/components/admin/AppShell";
 
 export default function WebsitesPage() {
   const [items, setItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currentId, setCurrentId] = useState<string | null>(null);
-
+  const {user}= useSelector((state:RootState)=>state.user)
   const [name, setName] = useState("");
   const [serviceType, setServiceType] = useState<"WEBSITE_ONLY" | "ECOMMERCE">(
     "WEBSITE_ONLY"
   );
+
+  const dispatch= useDispatch<AppDispatch>()
   const [primaryDomains, setPrimaryDomains] = useState<string[]>([]);
   const [currentDomain, setCurrentDomain] = useState("");
   const [domain, setDomain] = useState("");
+  const {websites, hasfetched}= useSelector((state:RootState)=>state.websites)
 
-  async function load() {
-    try {
-      setLoading(true);
-      setError(null);
-      const [listRes, curRes] = await Promise.all([
-        fetch("/api/domain"),
-        fetch("/api/session/website"),
-      ]);
-      if (!listRes.ok) throw new Error("Failed to load websites");
-      const listJson = await listRes.json();
-      setItems(listJson.items || []);
-      if (curRes.ok) {
-        const curJson = await curRes.json();
-        setCurrentId(curJson.websiteId || null);
-      }
-    } catch (e: any) {
-      setError(e?.message || "Error");
-    } finally {
-      setLoading(false);
+  const allWebsite= useMemo(()=>{
+    if(websites && websites.length>0)
+      return websites
+  },[websites])
+  
+  useEffect(()=>{
+    if(user && user.tenantId &&
+      !hasfetched && websites.length==0){
+        console.log("websitite calloing")
+       dispatch(getAllWebsites({tenantId:user.tenantId}))
     }
-  }
-  useEffect(() => {
-    load();
-  }, []);
+  },[hasfetched, websites,user])
 
   const addDomain = () => {
     if (currentDomain.trim()) {
@@ -61,41 +57,63 @@ export default function WebsitesPage() {
 
   const onCreate = async (e: React.FormEvent) => {
     e.preventDefault();
-    const res = await fetch("/api/domain", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        name,
-        serviceType,
-        primaryDomain: primaryDomains.length > 0 ? primaryDomains : null,
-      }),
-    });
+    if(user &&!user.tenantId )
+      toast.error("Missing tenant Id")
+    // const res = await fetch("/api/domain", {
+    //   method: "POST",
+    //   headers: { "Content-Type": "application/json" },
+    //   body: JSON.stringify({
+    //     name,
+    //     serviceType,
+    //     primaryDomain: primaryDomains.length > 0 ? primaryDomains : null,
+    //   }),
+    // });
+    const data={
+      name: name,
+      tenantId:user?.tenantId,
+      primaryDomain: primaryDomains.length > 0 ? primaryDomains : [currentDomain],
+      systemSubdomain: "",
+      serviceType: serviceType,
+      status: "active" as const
+    }
 
-    console.log(res);
-    if (res.ok) {
+    const response= await dispatch (createWebsite(data)).unwrap()
+
+     console.log(response);
+    if (response) {
       setName("");
       setPrimaryDomains([]);
       setCurrentDomain("");
       setServiceType("WEBSITE_ONLY");
-      load();
+      // load();
     } else {
-      let msg = "";
-      try {
-        msg = (await res.json()).error;
-      } catch {}
-      alert("Create failed: " + (msg || res.status));
-    }
+    //   let msg = "";
+    //   try {
+    //     msg = (await response.json()).error;
+    //   } catch {}
+    //   alert("Create failed: " + (msg || response.status));
+    // }
   };
-
+  }
   const setCurrent = async (websiteId: string) => {
     const res = await fetch("/api/session/website", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ websiteId }),
     });
-    if (res.ok) load();
+    // if (res.ok) load();
   };
 
+
+  const handleDeleteDomain=async(data:Website)=>{
+    if(data && !data._id)
+      toast.error("Missing the object Id of selected Website")
+    try{
+  const response= await dispatch(deleteWebsite(data._id))
+    }catch(err){
+      console.log("error on deleting domain")
+    }
+  }
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -201,14 +219,19 @@ export default function WebsitesPage() {
           </div>
         </form>
       </div>
-
+{/* 
       {loading && <p>Loading...</p>}
-      {error && <p className="text-red-600">{error}</p>}
-      {!loading && items.length > 0 ? (
+      {error && <p className="text-red-600">{error}</p>} */}
+      { allWebsite&&allWebsite.length > 0 ? (
         <div className="mt-4">
           {(() => {
             const Ext = require("./ExtTable").default as any;
-            return <Ext items={items} currentId={currentId} />;
+            return <Ext 
+            items={allWebsite}
+             currentId={currentId}
+               deleteData={handleDeleteDomain}
+             
+              />;
           })()}
         </div>
       ) : (

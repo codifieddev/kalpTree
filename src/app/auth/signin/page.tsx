@@ -35,12 +35,15 @@ function SignInForm() {
       if (result && (result as any).error) {
         throw new Error((result as any).error || "Sign-in failed");
       }
-
+  console.log("cutomer login result-- ", result)
       const session = await getSession();
+
       if (session?.user) {
+         console.log("cutomer login session-- ", session)
         const mappedUser = {
           email: session.user.email,
           name: session.user.name,
+          tenanId:session.user.tenantId,
           ...(session.user as any),
         };
         dispatch(setUser(mappedUser));
