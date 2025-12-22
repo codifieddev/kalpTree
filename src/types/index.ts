@@ -120,40 +120,15 @@ export interface Tenant extends Omit<BaseDocument, "tenantId"> {
 export interface User extends BaseDocument {
   email: string;
   passwordHash: string;
-  // name: string;
+  name: string;
   role: string;
   avatar?: string;
   status: "active" | "invited" | "suspended";
   lastLoginAt?: Date;
   franchise?: ObjectId;
   // Enhanced permissions with granular control
-  permissions: {
-    // Core permissions
-    dashboard: boolean;
-    users: string[]; // ['create', 'read', 'update', 'delete']
-    tenants: string[];
-    products: string[];
-    orders: string[];
-    content: string[];
-    settings: string[];
-
-    // Franchise-specific permissions
-
-    // Business-specific permissions
-    business?: {
-      manageInventory: boolean;
-      processOrders: boolean;
-      viewReports: boolean;
-    };
-
-    // Client-specific permissions
-    client?: {
-      viewOwnData: boolean;
-      editProfile: boolean;
-      placeOrders: boolean;
-    };
-  };
-
+  permissions: string[]
+  createdById: ObjectId | string
   // User metadata
   metadata?: {
     department?: string;

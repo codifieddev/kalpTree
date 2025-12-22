@@ -33,7 +33,7 @@ export class UserService {
     // tenantId: string | ObjectId;
     email: string;
     password: string;
-    // name: string;
+    name?: string;
     role: string;
     // role: User['role'];
     createdById: string;
@@ -53,26 +53,54 @@ export class UserService {
       // tenantId: tid,
       email: data.email.toLowerCase(),
       passwordHash,
-      // name: data.name,
+      name: data.name!,
       role: data.role,
       status: "active",
       createdAt: new Date(),
       updatedAt: new Date(),
-      permissions: {
-        dashboard: true,
-        users: [],
-        tenants: [],
-        products: [],
-        orders: [],
-        content: [],
-        settings: [],
-      },
+      permissions: [],
     };
 
     if (data.role == "business") {
-      const franchiseId = new ObjectId(data.createdById)
-      user.franchise = franchiseId
+      const franchiseId = new ObjectId(data.createdById);
+      user.franchise = franchiseId;
     }
+
+    const result = await collection.insertOne(user as User);
+    return { ...user, _id: result.insertedId } as User;
+  }
+
+  async createSingleUser(data: {
+    // tenantId: string | ObjectId;
+    email: string;
+    password: string;
+    name: string;
+    role: string;
+    permissions: string[];
+    createdById: string;
+  }): Promise<User> {
+    const collection = await this.getCollection();
+
+    const existing = await this.getUserByEmail(data.email);
+
+    if (existing) {
+      throw new Error("User with this email already exists");
+    }
+    const passwordHash = await bcrypt.hash(data.password, 10);
+
+    const newObjectId = new ObjectId(data.createdById);
+
+    const user: Omit<User, "_id"> = {
+      email: data.email.toLowerCase(),
+      passwordHash,
+      name: data.name,
+      role: data.role,
+      status: "active",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      permissions: data.permissions,
+      createdById: newObjectId,
+    };
 
     const result = await collection.insertOne(user as User);
     return { ...user, _id: result.insertedId } as User;

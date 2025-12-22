@@ -86,6 +86,7 @@ import {
   ChevronsUpDown,
   User,
   LogOut,
+  ArrowBigDown,
 } from "lucide-react";
 import { FaChevronCircleLeft, FaChevronCircleRight } from "react-icons/fa";
 
@@ -166,6 +167,7 @@ type AppShellProps = {
   tenants: any[];
   currentTenant: any | null;
   onTenantChange?: (tenantId: string) => void;
+  loggedinTenant: any;
 };
 
 type NavItem = {
@@ -568,15 +570,20 @@ const currentWebsiteSections: NavSection[] = [
       },
     ],
   },
-
   {
     id: "users",
     label: "Users",
     items: [
       {
         label: "All Users",
-        href: "/admin/users/all-users",
+        href: "/admin/users/all-user",
         icon: Users,
+        permission: ["content:read", "content:update", "content:delete"],
+      },
+      {
+        label: "Create Users",
+        href: "/admin/users/create",
+        icon: UserPlus,
         permission: ["content:read", "content:update", "content:delete"],
       },
       {
@@ -589,12 +596,6 @@ const currentWebsiteSections: NavSection[] = [
         label: "Teams",
         href: "/admin/users/teams",
         icon: UsersRound,
-        permission: ["content:read", "content:update", "content:delete"],
-      },
-      {
-        label: "Invitations",
-        href: "/admin/users/invitations",
-        icon: UserPlus,
         permission: ["content:read", "content:update", "content:delete"],
       },
       {
@@ -611,7 +612,6 @@ const currentWebsiteSections: NavSection[] = [
       },
     ],
   },
-
   {
     id: "settings",
     label: "Settings",
@@ -735,6 +735,7 @@ type SidebarProps = {
   user: User | null;
   collapsed?: boolean;
   onToggleCollapse?: () => void;
+  loggedinTenant: any;
 };
 
 function Sidebar({
@@ -747,6 +748,7 @@ function Sidebar({
   tenants,
   currentTenant,
   onTenantChange,
+  loggedinTenant,
 }: SidebarProps) {
   const pathname = usePathname();
   const hasPermission = useHasPermission(user);
@@ -785,6 +787,12 @@ function Sidebar({
   // collapsed hover floating panel (like screenshot right)
   const [hoverGroupId, setHoverGroupId] = React.useState<string | null>(null);
 
+  const sentenceCase = (s: string | undefined) => {
+    if (!s) return "";
+    let t = s[0].toUpperCase() + s.slice(1).toLowerCase();
+    return t;
+  };
+
   return (
     <TooltipProvider>
       <div
@@ -815,107 +823,139 @@ function Sidebar({
                       </div>
                       {!collapsed && (
                         <div className="leading-tight">
-                          <div className="text-sm font-semibold">Dzinly</div>
+                          <div className="text-sm font-semibold">
+                            {loggedinTenant.name}
+                          </div>
                           <div className="text-[11px] text-black/45">
-                            Admin panel
+                            {sentenceCase(user?.role)} panel
                           </div>
                         </div>
                       )}
                     </div>
                   </div>
+                </div>
+
+                <div className="relative mt-2">
                   {tenants.length > 0 && (
                     <div className={cn("px-3 pt-2", collapsed && "px-2")}>
-                      <Select
-                        value={currentTenant?._id || ""}
-                        onValueChange={onTenantChange}
-                        disabled={user?.role=="business"}
-                      >
-                        <SelectTrigger
+                      <div className="relative">
+                        <Select
+                          value={currentTenant?._id || ""}
+                          onValueChange={onTenantChange}
+                          disabled={user?.role == "business"}
+                        >
+                          <SelectTrigger
+                            className={cn(
+                              "h-14 w-full rounded-lg bg-white border-2 border-gray-600 focus:ring-2 focus:ring-gray-600 focus:border-gray-600",
+                              "text-left px-4 pt-2",
+                              "[&>svg]:hidden",
+                              collapsed && "justify-center px-2"
+                            )}
+                          >
+                            <div className="flex items-center justify-between w-full">
+                              <span className="text-base text-gray-900">
+                                {currentTenant?.name || ""}
+                              </span>
+                              <ArrowBigDown className="h-4 w-4 text-black/70" />
+                            </div>
+                          </SelectTrigger>
+
+                          <SelectContent className="w-[260px] rounded-lg border shadow-lg">
+                            <div className="px-3 py-2 text-xs font-medium text-muted-foreground">
+                              Tenants
+                            </div>
+
+                            {tenants.map((tenant) => (
+                              <SelectItem key={tenant._id} value={tenant._id}>
+                                <div className="flex items-center gap-2">
+                                  <Building2 className="h-4 w-4 text-black/60" />
+                                  <span className="text-sm font-medium">
+                                    {tenant.name}
+                                  </span>
+                                </div>
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+
+                        {/* Floating Label */}
+                        <label
                           className={cn(
-                            "h-12 w-full rounded-md bg-white shadow border border-black/5",
-                            "[&>svg]:hidden",
-                            collapsed && "justify-center px-2"
+                            "absolute left-7 transition-all duration-200 pointer-events-none bg-white px-1",
+                            currentTenant?._id
+                              ? "-top-2.5 text-xs text-gray-600"
+                              : "top-6 text-base text-gray-500"
                           )}
                         >
-                          {!collapsed ? (
-                            <div className="flex items-center gap-2">
-                              <Building2 className="h-4 w-4 text-black/60" />
-                              <span className="text-sm font-medium truncate">
-                                {currentTenant?.name || "Select Tenant"}
-                              </span>
-                            </div>
-                          ) : (
-                            <Building2 className="h-4 w-4 text-black/70" />
-                          )}
-                        </SelectTrigger>
-
-                        <SelectContent className="w-[260px] rounded-lg border shadow-lg">
-                          <div className="px-3 py-2 text-xs font-medium text-muted-foreground">
-                            Tenants
-                          </div>
-
-                          {tenants.map((tenant) => (
-                            <SelectItem key={tenant._id} value={tenant._id}>
-                              <div className="flex items-center gap-2">
-                                <Building2 className="h-4 w-4 text-black/60" />
-                                <span className="text-sm font-medium">
-                                  {tenant.name}
-                                </span>
-                              </div>
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                          Select Businesses
+                        </label>
+                      </div>
                     </div>
                   )}
                 </div>
+                <div className="relative mt-2">
+                  {websites.length > 0 && (
+                    <div className={cn("px-3 pt-2", collapsed && "px-2")}>
+                      <div className="relative">
+                        <Select
+                          value={currentWebsite?._id || ""}
+                          onValueChange={onWebsiteChange}
+                        >
+                          <SelectTrigger
+                            className={cn(
+                              "h-14 w-full rounded-lg bg-white border-2 border-gray-600 focus:ring-2 focus:ring-gray-600 focus:border-gray-600",
+                              "text-left px-4 pt-2",
+                              "[&>svg]:hidden",
+                              collapsed && "justify-center px-2"
+                            )}
+                          >
+                            {!collapsed ? (
+                              <div className="flex items-center gap-2">
+                                <Globe2 className="h-4 w-4 text-black/60" />
+                                <span className="text-sm font-medium truncate">
+                                  {currentWebsite?.name || ""}
+                                </span>
+                              </div>
+                            ) : (
+                              <Globe2 className="h-4 w-4 text-black/70" />
+                            )}
+                          </SelectTrigger>
 
-                {websites.length > 0 && (
-                  <div className={cn("px-3 pt-2", collapsed && "px-2")}>
-                    <Select
-                      value={currentWebsite?._id || ""}
-                      onValueChange={onWebsiteChange}
-                    >
-                      <SelectTrigger
-                        className={cn(
-                          "h-12 w-full rounded-md bg-white shadow border border-black/5",
-                          "[&>svg]:hidden",
-                          collapsed && "justify-center px-2"
-                        )}
-                      >
-                        {!collapsed ? (
-                          <div className="flex items-center gap-2">
-                            <Globe2 className="h-4 w-4 text-black/60" />
-                            <span className="text-sm font-medium truncate">
-                              {currentWebsite?.name || "Select Website"}
-                            </span>
-                          </div>
-                        ) : (
-                          <Globe2 className="h-4 w-4 text-black/70" />
-                        )}
-                      </SelectTrigger>
-
-                      <SelectContent className="w-[260px] rounded-lg border shadow-lg">
-                        <div className="px-3 py-2 text-xs font-medium text-muted-foreground">
-                          Websites
-                        </div>
-
-                        {websites.map((site) => (
-                          <SelectItem key={site._id} value={site._id}>
-                            <div className="flex flex-col">
-                              <span className="text-sm font-medium">
-                                {site.name}
-                              </span>
-                              <span className="text-[11px] text-muted-foreground">
-                                {site.primaryDomain || site.systemSubdomain}
-                              </span>
+                          <SelectContent className="w-[260px] rounded-lg border shadow-lg">
+                            <div className="px-3 py-2 text-xs font-medium text-muted-foreground">
+                              Websites
                             </div>
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                )}
+
+                            {websites.map((site) => (
+                              <SelectItem key={site._id} value={site._id}>
+                                <div className="flex flex-col">
+                                  <span className="text-sm font-medium">
+                                    {site.name}
+                                  </span>
+                                  <span className="text-[11px] text-muted-foreground">
+                                    {site.primaryDomain || site.systemSubdomain}
+                                  </span>
+                                </div>
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+
+                        {/* Floating Label */}
+                        <label
+                          className={cn(
+                            "absolute left-7  transition-all duration-200 pointer-events-none bg-white px-1",
+                            currentWebsite?._id
+                              ? "-top-2.5 text-xs text-gray-600"
+                              : "top-6 text-base text-gray-500"
+                          )}
+                        >
+                          Select Website
+                        </label>
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
 
               <ScrollArea
@@ -1527,10 +1567,7 @@ function Topbar({
           </DropdownMenuTrigger>
 
           <DropdownMenuContent align="end">
-            <DropdownMenuLabel>
-              {user?.email || "User"}
-             
-            </DropdownMenuLabel>
+            <DropdownMenuLabel>{user?.email || "User"}</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem>Profile</DropdownMenuItem>
             <DropdownMenuItem>Account settings</DropdownMenuItem>
@@ -1561,6 +1598,7 @@ export function AppShell({
   onTenantChange = () => {},
   tenants = [],
   currentTenant = null,
+  loggedinTenant,
 }: AppShellProps) {
   const [mobileSidebarOpen, setMobileSidebarOpen] = React.useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = React.useState(false);
@@ -1577,6 +1615,7 @@ export function AppShell({
         onWebsiteChange={onWebsiteChange}
         collapsed={sidebarCollapsed}
         onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
+        loggedinTenant={loggedinTenant}
       />
 
       <div className="flex flex-1 min-h-screen flex-col overflow-hidden">

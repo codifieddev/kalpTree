@@ -36,13 +36,11 @@ export default function UsersPage({ user }: any) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState({ type: "", text: "" });
   const [expandedUser, setExpandedUser] = useState(null);
-  console.log(user);
 
   useEffect(() => {
     fetchUsers();
   }, []);
 
-  console.log(users);
 
   const fetchUsers = async () => {
     try {

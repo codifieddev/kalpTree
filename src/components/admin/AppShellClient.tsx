@@ -26,6 +26,7 @@ type AppShellClientProps = {
   user: User | null;
   tenants: any[];
   currentTenant: any;
+  loggedinTenant: any | null
 };
 
 export function AppShellClient({
@@ -35,6 +36,7 @@ export function AppShellClient({
   user,
   tenants,
   currentTenant: initialCurrentTenant,
+  loggedinTenant
 }: AppShellClientProps) {
   const [currentWebsite, setCurrentWebsite] = useState(initialCurrentWebsite);
   const [currentTenant, setCurrentTenant] = useState(initialCurrentTenant);
@@ -145,6 +147,7 @@ export function AppShellClient({
       onTenantChange={handleTenantChange}
       tenants={tenants}
       currentTenant={currentTenant}
+      loggedinTenant={loggedinTenant}
     >
       {children}
     </AppShell>

@@ -2,14 +2,16 @@ import { cookies } from "next/headers";
 import { DataTableExt } from "@/components/admin/DataTableExt";
 import { auth } from "@/auth";
 import { pageService } from "@/modules/website/page-service";
+import { websiteService } from "@/lib/websites/website-service";
 
 export default async function PagesAdmin() {
   const session = await auth();
+  const user = session?.user.id;
+  const role = session?.user.role;
+  const tenant = await websiteService.listByUserId(user!, role);
+  const tenantId = String(tenant[0]._id);
 
-  // Change when tenantid need to real one
-  const tenantId = "asf";
-
-  if (tenantId) {
+  if (!tenantId) {
     return (
       <div className="text-sm text-red-600">Unauthorized: Please sign in</div>
     );

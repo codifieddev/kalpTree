@@ -68,6 +68,14 @@ export class WebsiteService {
     ]);
   }
 
+  async listSingleByTenant(tenantId: string) {
+    const c = await getDatabase();
+    const coll = await c.collection("tenants");
+    const tid =
+      typeof tenantId === "string" ? new ObjectId(tenantId) : tenantId;
+    return coll.findOne({ _id: tid });
+  }
+
   async listByTenant(tenantId: string | ObjectId) {
     const c = await this.col();
     const tid =
@@ -84,6 +92,23 @@ export class WebsiteService {
   // }
 
   async listByUserId(tenantId: string | ObjectId, role?: string) {
+    const c = await getDatabase();
+    const coll = await c.collection("tenants");
+    const userId = new ObjectId(tenantId);
+    const c1 = await this.col();
+    let getTenants;
+    if (role == "business") {
+      getTenants = await coll.find({ userId: userId }).toArray();
+    } else {
+      getTenants = await coll.find({ franchise: userId }).toArray();
+    }
+    return getTenants;
+  }
+
+  async listSingleWebsiteByWebsiteId(
+    tenantId: string | ObjectId,
+    role?: string
+  ) {
     const c = await getDatabase();
     const coll = await c.collection("tenants");
     const userId = new ObjectId(tenantId);

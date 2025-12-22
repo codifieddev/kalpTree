@@ -1,10 +1,8 @@
 import { NextAuthConfig } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { userService } from "./user-service";
-import { tenantService } from "../tenant/tenant-service";
 
 export const authConfig: NextAuthConfig = {
-  // Dynamically set the base URL based on environment
   trustHost: true,
   providers: [
     CredentialsProvider({
@@ -12,76 +10,95 @@ export const authConfig: NextAuthConfig = {
       credentials: {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
-        // tenantSlug?: { label: 'Tenant', type: 'hidden' },
       },
       async authorize(credentials) {
+        // Validate credentials exist
         if (!credentials?.email || !credentials?.password) {
+          throw new Error("Email and password are required");
+        }
+
+        try {
+          // Get user by email
+          const user = await userService.getUserByEmail(
+            credentials.email as string
+          );
+
+          // Check if user exists and is active
+          if (!user || user.status !== "active") {
+            throw new Error("Invalid credentials or inactive account");
+          }
+
+          // Verify password
+          const isValid = await userService.verifyPassword(
+            user,
+            credentials.password as string
+          );
+
+          if (!isValid) {
+            throw new Error("Invalid credentials");
+          }
+
+          // Update last login (don't await to avoid blocking)
+          userService.updateLastLogin(user._id).catch((err) => {
+            console.error("Failed to update last login:", err);
+          });
+
+          // Return user object
+          return {
+            id: user._id.toString(),
+            email: user.email,
+            name: user.name,
+            tenantId: user.tenantId!.toString(),
+            role: user.role,
+            permissions: user.permissions,
+          };
+        } catch (error) {
+          console.error("Authorization error:", error);
           return null;
         }
-        // const tenantSlug = credentials.tenantSlug as string;
-
-        // Get tenant
-        // const tenant = await tenantService.getTenantBySlug(tenantSlug);
-
-        // if (!tenant || tenant.status !== 'active') {
-        //   return null;
-        // }
-
-        // Get user
-        const user = await userService.getUserByEmail(
-          // tenant._id,
-          credentials.email as string
-        );
-
-        if (!user || user.status !== "active") {
-          return null;
-        }
-        // Verify password
-        const isValid = await userService.verifyPassword(
-          user,
-          credentials.password as string
-        );
-
-        if (!isValid) {
-          return null;
-        }
-        // Update last login
-        await userService.updateLastLogin(user._id);
-        return {
-          id: user._id.toString(),
-          email: user.email,
-          name: user.name,
-          // tenantId: tenant._id.toString(),
-          // tenantSlug: tenant.slug,
-          role: user.role,
-        };
       },
     }),
   ],
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger }) {
+      // Initial sign in
       if (user) {
         token.userId = user.id;
-        // token.tenantId = user?.tenantId;
-        // token.tenantSlug = user.tenantSlug;
+        token.email = user.email;
+        token.name = user.name;
         token.role = user.role;
+        token.permissions = user.permissions;
+        token.tenantId = user.tenantId;
       }
+
+      // Handle token refresh/update
+      if (trigger === "update") {
+        // You can refresh user data here if needed
+        // const refreshedUser = await userService.getUserById(token.userId);
+        // Update token with fresh data
+      }
+
       return token;
     },
     async session({ session, token }) {
-      if (session.user) {
-        session.user.id = token.userId as string;
-        // "asda" = token.tenantId as string;
-        // session.user.tenantSlug = token.tenantSlug as string;
-        session.user.role = token.role as string;
+      if (session.user && token) {
+        session.user.id = token.userId;
+        session.user.email = token.email;
+        session.user.name = token.name;
+        session.user.role = token.role;
+        session.user.permissions = token.permissions;
+        session.user.tenantId = token.tenantId;
       }
       return session;
     },
   },
   pages: {
     signIn: "/auth/signin",
+    error: "/auth/error",
   },
   session: {
     strategy: "jwt",
+    maxAge: 30 * 24 * 60 * 60, // 30 days
   },
+  secret: process.env.NEXTAUTH_SECRET,
 };
