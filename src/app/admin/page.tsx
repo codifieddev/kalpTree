@@ -33,7 +33,7 @@ export default async function AdminIndex() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-xl font-semibold">Dashboard</h2>
+        <h2 className="text-xl font-semibold">Home Page</h2>
         <p className="text-sm text-muted-foreground">Quick overview</p>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">

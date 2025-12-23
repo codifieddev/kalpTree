@@ -105,6 +105,61 @@ export class UserService {
     return { ...user, _id: result.insertedId } as User;
   }
 
+  async createwithemail(data: {
+    tenantId: string | ObjectId;
+    email: string;
+    role: string;
+    permissions: string[];
+    createdById: string;
+    managedServices: any;
+  }): Promise<User> {
+    const collection = await this.getCollection();
+
+    const existing = await this.getUserByEmail(data.email);
+
+    if (existing) {
+      throw new Error("User with this email already exists");
+    }
+
+    const newObjectId = new ObjectId(data.createdById);
+
+    const user: Omit<User, "_id"> = {
+      email: data.email.toLowerCase(),
+      role: data.role,
+      status: "active",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      permissions: data.permissions,
+      createdById: newObjectId,
+      managedServices: data.managedServices,
+      tenantId: data.tenantId,
+    };
+
+    const result = await collection.insertOne(user as User);
+    return { ...user, _id: result.insertedId } as User;
+  }
+
+  async updatepasswordafterverification(data: {
+    name: string ;
+    password: string;
+    id:ObjectId;
+  }): Promise<any> {
+    const collection = await this.getCollection();
+    const passwordHash = await bcrypt.hash(data.password, 10);
+    const result = await collection.updateOne(
+      { _id: data.id },
+      {
+        $set: {
+          name: data.name,
+          passwordHash: passwordHash,
+        },
+      }
+    );
+
+    // const result = await collection.insertOne(user as User);
+    return result;
+  }
+
   async createsuperadminUser(data: {
     email: string;
     password: string;
@@ -136,7 +191,7 @@ export class UserService {
   }
 
   async verifyPassword(user: User, password: string): Promise<boolean> {
-    return bcrypt.compare(password, user.passwordHash);
+    return bcrypt.compare(password, user.passwordHash!);
   }
 
   async updateLastLogin(userId: string | ObjectId): Promise<void> {

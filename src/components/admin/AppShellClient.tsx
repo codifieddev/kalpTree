@@ -112,14 +112,6 @@ export function AppShellClient({
     }
   };
 
-  // useEffect(() => {
-  //   if (initialCurrentWebsite) {
-  //     handleWebsiteChange(initialCurrentWebsite._id);
-  //   }
-  // }, []);
-
-  // When client receives server-provided websites, save them to Redux
-
   useEffect(() => {
     if (websites && websites.length > 0) {
       dispatch(setTenants(tenants));

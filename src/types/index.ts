@@ -119,8 +119,8 @@ export interface Tenant extends Omit<BaseDocument, "tenantId"> {
 // Enhanced User with comprehensive role system
 export interface User extends BaseDocument {
   email: string;
-  passwordHash: string;
-  name: string;
+  passwordHash?: string;
+  name?: string;
   role: string;
   avatar?: string;
   status: "active" | "invited" | "suspended";
@@ -138,6 +138,7 @@ export interface User extends BaseDocument {
     address?: string;
     notes?: string;
   };
+  managedServices?: any;
 }
 
 // Super Admin (platform-level access)

@@ -7,7 +7,6 @@ export default async function PageTemplate({ params }: any) {
 
   const host = headersList.get("host");
 
-  console.log("Host===>>>", host);
 
   const main = await fetch(`${API_BASE_URL}/api/domain/${host}`);
 

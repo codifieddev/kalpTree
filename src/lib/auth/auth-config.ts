@@ -1,8 +1,6 @@
 import { NextAuthConfig } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { userService } from "./user-service";
-import { tenantService } from "../tenant/tenant-service";
-import { ObjectId } from "mongodb";
 
 export const authConfig: NextAuthConfig = {
   trustHost: true,
@@ -53,6 +51,7 @@ export const authConfig: NextAuthConfig = {
             tenantId: user.tenantId!.toString(),
             role: user.role,
             permissions: user.permissions,
+            createdById: user.createdById?.toString(), // Handle optional createdById
           };
         } catch (error) {
           console.error("Authorization error:", error);
@@ -69,10 +68,9 @@ export const authConfig: NextAuthConfig = {
         token.email = user.email;
         token.name = user.name;
         token.tenantId = user?.tenantId as string;
-        // token.tenantSlug = user.tenantSlug;
         token.role = user.role;
         token.permissions = user.permissions;
-        token.tenantId = user.tenantId;
+        token.createdById = user.createdById; // Will be undefined if not present
       }
 
       // Handle token refresh/update
@@ -92,6 +90,7 @@ export const authConfig: NextAuthConfig = {
         session.user.role = token.role;
         session.user.permissions = token.permissions;
         session.user.tenantId = token.tenantId;
+        session.user.createdById = token.createdById; // Will be undefined if not present
       }
       return session;
     },

@@ -50,6 +50,8 @@ export async function AppShellProvider({ children }: AppShellProviderProps) {
         permissions: Array.isArray((session.user as any).permissions)
           ? (session.user as any).permissions
           : undefined,
+        createdById: session.user.createdById || "",
+        tenantId: session.user.tenantId || "",
       }
     : null;
 
@@ -70,7 +72,11 @@ export async function AppShellProvider({ children }: AppShellProviderProps) {
 
       loggedinTenant = serializeMongoDoc(maintenant);
 
-      const tenantDocs = await websiteService.listByUserId(user.id);
+      console.log(loggedinTenant)
+
+      const idtoPass = user && user.createdById ? user.createdById : user.id;
+
+      const tenantDocs = await websiteService.listByUserId(idtoPass);
 
       tenants = tenantDocs.map((doc: any) => ({
         _id: doc._id.toString(),
@@ -99,8 +105,6 @@ export async function AppShellProvider({ children }: AppShellProviderProps) {
         const websiteDocs = await websiteService.listByTenant(
           currentTenant._id
         );
-
-        console.log("===>>>", websiteDocs);
 
         websites = websiteDocs.map((doc) => ({
           _id: doc._id.toString(),

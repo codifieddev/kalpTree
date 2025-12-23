@@ -4,11 +4,11 @@ declare module "next-auth" {
   interface User {
     id: string;
     tenantId: string;
-    // tenantSlug: string;
     role: string;
     permissions: string[];
     name: string;
     email: string;
+    createdById?: string; // Made optional
   }
 
   interface Session {
@@ -17,9 +17,9 @@ declare module "next-auth" {
       email: string;
       name: string;
       tenantId: string;
-      // tenantSlug: string;
       role: string;
       permissions: string[];
+      createdById?: string; // Made optional
     };
   }
 }
@@ -28,11 +28,10 @@ declare module "next-auth/jwt" {
   interface JWT {
     userId: string;
     email: string;
-     tenantId: string;
-    // tenantSlug: string;
-    role: string;
     tenantId: string;
+    role: string;
     permissions: string[];
     name: string;
+    createdById?: string; // Made optional
   }
 }

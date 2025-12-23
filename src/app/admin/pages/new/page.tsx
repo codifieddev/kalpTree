@@ -3,12 +3,12 @@ import PageCreator, { FieldConfig } from "@/components/admin/Creator";
 import { auth } from "@/auth";
 
 export default async function NewPage() {
-  const session = await auth()
-  console.log(session?.user)
+  const session = await auth();
+  console.log(session?.user);
   const cookies = await cookiesFn();
 
-
-  const currentWebsiteId = cookies.get('current_website_id')?.value;
+  const currentWebsiteId = cookies.get("current_website_id")?.value;
+  const currentTenantId = cookies.get("current_selected_tenant_id")?.value;
 
   // Default/empty item for new page
   const emptyItem = {
@@ -16,7 +16,7 @@ export default async function NewPage() {
     content: "",
     slug: "",
     status: "draft",
-    // tenantId: session?.user.tenantId || "",
+    tenantId: session?.user.tenantId || "",
     websiteId: currentWebsiteId || "",
   };
 
