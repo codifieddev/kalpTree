@@ -33,7 +33,6 @@ export class TenantService {
     name: string;
     email: string;
     plan?: Tenant["plan"];
-    userId?: ObjectId | string;
     createdById: ObjectId | string;
   }): Promise<Tenant> {
     const collection = await this.getCollection();
@@ -48,8 +47,7 @@ export class TenantService {
       slug: data.slug.toLowerCase(),
       name: data.name,
       email: data.email,
-      userId: data.userId!,
-      franchise: new ObjectId(data.createdById),
+      createdById: new ObjectId(data.createdById),
       plan: data.plan || "trial",
       subscriptionStatus: "active",
       customDomainVerified: false,

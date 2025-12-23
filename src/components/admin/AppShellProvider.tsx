@@ -77,8 +77,8 @@ export async function AppShellProvider({ children }: AppShellProviderProps) {
         name: doc.name,
         email: doc.email,
         slug: doc.slug,
-        userId: doc.userId.toString(),
-        franchise: doc.franchise?.toString(),
+        // userId: doc.userId.toString(),
+        createdById: doc.createdById?.toString(),
       }));
 
       const cookieStore = await cookies();
@@ -100,6 +100,8 @@ export async function AppShellProvider({ children }: AppShellProviderProps) {
           currentTenant._id
         );
 
+        console.log("===>>>", websiteDocs);
+
         websites = websiteDocs.map((doc) => ({
           _id: doc._id.toString(),
           websiteId: doc.websiteId,
@@ -107,7 +109,7 @@ export async function AppShellProvider({ children }: AppShellProviderProps) {
           primaryDomain: Array.isArray(doc.primaryDomain)
             ? doc.primaryDomain[0] ?? null
             : doc.primaryDomain,
-          systemSubdomain: doc.systemSubdomain,
+          // systemSubdomain: doc.systemSubdomain,
           serviceType: doc.serviceType,
           status: "active" as const,
         }));
@@ -186,8 +188,6 @@ export async function AppShellProvider({ children }: AppShellProviderProps) {
       console.error("Failed to load franchise data:", error);
     }
   }
-
-  console.log(loggedinTenant);
 
   return (
     <AppShellClient

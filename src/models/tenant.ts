@@ -29,7 +29,8 @@ export interface TenantModel {
   status: "active" | "suspended" | "pending";
   createdAt: Date;
   updatedAt: Date;
-  userId: ObjectId | string;
+  userId?: ObjectId | string;
+  createdById?: string | ObjectId
 }
 
 // Example usage:

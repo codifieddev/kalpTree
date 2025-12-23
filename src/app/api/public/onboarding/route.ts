@@ -25,11 +25,9 @@ const baseSchema = z.object({
     .min(3)
     .max(40)
     .regex(/^[a-z0-9-]+$/i, "Use letters, numbers or dashes"),
-
   tenantName: z.string().min(3).max(80),
   adminEmail: z.string().email(),
   adminPassword: z.string().min(6).max(100),
-  // websiteName: z.string().min(2).max(80),
   serviceType: z.enum(["WEBSITE_ONLY", "ECOMMERCE"]),
   role: z.string().min(3).max(80),
   website_name: z.string().min(3).max(80),
@@ -152,7 +150,8 @@ export async function POST(req: Request) {
       !data.tenantSlug ||
       !data.role ||
       !data.website_name ||
-      !data.createdById || !data.website_url
+      !data.createdById ||
+      !data.website_url
     ) {
       return NextResponse.json(
         { ok: false, error: "Missing required tenant fields" },
@@ -160,38 +159,39 @@ export async function POST(req: Request) {
       );
     }
 
-    const t = await userService.createUser({
-      email: data.adminEmail,
-      password: data.adminPassword,
-      // name: `${data.tenantName} Owner`,
-      role: data.role,
-      createdById: data.createdById,
-    });
-
     const tenant = await tenantService.createTenant({
       slug: data.tenantSlug,
       name: data.tenantName,
       email: data.adminEmail,
       plan: "trial",
-      userId: t._id,
       createdById: data.createdById,
     });
 
-    const primaryDomain = [data.website_url]
+    const t = await userService.createUser({
+      email: data.adminEmail,
+      password: data.adminPassword,
+      name: data.tenantName,
+      role: data.role,
+      createdById: data.createdById,
+      //  tenant ID here
+      tenantId: tenant._id,
+    });
+
+    const primaryDomain = [data.website_url];
 
     const website = await websiteService.create({
       tenantId: tenant._id,
-      tenantSlug: tenant.slug,
+      // tenantSlug: tenant.slug,
       name: data.website_name,
       serviceType: data.serviceType ?? "WEBSITE_ONLY",
-      primaryDomain: primaryDomain
+      primaryDomain: primaryDomain,
     });
 
     return NextResponse.json({
       ok: true,
       tenantId: String(tenant._id),
       tenantSlug: tenant.slug,
-      // websiteId: website.websiteId,
+      websiteId: website.websiteId,
       // systemSubdomain: website.systemSubdomain,
     });
   } catch (e: unknown) {

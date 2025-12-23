@@ -30,7 +30,7 @@ export default function UsersPage({ user }: any) {
     role: "business",
     service: "ECOMMERCE",
     website_name: "",
-    website_url: ""
+    website_url: "",
   });
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -40,7 +40,6 @@ export default function UsersPage({ user }: any) {
   useEffect(() => {
     fetchUsers();
   }, []);
-
 
   const fetchUsers = async () => {
     try {
@@ -83,7 +82,7 @@ export default function UsersPage({ user }: any) {
           serviceType: formData.service,
           website_name: formData.website_name,
           createdById: user.id,
-          website_url: `${formData.website_url}.kalptree.com`
+          website_url: `${formData.website_url}.kalptree.com`,
         }),
       });
 
@@ -99,7 +98,7 @@ export default function UsersPage({ user }: any) {
           role: "business",
           service: "ECOMMERCE",
           website_name: "",
-          website_url: ""
+          website_url: "",
         });
         fetchUsers();
       } else {
@@ -279,7 +278,7 @@ export default function UsersPage({ user }: any) {
               </select>
             </div>
 
-            <hr className="col-span-2"/>
+            <hr className="col-span-2" />
 
             <div className="col-span-2">
               <label className="block text-sm font-semibold text-gray-700 mb-2">

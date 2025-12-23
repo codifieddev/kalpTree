@@ -95,12 +95,11 @@ export class WebsiteService {
     const c = await getDatabase();
     const coll = await c.collection("tenants");
     const userId = new ObjectId(tenantId);
-    const c1 = await this.col();
     let getTenants;
     if (role == "business") {
       getTenants = await coll.find({ userId: userId }).toArray();
     } else {
-      getTenants = await coll.find({ franchise: userId }).toArray();
+      getTenants = await coll.find({ createdById: userId }).toArray();
     }
     return getTenants;
   }

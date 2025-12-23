@@ -3,7 +3,7 @@ import { ObjectId } from "mongodb";
 // Base document with multi-tenant support
 export interface BaseDocument {
   _id: ObjectId;
-  tenantId?: ObjectId| string ;
+  tenantId?: ObjectId | string;
   // Optional website scope for multi-website tenants
   websiteId?: ObjectId;
   createdAt: Date;
@@ -126,10 +126,10 @@ export interface User extends BaseDocument {
   status: "active" | "invited" | "suspended";
   lastLoginAt?: Date;
   franchise?: ObjectId;
-    tenantId?:string|ObjectId;
+  tenantId?: string | ObjectId;
   // Enhanced permissions with granular control
-  permissions: string[]
-  createdById: ObjectId | string
+  permissions: string[];
+  createdById: ObjectId | string;
   // User metadata
   metadata?: {
     department?: string;
