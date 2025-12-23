@@ -68,8 +68,8 @@ function SignUpForm() {
       <div className="hidden md:flex md:w-1/2 bg-primary p-12 flex-col justify-between border-r border-border">
         <div>
           <img
-            src="/dzinlylogo.svg"
-            alt="Dzinly"
+            src="/kalptree-white-logo.svg"
+            alt="KalpTree"
             className="w-52 brightness-0 invert my-10"
           />
 

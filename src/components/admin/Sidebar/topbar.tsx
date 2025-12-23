@@ -115,8 +115,8 @@ export function Topbar({
           <Bell className="h-4 w-4" />
         </Button>
         <Button size="sm" className="text-xs">
-          <Sparkles className="h-3 w-3 mr-1" />
-          Upgrade
+          <Sparkles className="h-3 w-3 " />
+          Ai Assistant
         </Button>
 
         <DropdownMenu>
@@ -124,7 +124,7 @@ export function Topbar({
             <Button
               variant="ghost"
               size="icon"
-              className="ml-1 h-8 w-8 rounded-full"
+              className="ml-1 h-8 w-8 rounded-full bg-primary/10 hover:bg-primary/20 pt-2"
             >
               <Avatar className="h-7 w-7">
                 <AvatarFallback>
@@ -134,15 +134,15 @@ export function Topbar({
             </Button>
           </DropdownMenuTrigger>
 
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>{user?.email || "User"}</DropdownMenuLabel>
+          <DropdownMenuContent align="end" className="bg-white rounded-md shadow-md w-40">
+            <DropdownMenuLabel className="hover:bg-primary hover:text-white p-2">{user?.email || "User"}</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>Profile</DropdownMenuItem>
-            <DropdownMenuItem>Account settings</DropdownMenuItem>
+            <DropdownMenuItem className="hover:bg-primary hover:text-white p-2">Profile</DropdownMenuItem>
+            <DropdownMenuItem className="hover:bg-primary hover:text-white p-2">Account settings</DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem
               onClick={handleSignOut}
-              className="text-destructive"
+             className="hover:bg-primary hover:text-white p-2"  
             >
               Sign out
             </DropdownMenuItem>

@@ -157,7 +157,7 @@ export function HighLevelSidebar({
                   <div className="flex items-center gap-3">
                     <div className="grid h-10 w-10 place-items-center rounded-md">
                       <img
-                        src="../dzinly-favicon.svg"
+                        src="../kalptree-favicon.svg"
                         className="w-10 h-10"
                         alt="Logo"
                       />

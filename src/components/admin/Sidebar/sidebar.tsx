@@ -122,15 +122,15 @@ export function Sidebar({
                 <div className="flex justify-between items-center">
                   <div className={cn("px-4 pt-4 pb-0", collapsed && "px-3")}>
                     <div className="flex items-center gap-3">
-                      <div className="grid h-10 w-10 place-items-center rounded-md">
+                      {/* <div className="grid h-10 w-10 place-items-center rounded-md">
                         <img
-                          src="../dzinly-favicon.svg"
+                          src="../kalptree-favicon.svg"
                           className="w-10 h-10"
                         ></img>
-                      </div>
+                      </div> */}
                       {!collapsed && (
                         <div className="leading-tight">
-                          <div className="text-sm font-semibold">
+                          <div className="text-md uppercase font-semibold">
                             {loggedinTenant.name}
                           </div>
                           <div className="text-[11px] text-black/45">

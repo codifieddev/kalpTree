@@ -61,7 +61,7 @@ function SignInForm() {
     <div className="min-h-screen flex flex-col md:flex-row bg-background text-foreground">
       
       {/* LEFT PANEL: Branding & Info 
-          Uses bg-primary (Plum) and text-secondary (Gold) for contrast 
+          Uses bg-primary (Plum) and text-white (Gold) for contrast 
       */}
       <div className="hidden md:flex md:w-1/2 bg-primary relative overflow-hidden p-12 flex-col justify-between border-r border-border">
         {/* Decorative Background - Using Secondary (Gold/Sand) for glow */}
@@ -69,12 +69,12 @@ function SignInForm() {
 
         <div className="relative z-10">
           {/* Logo brightness inverted to look white on the dark primary background */}
-          <img src="/dzinlylogo.svg" alt="Dzinly" className="w-52 brightness-0 invert my-10" />
+          <img src="/kalptree-white-logo.svg" alt="KalpTree" className="w-36 brightness-0 invert my-6" />
           
           <h2 className="text-4xl lg:text-[72px] font-bold text-primary-foreground leading-tight mb-6">
             Enterprise <br />
             {/* Using Secondary Color for Emphasis */}
-            <span className="text-secondary">Admin Portal</span>
+            <span className="text-white">Admin Portal</span>
           </h2>
           
           <p className="text-primary-foreground/80 text-lg max-w-md">
@@ -84,11 +84,11 @@ function SignInForm() {
 
         <div className="relative z-10 grid grid-cols-2 gap-6">
           <div className="flex items-center gap-3 text-primary-foreground/70 text-sm font-medium">
-            <ShieldCheck className="w-5 h-5 text-secondary" />
+            <ShieldCheck className="w-5 h-5 text-white" />
             RBAC Protected
           </div>
           <div className="flex items-center gap-3 text-primary-foreground/70 text-sm font-medium">
-            <Globe className="w-5 h-5 text-secondary" />
+            <Globe className="w-5 h-5 text-white" />
             Multi-Tenant
           </div>
         </div>

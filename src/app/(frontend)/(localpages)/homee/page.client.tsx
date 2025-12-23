@@ -30,7 +30,7 @@ export default function RootClientPage() {
         <div className="max-w-6xl mx-auto relative z-10 text-center">
           {/* Logo Container */}
           <div className="inline-flex items-center justify-center p-4 rounded-2xl mb-8 animate-fade-in">
-            <img src="/dzinlylogo.svg" alt="Dzinly Logo" className="w-56 h-auto brightness-0 invert" />
+            <img src="/kalptree-white-logo.svg" alt="Dzinly Logo" className="w-56 h-auto brightness-0 invert" />
           </div>
           
           <h1 className="text-5xl md:text-7xl font-black text-white mb-6  leading-[1.1]">
@@ -272,7 +272,7 @@ export default function RootClientPage() {
       <footer className="py-12 border-t border-slate-200 bg-[#f7f7f7] text-sm">
         <div className="max-w-6xl mx-auto px-6 grid md:grid-cols-4 gap-8 mb-8">
             <div>
-                <img src="/dzinlylogo.svg" className="w-32 mb-4 brightness-0 opacity-80" alt="logo" />
+                <img src="/kalptree-main-logo.svg" className="w-32 mb-4 brightness-0 opacity-80" alt="Kalptree" />
                 <p className="text-slate-500">The standard for enterprise franchise management.</p>
             </div>
             <div>
