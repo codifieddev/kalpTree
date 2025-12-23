@@ -165,7 +165,7 @@ export function HighLevelSidebar({
                     {!collapsed && (
                       <div className="leading-tight">
                         <div className="text-sm font-semibold">
-                          {loggedinTenant.name}
+                          {loggedinTenant?.name}
                         </div>
                         <div className="text-[11px] text-black/45">
                           {sentenceCase(user?.role)} panel
