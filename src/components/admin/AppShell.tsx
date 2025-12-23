@@ -410,6 +410,12 @@ export const currentWebsiteSections: NavSection[] = [
     id: "marketing",
     label: "Marketing",
     items: [
+       {
+        label: "Proposal",
+        href: "/admin/marketing/proposal",
+        icon: ImageIcon,
+        permission: ["content:read", "content:update", "content:delete"],
+      },
       {
         label: "Banners",
         href: "/admin/marketing/banners",
