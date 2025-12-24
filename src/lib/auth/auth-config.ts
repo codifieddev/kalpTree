@@ -33,11 +33,11 @@ export const authConfig: NextAuthConfig = {
             user,
             credentials.password as string
           );
-
+            console.log("isValid=====", isValid)
           if (!isValid) {
             throw new Error("Invalid credentials");
           }
-
+           
           // Update last login (don't await to avoid blocking)
           userService.updateLastLogin(user._id).catch((err) => {
             console.error("Failed to update last login:", err);
@@ -48,7 +48,7 @@ export const authConfig: NextAuthConfig = {
             id: user._id.toString(),
             email: user.email,
             name: user.name,
-            tenantId: user.tenantId!.toString(),
+            tenantId: user.role==="superadmin"?true:user.tenantId!.toString(),
             role: user.role,
             permissions: user.permissions,
             createdById: user.createdById?.toString(), // Handle optional createdById
