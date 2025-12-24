@@ -27,7 +27,7 @@ export default async function PageTemplate({ params }: any) {
 
   const session = await auth();
 
-  console.log(session?.user.role);
+  console.log("session iiii===", session);
 
   const res = await fetch(`${API_BASE_URL}/api/pages/websites?${query}`);
  
@@ -46,7 +46,7 @@ export default async function PageTemplate({ params }: any) {
     <div>
       {session &&
         session.user &&
-        (session.user.role == "owner" || session?.user.role == "A") &&
+        (session.user.role == "superadmin" || session?.user.role == "agency" || session.user.role==="business") &&
         Array.isArray(t) && t.length > 0 && (
           <EditButton pageData={t[0]} />
         )}

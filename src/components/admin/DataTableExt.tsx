@@ -51,6 +51,7 @@ export type DataTableExtProps = {
   initialColumns?: ColumnConfig[];
   onDelete?: (row: any) => void;
   onView?: (row: any) => void;
+  opentab:(row:any)=>void
 };
 
 type SortDir = "asc" | "desc";
@@ -85,6 +86,7 @@ export function DataTableExt({
   initialColumns,
   onDelete,
   onView,
+  opentab,
 }: DataTableExtProps) {
   const [query, setQuery] = useState("");
   const [page, setPage] = useState(1);
@@ -324,26 +326,29 @@ export function DataTableExt({
       primaryDomain?: string[];
     }
   ) {
-    e.preventDefault();
-    if (path.includes("domain")) {
-      if (!row.primaryDomain?.length) return;
+   
+    opentab(row)
+  //   e.preventDefault();
+  //   if (path.includes("domain")) {
+  //     if (!row.primaryDomain?.length) return;
+    
+  //     const isLocalHost = window.location.hostname.includes("localhost");
+  //       console.log("isLocalHost--",isLocalHost)
+  //         console.log("row.primaryDomain--",row.primaryDomain)
+  //     const domain = row.primaryDomain.find((d) =>
+  //       isLocalHost ? d.includes("localhost") : !d.includes("localhost")
+  //     );
 
-      const isLocalHost = window.location.hostname.includes("localhost");
+  //     if (!domain) return;
 
-      const domain = row.primaryDomain.find((d) =>
-        isLocalHost ? d.includes("localhost") : !d.includes("localhost")
-      );
+  //     const url = isLocalHost ? `http://${domain}` : `https://${domain}`;
+  // console.log("url00-0", url)
+  //     window.location.href = url;
+  //   } else {
+  //     // if (!row.slug) return;
 
-      if (!domain) return;
-
-      const url = isLocalHost ? `http://${domain}` : `https://${domain}`;
-
-      window.location.href = url;
-    } else {
-      if (!row.slug) return;
-
-      router.push(`/${row.slug}`);
-    }
+  //     // router.push(`/${row.slug}`);
+  //   }
   }
 
   return (
