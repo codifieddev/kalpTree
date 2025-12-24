@@ -13,19 +13,13 @@ interface UserFormData {
   createdById: string;
 }
 
-// const PERMISSION_CATEGORIES = {
-//   User: ["user:create", "user:read", "user:update", "user:delete"],
-//   Role: ["role:create", "role:read", "role:update", "role:delete"],
-//   Agency: ["agency:create", "agency:read", "agency:update", "agency:delete"],
-//   Reports: ["report:view", "report:export"],
-//   Settings: ["settings:manage", "settings:view"],
-// };
-
 interface CreateUserFormProps {
   user: Usertype;
 }
 
 export default function CreateUserForm({ user, roles }: any) {
+  console.log("===>>>", "roles");
+
   const filteredRoles = roles.items.filter(
     (d: any) => d.code.includes(user.role) && d.code !== user.role
   );
@@ -139,7 +133,7 @@ export default function CreateUserForm({ user, roles }: any) {
         setFormData({
           email: "",
           password: "",
-          role: "franchise",
+          role: "agency",
           permissions: [],
           name: "",
           createdById: user.id,

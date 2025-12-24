@@ -41,7 +41,6 @@ type AppShellProviderProps = {
 
 export async function AppShellProvider({ children }: AppShellProviderProps) {
   const session = await auth();
-
   const user: User | null = session?.user
     ? {
         id: session.user.id || "",
@@ -63,7 +62,7 @@ export async function AppShellProvider({ children }: AppShellProviderProps) {
   let loggedinTenant: null | any | undefined = null;
 
   // ---------------- FRANCHISE USER ----------------
-  if (user?.role === "franchise") {
+  if (user?.role === "agency") {
     try {
       // 1. Load tenants for franchise
       let maintenant = await websiteService.listSingleByTenant(
@@ -71,8 +70,6 @@ export async function AppShellProvider({ children }: AppShellProviderProps) {
       );
 
       loggedinTenant = serializeMongoDoc(maintenant);
-
-      console.log(loggedinTenant)
 
       const idtoPass = user && user.createdById ? user.createdById : user.id;
 
@@ -191,6 +188,7 @@ export async function AppShellProvider({ children }: AppShellProviderProps) {
     } catch (error) {
       console.error("Failed to load franchise data:", error);
     }
+  } else if (user?.role === "agency_admin") {
   }
 
   return (

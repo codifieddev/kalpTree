@@ -256,7 +256,7 @@ export default function UsersPage({ user }: any) {
                 className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
               >
                 <option value="business">Business</option>
-                <option value="franchise">Franchise</option>
+                <option value="agency">Agency</option>
               </select>
             </div>
 

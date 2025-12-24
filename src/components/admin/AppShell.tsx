@@ -410,7 +410,7 @@ export const currentWebsiteSections: NavSection[] = [
     id: "marketing",
     label: "Marketing",
     items: [
-       {
+      {
         label: "Proposal",
         href: "/admin/marketing/proposal",
         icon: ImageIcon,
@@ -698,7 +698,6 @@ export function AppShell({
 
   const isHighLevelCollapsed = currentWebsite ? true : false;
 
-  console.log(isHighLevelCollapsed);
   return (
     <div className="flex min-h-screen bg-[#e8e9eb] text-foreground overflow-hidden">
       <HighLevelSidebar
