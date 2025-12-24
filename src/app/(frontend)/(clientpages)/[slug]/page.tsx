@@ -30,23 +30,25 @@ export default async function PageTemplate({ params }: any) {
   console.log(session?.user.role);
 
   const res = await fetch(`${API_BASE_URL}/api/pages/websites?${query}`);
-
+ 
   const t = await res.json();
-
-  const html = t.item.content;
+     console.log(" tttt-->",t)
+  // t is an array, get the first item
+  const html = Array.isArray(t) && t.length > 0 ? t[0].content : undefined;
 
   const EditButton = (await import("../EditButton")).default;
-
+  console.log(" html-->", html);
   const name = "Himanshu";
 
-  const processedHtml = html.replace(/\{\{name\}\}/g, name);
-
+  const processedHtml = html ? html.replace(/\{\{name\}\}/g, name) : "";
+  console.log(" processedHtml-->", processedHtml);
   return (
     <div>
       {session &&
         session.user &&
-        (session.user.role == "owner" || session?.user.role == "A") && (
-          <EditButton pageData={t.item} />
+        (session.user.role == "owner" || session?.user.role == "A") &&
+        Array.isArray(t) && t.length > 0 && (
+          <EditButton pageData={t[0]} />
         )}
       <div dangerouslySetInnerHTML={{ __html: processedHtml }} />
     </div>
