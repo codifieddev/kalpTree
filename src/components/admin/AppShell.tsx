@@ -712,7 +712,21 @@ export function AppShell({
         collapsed={isHighLevelCollapsed}
         loggedinTenant={loggedinTenant}
       />
-      {params.website && (
+      {/* {params.website && (
+        <Sidebar
+          tenants={tenants}
+          currentTenant={currentTenant}
+          onTenantChange={onTenantChange}
+          websites={websites}
+          currentWebsite={currentWebsite}
+          user={user}
+          onWebsiteChange={onWebsiteChange}
+          collapsed={sidebarCollapsed}
+          onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
+          loggedinTenant={loggedinTenant}
+        />
+      )} */}
+       {true && (
         <Sidebar
           tenants={tenants}
           currentTenant={currentTenant}
