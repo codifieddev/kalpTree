@@ -8,7 +8,7 @@ export interface WebsiteDoc {
   websiteId: string;
   tenantId: ObjectId;
   name: string;
-  serviceType: ServiceType;
+  serviceType: string;
   primaryDomain?: string[] | null;
   systemSubdomain?: string;
   branding?: {
@@ -81,6 +81,13 @@ export class WebsiteService {
     const tid =
       typeof tenantId === "string" ? new ObjectId(tenantId) : tenantId;
     return c.find({ tenantId: tid }).sort({ createdAt: -1 }).toArray();
+  }
+
+  async listByWebsiteId(tenantId: string | ObjectId) {
+    const c = await this.col();
+    const tid =
+      typeof tenantId === "string" ? new ObjectId(tenantId) : tenantId;
+    return c.find({ _id: tid }).sort({ createdAt: -1 }).toArray();
   }
 
   // async listTenantById(tenantId: string | ObjectId) {
@@ -158,7 +165,7 @@ export class WebsiteService {
     tenantId: string | ObjectId;
     // tenantSlug: string;
     name: string;
-    serviceType: ServiceType;
+    serviceType: string;
     primaryDomain?: string[] | null;
   }) {
     const c = await this.col();

@@ -26,7 +26,7 @@ type AppShellClientProps = {
   user: User | null;
   tenants: any[];
   currentTenant: any;
-  loggedinTenant: any | null
+  loggedinTenant: any | null;
 };
 
 export function AppShellClient({
@@ -36,7 +36,7 @@ export function AppShellClient({
   user,
   tenants,
   currentTenant: initialCurrentTenant,
-  loggedinTenant
+  loggedinTenant,
 }: AppShellClientProps) {
   const [currentWebsite, setCurrentWebsite] = useState(initialCurrentWebsite);
   const [currentTenant, setCurrentTenant] = useState(initialCurrentTenant);
@@ -53,7 +53,6 @@ export function AppShellClient({
   };
   const handleWebsiteChange = async (websiteId: string) => {
     const newWebsite = websites.find((w) => w._id === websiteId) || null;
-    console.log("newWebsite", newWebsite);
     setCurrentWebsite(newWebsite);
     try {
       // Call API to update the current website cookie
@@ -64,11 +63,12 @@ export function AppShellClient({
         },
         body: JSON.stringify({ websiteId }),
       });
+      
       if (response.ok) {
         // Clear Redux state first to prevent old data from being used
         resetRedux();
         // Navigate to /admin (which will load fresh data for new website)
-        window.location.href = "/admin";
+        window.location.href = `/admin/websites/${newWebsite!.primaryDomain}`;
         // router.push("/admin")
       } else {
         console.error("Failed to update website context");

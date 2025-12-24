@@ -13,6 +13,7 @@ import {
   ChevronsUpDown,
   LayoutDashboard,
   UserCircle,
+  Shield,
 } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
@@ -96,6 +97,19 @@ const navigationItems = [
     label: "Account Sharing",
     icon: UserCircle,
     href: "/admin/accountsharing",
+    // hasSubmenu: true,
+    // submenuItems: [
+    //   { label: "Subscriptions", href: "/billing/subscriptions" },
+    //   { label: "Payment history", href: "/billing/history" },
+    //   { label: "Payment methods", href: "/billing/methods" },
+    // ],
+  },
+
+  {
+    id: "roles",
+    label: "Roles and Permissions",
+    icon: Shield,
+    href: "/admin/rolesandpermission",
     // hasSubmenu: true,
     // submenuItems: [
     //   { label: "Subscriptions", href: "/billing/subscriptions" },

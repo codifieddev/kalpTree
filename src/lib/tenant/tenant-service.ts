@@ -29,35 +29,37 @@ export class TenantService {
   }
 
   async createTenant(data: {
-    slug: string;
+    slug?: string;
     name: string;
     email: string;
     plan?: Tenant["plan"];
     createdById: ObjectId | string;
+    businessdetails?: any;
+    branding?: any;
   }): Promise<Tenant> {
     const collection = await this.getCollection();
 
     // Check if slug already exists
-    const existing = await this.getTenantBySlug(data.slug);
+    let existing = null;
+    if (data.slug) {
+      existing = await this.getTenantBySlug(data.slug);
+    }
+
     if (existing) {
       throw new Error("Tenant slug already exists");
     }
 
     const tenant: Omit<TenantModel, "_id"> = {
-      slug: data.slug.toLowerCase(),
+      slug: data.slug ? data.slug.toLowerCase() : "",
       name: data.name,
       email: data.email,
       createdById: new ObjectId(data.createdById),
       plan: data.plan || "trial",
       subscriptionStatus: "active",
       customDomainVerified: false,
-      branding: {
-        colors: {
-          primary: "#3b82f6",
-          secondary: "#f4e04f",
-        },
-      },
+      branding: data.branding,
       paymentGateways: {},
+      businessdetails: data.businessdetails,
       features: {
         websiteEnabled: true,
         ecommerceEnabled: true,

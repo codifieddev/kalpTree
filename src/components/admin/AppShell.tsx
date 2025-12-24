@@ -80,6 +80,7 @@ import { Sidebar } from "./Sidebar/sidebar";
 import { Topbar } from "./Sidebar/topbar";
 import { MobileSidebar } from "./Sidebar/mobileSidebar";
 import { HighLevelSidebar } from "./Sidebar/highlevelsidebar";
+import { useParams } from "next/navigation";
 
 // ---------------------------------------------------------------------------
 // Types & interfaces
@@ -144,19 +145,13 @@ export const currentWebsiteSections: NavSection[] = [
         label: "Analytics",
         href: "/admin/analytics",
         icon: BarChart3,
-        permission: [
-          "websites:create",
-          "websites:read",
-          "websites:update",
-          "websites:delete",
-          "websites:view"
-        ],
+        permission: "dashboard:update",
       },
       {
         label: "Activity Log",
         href: "/admin/activity-log",
         icon: Activity,
-        permission: "analytics:view",
+        permission: "analytics:read",
       },
       {
         label: "Notifications",
@@ -183,60 +178,59 @@ export const currentWebsiteSections: NavSection[] = [
     id: "websites",
     label: "Websites",
     items: [
-      { label: "Pages", href: "/admin/pages", icon: FileCode2 },
+      {
+        label: "Pages",
+        href: "/admin/pages",
+        icon: FileCode2,
+        permission: ["websites:update", "websites:read", "websites:delete"],
+      },
       {
         label: "Posts",
         href: "/admin/posts",
         icon: Newspaper,
-        //    permission: [
-        //   "websites:create",
-        //   "websites:read",
-        //   "websites:update",
-        //   "websites:delete",
-        //   "websites:view"
-        // ],
+        permission: ["websites:update", "websites:read", "websites:delete"],
       },
       {
         label: "Media",
         href: "/admin/media",
         icon: ImageIcon,
-        // permission: "analytics:view",
+        permission: ["media:update", "media:read", "media:delete"],
       },
       {
         label: "Header",
         href: "/admin/header",
         icon: PanelTop,
-        // permission: "security:read",
+        permission: ["websites:update", "websites:read", "websites:delete"],
       },
       {
         label: "Footer",
         href: "/admin/footer",
         icon: PanelBottom,
-        // permission: "security:read",
+        permission: ["websites:update", "websites:read", "websites:delete"],
       },
       {
         label: "Navigation",
         href: "/admin/navigation",
         icon: Compass,
-        // permission: "security:read",
+        permission: ["websites:update", "websites:read", "websites:delete"],
       },
       {
         label: "Forms",
         href: "/admin/forms",
         icon: ClipboardList,
-        // permission: "security:read",
+        permission: ["websites:update", "websites:read", "websites:delete"],
       },
       {
         label: "Redirects",
         href: "/admin/redirects",
         icon: ArrowLeftRight,
-        // permission: "security:read",
+        permission: ["websites:update", "websites:read", "websites:delete"],
       },
       {
         label: "Domain Settings",
         href: "/admin/domains",
         icon: Globe2,
-        // permission: "security:read",
+        permission: ["websites:update", "websites:read", "websites:delete"],
       },
     ],
   },
@@ -292,61 +286,61 @@ export const currentWebsiteSections: NavSection[] = [
         label: "Products",
         href: "/admin/products",
         icon: Package,
-        permission: ["content:read", "content:update", "content:delete"],
+        permission: ["product:read", "product:update", "product:delete"],
       },
       {
         label: "Category",
         href: "/admin/category",
         icon: LayoutGrid,
-        permission: ["content:read", "content:update", "content:delete"],
+        permission: ["product:read", "product:update", "product:delete"],
       },
       {
         label: "Brand",
         href: "/admin/brand",
         icon: Award,
-        permission: ["content:read", "content:update", "content:delete"],
+        permission: ["product:read", "product:update", "product:delete"],
       },
       {
         label: "Segment",
         href: "/admin/segment",
         icon: Layers,
-        permission: ["content:read", "content:update", "content:delete"],
+        permission:["product:read", "product:update", "product:delete"],
       },
       {
         label: "Attribute",
         href: "/admin/attribute",
         icon: ListTree,
-        permission: ["content:read", "content:update", "content:delete"],
+        permission: ["product:read", "product:update", "product:delete"],
       },
       {
         label: "Styles",
         href: "/admin/styles",
         icon: Palette,
-        permission: ["content:read", "content:update", "content:delete"],
+        permission: ["product:read", "product:update", "product:delete"],
       },
       {
         label: "Tags",
         href: "/admin/tags",
         icon: Hash,
-        permission: ["content:read", "content:update", "content:delete"],
+        permission: ["product:read", "product:update", "product:delete"],
       },
       {
         label: "Attributes",
         href: "/admin/attributes-list",
         icon: Component,
-        permission: ["content:read", "content:update", "content:delete"],
+        permission: ["product:read", "product:update", "product:delete"],
       },
       {
         label: "Variants",
         href: "/admin/variants",
         icon: Boxes,
-        permission: ["content:read", "content:update", "content:delete"],
+        permission: ["product:read", "product:update", "product:delete"],
       },
       {
         label: "Pricing Rules",
         href: "/admin/pricing-rules",
         icon: CircleDollarSign,
-        permission: ["content:read", "content:update", "content:delete"],
+        permission: ["product:read", "product:update", "product:delete"],
       },
     ],
   },
@@ -359,61 +353,61 @@ export const currentWebsiteSections: NavSection[] = [
         label: "Orders",
         href: "/admin/ecommerce/orders",
         icon: ShoppingBag,
-        permission: ["content:read", "content:update", "content:delete"],
+        permission: ["product:read", "product:update", "product:delete"],
       },
       {
         label: "Customers",
         href: "/admin/ecommerce/customers",
         icon: Users,
-        permission: ["content:read", "content:update", "content:delete"],
+        permission:["product:read", "product:update", "product:delete"],
       },
       {
         label: "Reports",
         href: "/admin/ecommerce/reports",
         icon: BarChart4,
-        permission: ["content:read", "content:update", "content:delete"],
+        permission:["product:read", "product:update", "product:delete"],
       },
       {
         label: "Abandoned Carts",
         href: "/admin/ecommerce/abandoned-carts",
         icon: ShoppingCart,
-        permission: ["content:read", "content:update", "content:delete"],
+        permission: ["product:read", "product:update", "product:delete"],
       },
       {
         label: "Subscriptions",
         href: "/admin/ecommerce/subscriptions",
         icon: RefreshCcw,
-        permission: ["content:read", "content:update", "content:delete"],
+        permission: ["product:read", "product:update", "product:delete"],
       },
       {
         label: "Taxes",
         href: "/admin/ecommerce/taxes",
         icon: ReceiptIndianRupee,
-        permission: ["content:read", "content:update", "content:delete"],
+        permission: ["product:read", "product:update", "product:delete"],
       },
       {
         label: "Shipping",
         href: "/admin/ecommerce/shipping",
         icon: Truck,
-        permission: ["content:read", "content:update", "content:delete"],
+        permission: ["product:read", "product:update", "product:delete"],
       },
       {
         label: "Payments",
         href: "/admin/ecommerce/payments",
         icon: CreditCard,
-        permission: ["content:read", "content:update", "content:delete"],
+        permission:["product:read", "product:update", "product:delete"],
       },
       {
         label: "Invoices",
         href: "/admin/ecommerce/invoices",
         icon: FileText,
-        permission: ["content:read", "content:update", "content:delete"],
+        permission: ["product:read", "product:update", "product:delete"],
       },
       {
         label: "Settings",
         href: "/admin/ecommerce/settings",
         icon: Settings,
-        permission: ["content:read", "content:update", "content:delete"],
+        permission: ["product:read", "product:update", "product:delete"],
       },
     ],
   },
@@ -487,49 +481,49 @@ export const currentWebsiteSections: NavSection[] = [
         label: "Image Uploads",
         href: "/admin/ai-studio/image-uploads",
         icon: ImagePlus,
-        permission: ["content:read", "content:update", "content:delete"],
+        permission: ["ai:read", "ai:update", "ai:delete"],
       },
       {
         label: "Segment Detection",
         href: "/admin/ai-studio/segment-detection",
         icon: ScanSearch,
-        permission: ["content:read", "content:update", "content:delete"],
+        permission: ["ai:read", "ai:update", "ai:delete"],
       },
       {
         label: "Material Application",
         href: "/admin/ai-studio/material-application",
         icon: Paintbrush,
-        permission: ["content:read", "content:update", "content:delete"],
+        permission: ["ai:read", "ai:update", "ai:delete"],
       },
       {
         label: "Prompt Library",
         href: "/admin/ai-studio/prompt-library",
         icon: Terminal,
-        permission: ["content:read", "content:update", "content:delete"],
+        permission: ["ai:read", "ai:update", "ai:delete"],
       },
       {
         label: "Render History",
         href: "/admin/ai-studio/render-history",
         icon: History,
-        permission: ["content:read", "content:update", "content:delete"],
+        permission: ["ai:read", "ai:update", "ai:delete"],
       },
       {
         label: "Saved Designs",
         href: "/admin/ai-studio/saved-designs",
         icon: Heart,
-        permission: ["content:read", "content:update", "content:delete"],
+        permission: ["ai:read", "ai:update", "ai:delete"],
       },
       {
         label: "Reference Images",
         href: "/admin/ai-studio/reference-images",
         icon: GalleryVerticalEnd,
-        permission: ["content:read", "content:update", "content:delete"],
+        permission: ["ai:read", "ai:update", "ai:delete"],
       },
       {
         label: "AI Settings",
         href: "/admin/ai-studio/ai-settings",
         icon: Cpu,
-        permission: ["content:read", "content:update", "content:delete"],
+        permission: ["ai:read", "ai:update", "ai:delete"],
       },
     ],
   },
@@ -650,7 +644,7 @@ export const currentWebsiteSections: NavSection[] = [
         label: "Domains",
         href: "/admin/domain",
         icon: Globe,
-        permission: "content:read",
+        permission:  ["content:read", "content:update", "content:delete"],
       },
     ],
   },
@@ -707,8 +701,9 @@ export function AppShell({
 }: AppShellProps) {
   const [mobileSidebarOpen, setMobileSidebarOpen] = React.useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = React.useState(false);
+  const params = useParams();
 
-  const isHighLevelCollapsed = currentWebsite ? true : false;
+  const isHighLevelCollapsed = !params.website ? false : true;
 
   return (
     <div className="flex min-h-screen bg-[#e8e9eb] text-foreground overflow-hidden">
@@ -717,18 +712,20 @@ export function AppShell({
         collapsed={isHighLevelCollapsed}
         loggedinTenant={loggedinTenant}
       />
-      <Sidebar
-        tenants={tenants}
-        currentTenant={currentTenant}
-        onTenantChange={onTenantChange}
-        websites={websites}
-        currentWebsite={currentWebsite}
-        user={user}
-        onWebsiteChange={onWebsiteChange}
-        collapsed={!isHighLevelCollapsed}
-        onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
-        loggedinTenant={loggedinTenant}
-      />
+      {params.website && (
+        <Sidebar
+          tenants={tenants}
+          currentTenant={currentTenant}
+          onTenantChange={onTenantChange}
+          websites={websites}
+          currentWebsite={currentWebsite}
+          user={user}
+          onWebsiteChange={onWebsiteChange}
+          collapsed={sidebarCollapsed}
+          onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
+          loggedinTenant={loggedinTenant}
+        />
+      )}
 
       <div className="flex flex-1 min-h-screen flex-col overflow-hidden">
         <Topbar
