@@ -1,158 +1,106 @@
-import { cookies as cookiesFn } from "next/headers";
+
+"use client";
+import { useEffect, useMemo, useState } from "react";
 import PageEditor, { FieldConfig } from "@/components/admin/Editor";
-import { auth } from "@/auth";
-import { pageService } from "@/modules/website/page-service";
-import { getDatabase } from "@/lib/db/mongodb";
-import { ObjectId } from "mongodb";
+import { useSelector } from "react-redux";
+import { RootState } from "@/store/store";
+import { useParams } from "next/navigation";
 
-export default async function PageDetail({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
-  const param = await params;
-  const pageId = param.id;
+import { WebsitePageModel } from "@/components/admin/website/websitePage/WebsitePageType";
 
-  // Change when tenantid need to real one
-  const tenantId = "asf";
 
-  const session = await auth();
+export default function PageDetail() {
+  const params = useParams();
+  const pageId = params?.id as string;
+  const {user} = useSelector((state: RootState) => state.user);
+const {currentpage} = useSelector((state: RootState) => state.websitePage);
+  const [item, setItem] = useState<WebsitePageModel | null>(null);
+  const [website, setWebsite] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  if (tenantId) {
-    return (
-      <div className="text-sm text-red-600">Unauthorized: Please sign in</div>
-    );
+  useEffect(() => {
+    if (
+      currentpage &&
+      (currentpage as WebsitePageModel).tenantId &&
+      user && user.tenantId
+    ) {
+      setItem(currentpage as WebsitePageModel);
+    }
+  }, [currentpage, user]);
+
+  const fieldConfig: FieldConfig[] = useMemo(() => [
+    { name: "slug", label: "Slug", type: "readonly", side: "NA" },
+    { name: "createdAt", label: "CreatedAt", type: "readonly", side: "NA" },
+    { name: "updatedAt", label: "UpdatedAt", type: "readonly", side: "NA" },
+    {
+      name: "title",
+      label: "Title",
+      type: "text",
+      side: "left",
+      placeholder: "Enter page title",
+    },
+    {
+      name: "content",
+      label: "Content",
+      type: "textarea",
+      side: "left",
+      rows: 10,
+    },
+    {
+      name: "slug",
+      label: "Slug",
+      type: "text",
+      side: "right",
+      placeholder: "page-slug",
+    },
+    {
+      name: "status",
+      label: "Status",
+      type: "select",
+      side: "right",
+      options: [
+        { value: "draft", label: "draft" },
+        { value: "published", label: "published" },
+      ],
+    },
+    {
+      name: "tenantId",
+      label: "Tenant",
+      type: "text",
+      side: "right",
+      placeholder: "tenant-id",
+      readOnly: true,
+    },
+    {
+      name: "websiteId",
+      label: "Website",
+      type: "text",
+      side: "right",
+      placeholder: "website-id",
+      readOnly: true,
+    },
+  ], []);
+
+  if (!user?.tenantId) {
+    return <div className="text-sm text-red-600">Unauthorized: Please sign in</div>;
   }
 
-  const cookies = await cookiesFn();
-  const websiteId = cookies.get("current_website_id")?.value;
+  
 
-  try {
-    // Get page data directly from service
-    // Change when tenantid need to real one
-    const item = await pageService.getById(
-      tenantId as string,
-      pageId,
-      websiteId
-    );
-
-    if (!item) {
-      return <div className="text-sm text-red-600">Page not found</div>;
-    }
-
-    // Serialize the item to plain object
-    const serializedItem = {
-      ...item,
-      _id: item._id?.toString(),
-      tenantId: item.tenantId?.toString(),
-      websiteId: item.websiteId?.toString(),
-      createdAt: item.createdAt ? new Date(item.createdAt).toISOString() : null,
-      updatedAt: item.updatedAt ? new Date(item.updatedAt).toISOString() : null,
-      publishedAt: item.publishedAt
-        ? new Date(item.publishedAt).toISOString()
-        : null,
-    };
-
-    // Get website data if websiteId exists
-    let serializedWebsite = null;
-    if (websiteId) {
-      const db = await getDatabase();
-      const websitesCollection = db.collection("websites");
-      const websiteData = await websitesCollection.findOne({
-        _id: new ObjectId(websiteId),
-      });
-
-      if (websiteData) {
-        serializedWebsite = {
-          ...websiteData,
-          _id: websiteData._id?.toString(),
-          tenantId: websiteData.tenantId?.toString(),
-          createdAt: websiteData.createdAt
-            ? new Date(websiteData.createdAt).toISOString()
-            : null,
-          updatedAt: websiteData.updatedAt
-            ? new Date(websiteData.updatedAt).toISOString()
-            : null,
-        };
-      }
-    }
-
-    const fieldConfig: FieldConfig[] = [
-      // Readonly fields (shown at top)
-      { name: "slug", label: "Slug", type: "readonly", side: "NA" },
-      { name: "createdAt", label: "CreatedAt", type: "readonly", side: "NA" },
-      { name: "updatedAt", label: "UpdatedAt", type: "readonly", side: "NA" },
-
-      // Left side (8/12 width) - Main content
-      {
-        name: "title",
-        label: "Title",
-        type: "text",
-        side: "left",
-        placeholder: "Enter page title",
-      },
-      {
-        name: "content",
-        label: "Content",
-        type: "textarea",
-        side: "left",
-        rows: 10,
-      },
-
-      // Right side (4/12 width) - Metadata
-      {
-        name: "slug",
-        label: "Slug",
-        type: "text",
-        side: "right",
-        placeholder: "page-slug",
-      },
-      {
-        name: "status",
-        label: "Status",
-        type: "select",
-        side: "right",
-        options: [
-          { value: "draft", label: "draft" },
-          { value: "published", label: "published" },
-        ],
-      },
-      {
-        name: "tenantId",
-        label: "Tenant",
-        type: "text",
-        side: "right",
-        placeholder: "tenant-id",
-        readOnly: true,
-      },
-      {
-        name: "websiteId",
-        label: "Website",
-        type: "text",
-        side: "right",
-        placeholder: "website-id",
-        readOnly: true,
-      },
-    ];
-
-    return (
-      <div className="space-y-4">
-        <h2 className="text-xl font-medium">Edit Page</h2>
-        <PageEditor
-          viewUrl={serializedWebsite}
-          id={pageId}
-          item={serializedItem}
-          fields={fieldConfig}
-        />
-      </div>
-    );
-  } catch (error) {
-    console.error("Error loading page:", error);
-    return (
-      <div className="text-sm text-red-600">
-        Failed to load page:{" "}
-        {error instanceof Error ? error.message : "Unknown error"}
-      </div>
-    );
+  if (!item) {
+    return <div className="text-sm text-red-600">Page not found</div>;
   }
+
+  return (
+    <div className="space-y-4">
+      <h2 className="text-xl font-medium">Edit Page</h2>
+      <PageEditor
+        viewUrl={website}
+        id={pageId}
+        item={item}
+        fields={fieldConfig}
+      />
+    </div>
+  );
 }

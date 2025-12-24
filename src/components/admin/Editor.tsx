@@ -1,8 +1,15 @@
 
 
 "use client";
-import Link from "next/link";
+import { updateWebsitePage } from "@/hooks/slices/website/websitePageSlice";
+import { AppDispatch } from "@/store/store";
+
 import { useState, useTransition } from "react";
+import { useDispatch } from "react-redux";
+import { WebsitePageModel } from "./website/websitePage/WebsitePageType";
+import { routeModule } from "next/dist/build/templates/pages";
+import { useRouter } from "next/navigation";
+
 
 // Field configuration type
 export type FieldConfig = {
@@ -34,6 +41,9 @@ export default function PageEditor({
   onDeleteRedirect = "/admin/pages",
   viewUrl,
 }: PageEditorProps) {
+
+  const dispatch= useDispatch<AppDispatch>()
+    const router = useRouter();
   // Single state object for all form data
   const [formData, setFormData] = useState(() => {
     const initialData: Record<string, any> = {};
@@ -81,7 +91,19 @@ export default function PageEditor({
 
   // Generic change handler
   const handleChange = (name: string, value: any) => {
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setFormData((prev) => {
+      // If the name field is changed, also update slug
+      if (name === "title" || name === "name") {
+        const slugValue = value
+          .toString()
+          .trim()
+          .toLowerCase()
+          .replace(/\s+/g, "-")
+          .replace(/[^a-z0-9\-]/g, "");
+        return { ...prev, [name]: value, slug: slugValue };
+      }
+      return { ...prev, [name]: value };
+    });
   };
 
   // Array field handlers
@@ -102,20 +124,28 @@ export default function PageEditor({
     setFormData((prev) => ({ ...prev, [name]: currentArray }));
   };
 
-  const onSubmit = (e: React.FormEvent) => {
+  const onSubmit = async(e: React.FormEvent) => {
     e.preventDefault();
     setMsg(null);
-    start(async () => {
-      // Transform formData to handle nested objects
-      const transformedData = { ...formData };
-      console.log(transformedData)
-      const res = await fetch(`${apiEndpoint}/${id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(transformedData),
-      });
-      setMsg(res.ok ? "Saved" : "Save failed");
-    });
+    // Ensure all WebsitePageModel fields are present
+    const data: WebsitePageModel = {
+      _id: item._id,
+      tenantId: formData.tenantId ?? item.tenantId ?? "",
+      websiteId: formData.websiteId ?? item.websiteId ?? "",
+      slug: formData.slug ?? item.slug ?? "",
+      title: formData.title ?? item.title ?? "",
+      content: formData.content ?? item.content ?? "",
+      status: formData.status ?? item.status ?? "draft",
+      createdAt: item.createdAt ?? "",
+      updatedAt: item.updatedAt ?? "",
+      publishedAt: item.publishedAt ?? "",
+    };
+   const response= await dispatch(updateWebsitePage(data)).unwrap;
+   if(response){
+    router.push("/admin/pages")
+   console.log("response--", response)
+   }
+   
   };
 
   const handleDelete = async () => {
