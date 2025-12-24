@@ -17,15 +17,17 @@ export async function GET() {
 
 export async function POST(req: Request) {
   const session = await auth();
-  if (false)
+  if (!session)
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
   const json = await req.json().catch(() => null);
+
   const parsed = bodySchema.safeParse(json);
   if (!parsed.success)
     return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
 
   // Verify that website belongs to the same tenant
-  const list = await websiteService.listByTenant("asda");
+  const list = await websiteService.listByWebsiteId(json.websiteId);
 
   const found = list.find((w) => String(w._id) === parsed.data.websiteId);
   if (!found) return NextResponse.json({ error: "Not found" }, { status: 404 });

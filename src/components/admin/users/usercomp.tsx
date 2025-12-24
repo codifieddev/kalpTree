@@ -1,491 +1,355 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   UserPlus,
-  Trash2,
-  Eye,
-  EyeOff,
-  Building2,
-  Store,
-  Mail,
-  Key,
-  Shield,
-  Calendar,
   CheckCircle,
   XCircle,
-  ChevronDown,
-  ChevronUp,
+  User,
+  Briefcase,
+  Palette,
 } from "lucide-react";
-import { useSession } from "next-auth/react";
+import { Userdetails } from "./userdetails";
+import { Businessdetails } from "./businessdetails";
+import { Brandingdetails } from "./brandingdetails";
 
 export default function UsersPage({ user }: any) {
-  const [users, setUsers] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState("user");
   const [formData, setFormData] = useState({
-    name: "",
-    slug: "",
     email: "",
     password: "",
     role: "business",
     service: "ECOMMERCE",
-    website_name: "",
-    website_url: "",
+    business_name: "",
+    businsess_url: "",
+
+    // Business Details
+    businessdetails: {
+      business_website_url: "",
+      tagline: "",
+      industry: "Architecture",
+      founded_year: "2023",
+      about: "",
+      public_email: "",
+      phone: "",
+      headquarters: "",
+    },
+
+    // Branding
+    branding: {
+      logo: null,
+      primary_color: "#6366f1",
+      secondary_color: "#8b5cf6",
+      tertiary_color: "#ec4899",
+      typography: "Inter",
+    },
+
+    createdById: user.id,
   });
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState({ type: "", text: "" });
   const [expandedUser, setExpandedUser] = useState(null);
+  const [logoPreview, setLogoPreview] = useState<any>(null);
 
-  useEffect(() => {
-    fetchUsers();
-  }, []);
-
-  const fetchUsers = async () => {
-    try {
-      setLoading(true);
-      const response = await fetch("/api/users");
-      if (response.ok) {
-        const data = await response.json();
-        setUsers(data.users || []);
-      }
-    } catch (error) {
-      console.error("Error fetching users:", error);
-      setMessage({ type: "error", text: "Failed to load users" });
-    } finally {
-      setLoading(false);
-    }
-  };
+  const slugify = (text: string) =>
+    text
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9 ]/g, "")
+      .replace(/\s+/g, "-");
 
   const handleInputChange = (e: any) => {
-    const { name, value, type, checked } = e.target;
-    setFormData((prev) => ({
+    const { name, value, type, files } = e.target;
+
+    // Handle nested fields
+    if (name.includes(".")) {
+      const [parent, child] = name.split(".");
+      setFormData((prev: any) => ({
+        ...prev,
+        [parent]: {
+          ...prev[parent],
+          [child]: value,
+        },
+      }));
+      return;
+    }
+
+    // Handle business name (alphanumeric + space only)
+    if (name === "business_name") {
+      if (!/^[a-zA-Z0-9 ]*$/.test(value)) return;
+
+      setFormData((prev: any) => ({
+        ...prev,
+        business_name: value,
+        businsess_url: slugify(value),
+      }));
+      return;
+    }
+
+    // Handle file upload
+    if (type === "file") {
+      const file = files?.[0];
+      if (file) {
+        setFormData((prev: any) => ({
+          ...prev,
+          branding: {
+            ...prev.branding,
+            logo: file,
+          },
+        }));
+
+        const reader = new FileReader();
+        reader.onloadend = () => setLogoPreview(reader.result);
+        reader.readAsDataURL(file);
+      }
+      return;
+    }
+
+    // Normal fields
+    setFormData((prev: any) => ({
       ...prev,
-      [name]: type === "checkbox" ? checked : value,
+      [name]: value,
     }));
   };
 
   const handleSubmit = async () => {
-    setIsSubmitting(true);
-    setMessage({ type: "", text: "" });
-
     try {
+      setIsSubmitting(true);
+      setMessage({ type: "", text: "" });
+
+      const fd = new FormData();
+
+      // Root fields
+      fd.append("email", formData.email);
+      fd.append("password", formData.password);
+      fd.append("role", formData.role);
+      fd.append("service", formData.service);
+      fd.append("business_name", formData.business_name);
+      fd.append("businsess_url", formData.businsess_url);
+      fd.append("createdById", formData.createdById);
+
+      // Business details (nested → stringify)
+      fd.append("businessdetails", JSON.stringify(formData.businessdetails));
+
+      // Branding fields
+      fd.append(
+        "branding",
+        JSON.stringify({
+          primary_color: formData.branding.primary_color,
+          secondary_color: formData.branding.secondary_color,
+          tertiary_color: formData.branding.tertiary_color,
+          typography: formData.branding.typography,
+        })
+      );
+
+      // Logo file
+      if (formData.branding.logo) {
+        fd.append("logo", formData.branding.logo);
+      }
+
       const res = await fetch("/api/public/onboarding", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          tenantSlug: formData.slug,
-          tenantName: formData.name,
-          adminEmail: formData.email,
-          adminPassword: formData.password,
-          role: formData.role,
-          serviceType: formData.service,
-          website_name: formData.website_name,
-          createdById: user.id,
-          website_url: `${formData.website_url}.kalptree.com`,
-        }),
+        body: fd,
       });
 
-      const data = await res.json();
+      const result = await res.json();
 
-      if (res.ok) {
-        setMessage({ type: "success", text: "User created successfully!" });
+      if (result.tenantId) {
         setFormData({
-          name: "",
-          slug: "",
           email: "",
           password: "",
           role: "business",
           service: "ECOMMERCE",
-          website_name: "",
-          website_url: "",
-        });
-        fetchUsers();
-      } else {
-        setMessage({
-          type: "error",
-          text: data.error || "Failed to create user",
+          business_name: "",
+          businsess_url: "",
+
+          // Business Details
+          businessdetails: {
+            business_website_url: "",
+            tagline: "",
+            industry: "Architecture",
+            founded_year: "2023",
+            about: "",
+            public_email: "",
+            phone: "",
+            headquarters: "",
+          },
+
+          // Branding
+          branding: {
+            logo: null,
+            primary_color: "#6366f1",
+            secondary_color: "#8b5cf6",
+            tertiary_color: "#ec4899",
+            typography: "Inter",
+          },
+
+          createdById: user.id,
         });
       }
+
+      setIsSubmitting(false);
     } catch (error) {
-      setMessage({
-        type: "error",
-        text: "An error occurred while creating the user",
-      });
-    } finally {
+      console.error(error);
       setIsSubmitting(false);
     }
   };
 
+  const tabs = [
+    { id: "user", label: "User Details", icon: User },
+    { id: "business", label: "Business Details", icon: Briefcase },
+    { id: "branding", label: "Branding", icon: Palette },
+  ];
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-pink-50 p-8">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 p-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">
-            User Management
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent mb-2">
+            Business Management
           </h1>
           <p className="text-gray-600">
-            Manage your business and franchise users
+            Create and manage business accounts with complete branding
           </p>
         </div>
 
         {/* Create User Form */}
-        <div className="bg-white rounded-2xl shadow-xl p-8 mb-8 border border-purple-100">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="p-3 bg-purple-100 rounded-xl">
-              <UserPlus className="w-6 h-6 text-purple-600" />
-            </div>
-            <h2 className="text-2xl font-bold text-gray-800">
-              Create New User
-            </h2>
-          </div>
-
-          {message.text && (
-            <div
-              className={`mb-6 p-4 rounded-xl flex items-center gap-3 ${
-                message.type === "success"
-                  ? "bg-green-50 text-green-800 border border-green-200"
-                  : "bg-red-50 text-red-800 border border-red-200"
-              }`}
-            >
-              {message.type === "success" ? (
-                <CheckCircle className="w-5 h-5" />
-              ) : (
-                <XCircle className="w-5 h-5" />
-              )}
-              {message.text}
-            </div>
-          )}
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                <div className="flex items-center gap-2">
-                  <Building2 className="w-4 h-4" />
-                  Name
-                </div>
-              </label>
-              <input
-                type="text"
-                name="name"
-                value={formData.name}
-                onChange={handleInputChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
-                placeholder="Demo Tenant"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                <div className="flex items-center gap-2">
-                  <Store className="w-4 h-4" />
-                  Slug
-                </div>
-              </label>
-              <input
-                type="text"
-                name="slug"
-                value={formData.slug}
-                onChange={handleInputChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
-                placeholder="demo"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                <div className="flex items-center gap-2">
-                  <Mail className="w-4 h-4" />
-                  Email
-                </div>
-              </label>
-              <input
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleInputChange}
-                required
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
-                placeholder="user@example.com"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                <div className="flex items-center gap-2">
-                  <Key className="w-4 h-4" />
-                  Password
-                </div>
-              </label>
-              <div className="relative">
-                <input
-                  type={showPassword ? "text" : "password"}
-                  name="password"
-                  value={formData.password}
-                  onChange={handleInputChange}
-                  required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
-                  placeholder="••••••••"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
-                >
-                  {showPassword ? (
-                    <EyeOff className="w-5 h-5" />
-                  ) : (
-                    <Eye className="w-5 h-5" />
-                  )}
-                </button>
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                <div className="flex items-center gap-2">
-                  <Shield className="w-4 h-4" />
-                  Role
-                </div>
-              </label>
-              <select
-                name="role"
-                value={formData.role}
-                onChange={handleInputChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
-              >
-                <option value="business">Business</option>
-                <option value="agency">Agency</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                <div className="flex items-center gap-2">
-                  <Shield className="w-4 h-4" />
-                  Service Type
-                </div>
-              </label>
-              <select
-                name="service"
-                value={formData.service}
-                onChange={handleInputChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
-              >
-                <option value="WEBSITE_ONLY">Website Only</option>
-                <option value="ECOMMERCE">Ecommerce</option>
-              </select>
-            </div>
-
-            <hr className="col-span-2" />
-
-            <div className="col-span-2">
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                <div className="flex items-center gap-2">
-                  <Mail className="w-4 h-4" />
-                  Business Name
-                </div>
-              </label>
-              <input
-                type="text"
-                name="website_name"
-                value={formData.website_name}
-                onChange={handleInputChange}
-                required
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
-                placeholder="PeanutOrg"
-              />
-            </div>
-            <div className="col-span-2">
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                <div className="flex items-center gap-2">
-                  <Mail className="w-4 h-4" />
-                  Website Demo URL
-                </div>
-              </label>
-
-              <div className="flex items-center w-full border border-gray-300 rounded-xl overflow-hidden focus-within:ring-2 focus-within:ring-purple-500 focus-within:border-transparent transition-all">
-                <input
-                  type="text"
-                  name="website_url"
-                  value={formData.website_url}
-                  onChange={handleInputChange}
-                  required
-                  className="flex-1 px-4 py-3 outline-none text-gray-900"
-                  placeholder="shadcnstudio"
-                />
-                <span className="px-4 py-3 bg-gray-100 text-gray-600 text-sm border-l border-gray-300">
-                  .kalptree.com
-                </span>
-              </div>
+        <div className="bg-white rounded-3xl shadow-2xl overflow-hidden border border-indigo-100">
+          {/* Tabs */}
+          <div className="border-b border-gray-200 bg-gradient-to-r from-gray-50 to-white">
+            <div className="flex">
+              {tabs.map((tab) => {
+                const Icon = tab.icon;
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id)}
+                    className={`flex-1 px-6 py-4 font-semibold transition-all relative ${
+                      activeTab === tab.id
+                        ? "text-indigo-600"
+                        : "text-gray-500 hover:text-gray-700"
+                    }`}
+                  >
+                    <div className="flex items-center justify-center gap-2">
+                      <Icon className="w-5 h-5" />
+                      <span>{tab.label}</span>
+                    </div>
+                    {activeTab === tab.id && (
+                      <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-t-full" />
+                    )}
+                  </button>
+                );
+              })}
             </div>
           </div>
 
-          <button
-            onClick={handleSubmit}
-            disabled={isSubmitting}
-            className="mt-6 w-full bg-gradient-to-r from-purple-600 to-blue-600 text-white py-4 px-6 rounded-xl hover:from-purple-700 hover:to-blue-700 disabled:from-purple-400 disabled:to-blue-400 disabled:cursor-not-allowed transition-all transform hover:scale-[1.02] font-semibold shadow-lg"
-          >
-            {isSubmitting ? "Creating User..." : "Create User"}
-          </button>
+          {/* Tab Content */}
+          <div className="p-8">
+            {message.text && (
+              <div
+                className={`mb-6 p-4 rounded-xl flex items-center gap-3 ${
+                  message.type === "success"
+                    ? "bg-green-50 text-green-800 border border-green-200"
+                    : "bg-red-50 text-red-800 border border-red-200"
+                }`}
+              >
+                {message.type === "success" ? (
+                  <CheckCircle className="w-5 h-5" />
+                ) : (
+                  <XCircle className="w-5 h-5" />
+                )}
+                {message.text}
+              </div>
+            )}
+
+            {/* User Details Tab */}
+            {activeTab === "user" && (
+              <Userdetails
+                handleInputChange={handleInputChange}
+                formData={formData}
+                showPassword={showPassword}
+                setShowPassword={setShowPassword}
+              />
+            )}
+
+            {/* Business Details Tab */}
+            {activeTab === "business" && (
+              <Businessdetails
+                handleInputChange={handleInputChange}
+                formData={formData}
+              />
+            )}
+
+            {/* Branding Tab */}
+            {activeTab === "branding" && (
+              <Brandingdetails
+                handleInputChange={handleInputChange}
+                formData={formData}
+                logoPreview={logoPreview}
+              />
+            )}
+
+            {/* Navigation Buttons */}
+            <div className="flex items-center justify-between mt-8 pt-6 border-t border-gray-200">
+              <button
+                onClick={() => {
+                  const currentIndex = tabs.findIndex(
+                    (t) => t.id === activeTab
+                  );
+                  if (currentIndex > 0) {
+                    setActiveTab(tabs[currentIndex - 1].id);
+                  }
+                }}
+                disabled={activeTab === "user"}
+                className="px-6 py-3 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all font-semibold"
+              >
+                Previous
+              </button>
+
+              <div className="flex gap-3">
+                {activeTab === "branding" ? (
+                  <button
+                    onClick={handleSubmit}
+                    disabled={isSubmitting}
+                    className="px-8 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl hover:from-indigo-700 hover:to-purple-700 disabled:from-indigo-400 disabled:to-purple-400 disabled:cursor-not-allowed transition-all transform hover:scale-105 font-semibold shadow-lg"
+                  >
+                    {isSubmitting ? "Creating User..." : "Create User"}
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => {
+                      const currentIndex = tabs.findIndex(
+                        (t) => t.id === activeTab
+                      );
+                      if (currentIndex < tabs.length - 1) {
+                        setActiveTab(tabs[currentIndex + 1].id);
+                      }
+                    }}
+                    className="px-8 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl hover:from-indigo-700 hover:to-purple-700 transition-all transform hover:scale-105 font-semibold shadow-lg"
+                  >
+                    Next
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Users List */}
-        <div className="bg-white rounded-2xl shadow-xl p-8 border border-purple-100">
-          <h2 className="text-2xl font-bold text-gray-800 mb-6">All Users</h2>
+        {/* <div className="mt-8 bg-white rounded-3xl shadow-2xl p-8 border border-indigo-100">
+          <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2">
+            <User className="w-6 h-6 text-indigo-600" />
+            All Users
+          </h2>
 
-          {/* {loading ? (
-            <div className="text-center py-12">
-              <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-purple-200 border-t-purple-600"></div>
-              <p className="mt-4 text-gray-500">Loading users...</p>
-            </div>
-          ) : users.length === 0 ? (
-            <div className="text-center py-12 text-gray-500">
-              <UserPlus className="w-16 h-16 mx-auto mb-4 text-gray-300" />
-              <p>No users found. Create your first user above!</p>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {users.map((user) => (
-                <div
-                  key={user._id}
-                  className="border border-gray-200 rounded-xl overflow-hidden hover:border-purple-300 transition-all"
-                >
-                  <div className="p-5 bg-gradient-to-r from-gray-50 to-white">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-4 flex-1">
-                        <div
-                          className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-white ${
-                            user.role === "business"
-                              ? "bg-gradient-to-br from-blue-500 to-blue-600"
-                              : "bg-gradient-to-br from-green-500 to-green-600"
-                          }`}
-                        >
-                          {user.name?.charAt(0).toUpperCase() ||
-                            user.email.charAt(0).toUpperCase()}
-                        </div>
-                        <div className="flex-1">
-                          <h3 className="font-bold text-lg text-gray-900">
-                            {user.name || "Unnamed"}
-                          </h3>
-                          <p className="text-gray-600 text-sm">{user.email}</p>
-                        </div>
-                        <div className="flex items-center gap-3">
-                          <span
-                            className={`px-4 py-2 rounded-full text-sm font-semibold ${
-                              user.role === "business"
-                                ? "bg-blue-100 text-blue-700"
-                                : "bg-green-100 text-green-700"
-                            }`}
-                          >
-                            {user.role === "business" ? (
-                              <Building2 className="w-4 h-4 inline mr-1" />
-                            ) : (
-                              <Store className="w-4 h-4 inline mr-1" />
-                            )}
-                            {user.role}
-                          </span>
-                          <span
-                            className={`px-4 py-2 rounded-full text-sm font-semibold ${
-                              user.subscriptionStatus === "active"
-                                ? "bg-green-100 text-green-700"
-                                : "bg-yellow-100 text-yellow-700"
-                            }`}
-                          >
-                            {user.subscriptionStatus || "inactive"}
-                          </span>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-2 ml-4">
-                        <button
-                          onClick={() => toggleUserDetails(user._id)}
-                          className="p-2 text-gray-600 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-all"
-                        >
-                          {expandedUser === user._id ? (
-                            <ChevronUp className="w-5 h-5" />
-                          ) : (
-                            <ChevronDown className="w-5 h-5" />
-                          )}
-                        </button>
-                        <button
-                          onClick={() => handleDeleteUser(user._id)}
-                          className="p-2 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-all"
-                          title="Delete user"
-                        >
-                          <Trash2 className="w-5 h-5" />
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-
-                  {expandedUser === user._id && (
-                    <div className="p-5 bg-gray-50 border-t border-gray-200">
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div className="bg-white p-4 rounded-lg">
-                          <p className="text-xs text-gray-500 mb-1">Slug</p>
-                          <p className="font-semibold text-gray-900">
-                            {user.slug || "N/A"}
-                          </p>
-                        </div>
-                        <div className="bg-white p-4 rounded-lg">
-                          <p className="text-xs text-gray-500 mb-1">Plan</p>
-                          <p className="font-semibold text-gray-900 capitalize">
-                            {user.plan || "N/A"}
-                          </p>
-                        </div>
-                        <div className="bg-white p-4 rounded-lg">
-                          <p className="text-xs text-gray-500 mb-1">
-                            Custom Domain
-                          </p>
-                          <p className="font-semibold text-gray-900">
-                            {user.customDomainVerified ? (
-                              <span className="text-green-600 flex items-center gap-1">
-                                <CheckCircle className="w-4 h-4" /> Verified
-                              </span>
-                            ) : (
-                              <span className="text-gray-400 flex items-center gap-1">
-                                <XCircle className="w-4 h-4" /> Not Verified
-                              </span>
-                            )}
-                          </p>
-                        </div>
-                        <div className="bg-white p-4 rounded-lg">
-                          <p className="text-xs text-gray-500 mb-1">Status</p>
-                          <p className="font-semibold text-gray-900 capitalize">
-                            {user.status || "N/A"}
-                          </p>
-                        </div>
-                        <div className="bg-white p-4 rounded-lg">
-                          <p className="text-xs text-gray-500 mb-1">
-                            Created At
-                          </p>
-                          <p className="font-semibold text-gray-900 flex items-center gap-1">
-                            <Calendar className="w-4 h-4" />
-                            {user.createdAt
-                              ? new Date(user.createdAt).toLocaleDateString()
-                              : "N/A"}
-                          </p>
-                        </div>
-                        <div className="bg-white p-4 rounded-lg">
-                          <p className="text-xs text-gray-500 mb-1">
-                            Updated At
-                          </p>
-                          <p className="font-semibold text-gray-900 flex items-center gap-1">
-                            <Calendar className="w-4 h-4" />
-                            {user.updatedAt
-                              ? new Date(user.updatedAt).toLocaleDateString()
-                              : "N/A"}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          )} */}
-        </div>
+          <div className="text-center py-12 text-gray-500">
+            <UserPlus className="w-16 h-16 mx-auto mb-4 text-gray-300" />
+            <p>No users found. Create your first user above!</p>
+          </div>
+        </div> */}
       </div>
     </div>
   );

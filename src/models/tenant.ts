@@ -31,6 +31,7 @@ export interface TenantModel {
   updatedAt: Date;
   userId?: ObjectId | string;
   createdById?: string | ObjectId
+  businessdetails?: any;
 }
 
 // Example usage:

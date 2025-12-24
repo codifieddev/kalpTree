@@ -30,13 +30,9 @@ export interface Permission {
 
 // White-labeling and Branding
 export interface BrandingSettings {
-  logo?: {
-    url: string;
-    width?: number;
-    height?: number;
-  };
+  logo?: string,
   favicon?: string;
-  colors: {
+  colors?: {
     primary: string;
     secondary: string;
     accent?: string;
@@ -57,7 +53,7 @@ export interface BrandingSettings {
 
 // Tenant (franchise/client) - Enhanced
 export interface Tenant extends Omit<BaseDocument, "tenantId"> {
-  slug: string; // subdomain: "franchise1"
+  slug?: string; // subdomain: "franchise1"
   name: string; // "Franchise Store 1"
   email: string;
   phone?: string;

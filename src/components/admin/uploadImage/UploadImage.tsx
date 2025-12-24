@@ -17,7 +17,6 @@ interface UploadImageProps {
   accept?: string;
   createdProjectId?: string | null;
    jobImageUpload: (file: File ) => void;
-
 }
 
 interface FileWithPreview extends File {
@@ -32,7 +31,6 @@ const UploadImage: React.FC<UploadImageProps> = ({
   className = '',
   accept = 'image/*',
   createdProjectId,
-
 }) => {
   const [selectedFile, setSelectedFile] = useState<FileWithPreview | null>(null);
   const [uploading, setUploading] = useState(false);
