@@ -49,10 +49,18 @@ export async function PUT(req: Request) {
     const db = await getDatabase();
     const collection = db.collection("pages");
     const body = await req.json();
+    // Handle both {_id: "..."} and {_id: { $oid: "..." }}
     if (!body._id) {
       return NextResponse.json({ error: 'Missing _id' }, { status: 400 });
     }
-    const id = new ObjectId(String(body._id));
+    let id;
+    if (typeof body._id === 'object' && body._id.$oid) {
+      id = new ObjectId(body._id.$oid);
+    } else {
+      id = new ObjectId(String(body._id));
+    }
+    // Trim name if present
+    if (body.name) body.name = body.name.trim();
     const now = new Date().toISOString();
     const updateDoc = {
       ...body,
@@ -60,16 +68,17 @@ export async function PUT(req: Request) {
       publishedAt: body.status === 'published' ? (body.publishedAt || now) : null,
     };
     delete updateDoc._id;
-    const result = await collection.findOneAndUpdate(
+    const updateResult = await collection.updateOne(
       { _id: id },
-      { $set: updateDoc },
-      { returnDocument: 'after' }
+      { $set: updateDoc }
     );
-    if (!result || !result.value) {
+    if (updateResult.matchedCount === 0) {
       return NextResponse.json({ error: 'Page not found' }, { status: 404 });
     }
-    return NextResponse.json(result.value);
+    const updated = await collection.findOne({ _id: id });
+    return NextResponse.json(updated);
   } catch (err: any) {
+    console.error("PUT error:", err);
     return NextResponse.json({ error: err.message || 'Failed to update page' }, { status: 500 });
   }
 }

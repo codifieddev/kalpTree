@@ -49,15 +49,21 @@ export const updateWebsitePage = createAsyncThunk<
   { rejectValue: string }
 >("websitePage/updateWebsitePage", async (page, { rejectWithValue }) => {
   try {
-    const response = await axios.put(
-      `/api/admin/website/pages/${page._id}`,
-      page
-    );
-    return response.data;
+    const response = await fetch(`/api/pages/websites`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(page),
+    });
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || "Failed to update page");
+    }
+    const data = await response.json();
+    return data;
   } catch (err: any) {
-    return rejectWithValue(
-      err.response?.data?.message || "Failed to update page"
-    );
+    return rejectWithValue(err.message || "Failed to update page");
   }
 });
 
@@ -79,6 +85,7 @@ import { WebsitePageModel } from "../../../components/admin/website/websitePage/
 
 interface WebsitePageState {
   websitePages: WebsitePageModel[];
+  currentpage:WebsitePageModel|{};
   hasFetched: boolean;
   isLoading: boolean;
   error: string | null;
@@ -86,6 +93,7 @@ interface WebsitePageState {
 
 const initialState: WebsitePageState = {
   websitePages: [],
+  currentpage:{},
   hasFetched: false,
   isLoading: false,
   error: null,
@@ -95,36 +103,9 @@ const websitePageSlice = createSlice({
   name: "websitePage",
   initialState,
   reducers: {
-    fetchPagesStart(state) {
-      state.isLoading = true;
-      state.error = null;
-    },
-    fetchPagesSuccess(state, action: PayloadAction<WebsitePageModel[]>) {
-      state.websitePages = action.payload;
-      state.isLoading = false;
-      state.hasFetched = true;
-      state.error = null;
-    },
-    fetchPagesFailure(state, action: PayloadAction<string>) {
-      state.isLoading = false;
-      state.error = action.payload;
-    },
-    addPage(state, action: PayloadAction<WebsitePageModel>) {
-      state.websitePages.push(action.payload);
-    },
-    updatePage(state, action: PayloadAction<WebsitePageModel>) {
-      const index = state.websitePages.findIndex(
-        (page) => page._id === action.payload._id
-      );
-      if (index !== -1) {
-        state.websitePages[index] = action.payload;
-      }
-    },
-    deletePage(state, action: PayloadAction<string>) {
-      state.websitePages = state.websitePages.filter(
-        (page) => page._id !== action.payload
-      );
-    },
+    updateCurrentPage:(state, action)=>{
+        state.currentpage=action.payload
+    }
   },
   extraReducers: (builder) => {
     builder
@@ -170,12 +151,7 @@ const websitePageSlice = createSlice({
 });
 
 export const {
-  fetchPagesStart,
-  fetchPagesSuccess,
-  fetchPagesFailure,
-  addPage,
-  updatePage,
-  deletePage,
+updateCurrentPage
 } = websitePageSlice.actions;
 
 export default websitePageSlice.reducer;
