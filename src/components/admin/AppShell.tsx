@@ -104,6 +104,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { signOut } from "next-auth/react";
 import { useDispatch } from "react-redux";
 import { GoSidebarCollapse, GoSidebarExpand } from "react-icons/go";
+import { useState } from "react";
 // ---------------------------------------------------------------------------
 // Types & interfaces
 // ---------------------------------------------------------------------------
@@ -159,6 +160,7 @@ type NavSection = {
   items: NavItem[];
   permission?: string;
 };
+
 
 export const currentWebsiteSections: NavSection[] = [
   {
@@ -692,6 +694,11 @@ export function useHasPermission(user: User | null) {
   );
 }
 
+
+
+
+
+
 // Section "header icon" like screenshot (one icon per group)
 export const sectionIconMap: Record<
   string,
@@ -712,6 +719,8 @@ export const sectionIconMap: Record<
 export function FiCloseHint() {
   return <div className="text-[11px] text-black/35">hover</div>;
 }
+
+
 
 export function AppShell({
   children,
@@ -753,6 +762,7 @@ export function AppShell({
     };
     const dispatch = useDispatch();
 
+const [showSidebar, setShowSidebar] = useState<boolean>(true);
   return (
 
     <>
@@ -876,39 +886,28 @@ export function AppShell({
 
     
     <div className="flex h-[92vh] bg-[#e8e9eb] text-foreground overflow-hidden">
-      <HighLevelSidebar
-        user={user}
-        collapsed={isHighLevelCollapsed}
-        loggedinTenant={loggedinTenant}
-      />
-      {/* {params.website && (
-        <Sidebar
-          tenants={tenants}
-          currentTenant={currentTenant}
-          onTenantChange={onTenantChange}
-          websites={websites}
-          currentWebsite={currentWebsite}
-          user={user}
-          onWebsiteChange={onWebsiteChange}
-          collapsed={sidebarCollapsed}
-          onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
-          loggedinTenant={loggedinTenant}
-        />
-      )} */}
-       {true && (
-        <Sidebar
-          tenants={tenants}
-          currentTenant={currentTenant}
-          onTenantChange={onTenantChange}
-          websites={websites}
-          currentWebsite={currentWebsite}
-          user={user}
-          onWebsiteChange={onWebsiteChange}
-          collapsed={sidebarCollapsed}
-          onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
-          loggedinTenant={loggedinTenant}
-        />
-      )}
+     <HighLevelSidebar
+  showSidebar={showSidebar}
+  setShowSidebar={setShowSidebar}
+  user={user}
+  collapsed={sidebarCollapsed}
+  loggedinTenant={loggedinTenant}
+/>
+
+{showSidebar && (
+  <Sidebar
+    tenants={tenants}
+    currentTenant={currentTenant}
+    onTenantChange={onTenantChange}
+    websites={websites}
+    currentWebsite={currentWebsite}
+    user={user}
+    onWebsiteChange={onWebsiteChange}
+    collapsed={sidebarCollapsed}
+    onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
+    loggedinTenant={loggedinTenant}
+  />
+)}
 
       <div className="flex flex-1 min-h-screen flex-col overflow-hidden">
         {/* <Topbar

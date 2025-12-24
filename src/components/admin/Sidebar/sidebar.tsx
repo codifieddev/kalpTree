@@ -485,10 +485,10 @@ export function Sidebar({
               </ScrollArea>
 
               {/* collapse button */}
-              <div className="border-t border-black/10 p-3">
+              {/* <div className="border-t border-black/10 p-3">
                 <div className="mt-4">
                   <DropdownMenu>
-                    {/* TRIGGER */}
+                
                     <DropdownMenuTrigger asChild>
                       <button className="flex w-full items-center gap-3 rounded-md px-3 py-2 hover:bg-muted">
                         <Avatar className="h-8 w-8">
@@ -506,14 +506,14 @@ export function Sidebar({
                       </button>
                     </DropdownMenuTrigger>
 
-                    {/* ✅ DROPDOWN OPENS OUTSIDE SIDEBAR */}
+             
                     <DropdownMenuContent
-                      side="right" // 👈 sidebar se bahar
-                      align="start" // 👈 top align
-                      sideOffset={12} // 👈 gap
+                      side="right" 
+                      align="start" 
+                      sideOffset={12} 
                       className="w-56 rounded-xl shadow-xl mb-2"
                     >
-                      {/* Header */}
+                    
                       <DropdownMenuLabel className="flex items-center gap-3">
                         <Avatar className="h-8 w-8">
                           <AvatarFallback>SC</AvatarFallback>
@@ -560,7 +560,7 @@ export function Sidebar({
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </div>
-              </div>
+              </div> */}
             </div>
           </div>
         </div>

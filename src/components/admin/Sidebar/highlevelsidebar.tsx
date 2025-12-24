@@ -137,11 +137,18 @@ type SidebarProps = {
   loggedinTenant?: any;
 };
 
+type HighLevelSidebarProps = SidebarProps & {
+  showSidebar: boolean;
+  setShowSidebar: React.Dispatch<React.SetStateAction<boolean>>;
+};
+
 export function HighLevelSidebar({
+  showSidebar,
+  setShowSidebar,
   user,
   collapsed = false,
   loggedinTenant = { name: "Your Company" },
-}: SidebarProps) {
+}: HighLevelSidebarProps) {
   const pathname = usePathname();
   const [openItems, setOpenItems] = React.useState<Record<string, boolean>>({});
   const [hoverItemId, setHoverItemId] = React.useState<string | null>(null);
@@ -293,46 +300,40 @@ export function HighLevelSidebar({
                   return (
                     <div key={item.id}>
                       <div className="relative">
-                        <Link href={item.href}>
-                          <button
-                            type="button"
+                        <div className="relative">
+                          <div
                             className={cn(
                               "w-full flex items-center gap-3 rounded-md px-3 py-2.5",
-                              "text-left transition ",
-                              isActive
-                                ? "bg-white text-black shadow-sm"
-                                : "bg-transparent hover:bg-white/50"
+                              "text-left transition cursor-pointer",
+                              isActive ? "bg-white text-black shadow-sm" : "bg-transparent hover:bg-white/50"
                             )}
+                            onClick={() => setShowSidebar((v: boolean) => !v)}
                           >
                             <Icon className="h-5 w-5 text-black/70" />
-                            <span className="text-[13px] font-medium flex-1">
-                              {item.label}
-                            </span>
-                            {item.badge && (
-                              <span className="text-[11px] rounded-full bg-purple-100 text-purple-700 px-2 py-0.5 font-semibold border border-purple-200">
-                                {item.badge}
-                              </span>
-                            )}
-                            <button
+
+                            <Link
+                              href={item.href}
+                              className="text-[13px] font-medium flex-1"
                               onClick={(e) => {
-                                if (item.hasSubmenu) {
-                                  e.preventDefault();
-                                  toggleItem(item.id);
-                                }
+                                e.stopPropagation(); // don’t toggle sidebar when navigating
                               }}
                             >
-                              {item.hasSubmenu && (
-                                <div className="text-black/40">
-                                  {isOpen ? (
-                                    <ChevronDown className="h-4 w-4" />
-                                  ) : (
-                                    <ChevronRight className="h-4 w-4" />
-                                  )}
-                                </div>
-                              )}
-                            </button>
-                          </button>
-                        </Link>
+                              {item.label}
+                            </Link>
+
+                            {item.hasSubmenu && (
+                              <span
+                                className="text-black/40"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  toggleItem(item.id);
+                                }}
+                              >
+                                {isOpen ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+                              </span>
+                            )}
+                          </div>
+                        </div>
                       </div>
 
                       {/* Submenu */}
@@ -403,99 +404,112 @@ export function HighLevelSidebar({
                 </button>
               </div> */}
 
-                <DropdownMenu>
-  {/* TRIGGER */}
-  <DropdownMenuTrigger asChild>
-    <button
-      className="
+              <DropdownMenu>
+                {/* TRIGGER */}
+                <DropdownMenuTrigger asChild>
+                  <button
+                    className="
         flex w-full items-center gap-3
         rounded-lg px-3 py-2
         text-left transition-colors
         hover:bg-muted
         focus:outline-none
       "
-    >
-      {/* <Avatar className="h-8 w-8">
+                  >
+                    {/* <Avatar className="h-8 w-8">
         <AvatarFallback className="font-semibold">SC</AvatarFallback>
       </Avatar> */}
 
-                  <div className="rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-sm font-semibold">
-                   <span className="w-[40px] h-[40px] flex items-center justify-center"> SC </span>
-                  </div>
 
-      {/* <div className="flex flex-col flex-1 leading-tight">
+
+                    <button className="flex w-full items-center gap-3 rounded-md px-3 py-2 hover:bg-muted">
+                      <div className="rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-sm font-semibold">
+                        <span className="w-[40px] h-[40px] flex items-center justify-center"> SC </span>
+                      </div>
+
+                      <div className="flex flex-col flex-1 text-left leading-tight">
+                        <span className="text-sm font-medium">shadcn</span>
+                        <span className="text-xs text-muted-foreground">
+                          m@example.com
+                        </span>
+                      </div>
+
+                      <ChevronsUpDown className="h-4 w-4 text-muted-foreground" />
+                    </button>
+
+                    {/* <div className="flex flex-col flex-1 leading-tight">
         <span className="text-sm font-medium">shadcn</span>
         <span className="text-xs text-muted-foreground truncate">
           m@example.com
         </span> 
       </div> */}
 
-      {/* <ChevronsUpDown className="h-4 w-4 text-muted-foreground shrink-0" /> */}
-    </button>
-  </DropdownMenuTrigger>
+                    {/* <ChevronsUpDown className="h-4 w-4 text-muted-foreground shrink-0" /> */}
+                  </button>
+                </DropdownMenuTrigger>
 
-  {/* DROPDOWN */}
-  <DropdownMenuContent
-    side="right"
-    align="start"
-    sideOffset={12}
-    className="
+                {/* DROPDOWN */}
+                <DropdownMenuContent
+                  side="right"
+                  align="start"
+                  sideOffset={12}
+                  className="
       w-56 rounded-xl
       border bg-background
       shadow-lg p-1
     "
-  >
-    {/* HEADER */}
-    <DropdownMenuLabel className="flex items-center gap-3 px-2 py-2">
-      <Avatar className="h-8 w-8">
-        <AvatarFallback className="font-semibold">SC</AvatarFallback>
-      </Avatar>
+                >
+                  {/* HEADER */}
+                  <DropdownMenuLabel className="flex items-center gap-3 px-2 py-2">
+                    <Avatar className="h-8 w-8">
+                      <AvatarFallback className="font-semibold">SC</AvatarFallback>
+                    </Avatar>
 
-      <div className="flex flex-col leading-tight">
-        <span className="text-sm font-medium">shadcn</span>
-        <span className="text-xs text-muted-foreground truncate">
-          m@example.com
-        </span>
-      </div>
-    </DropdownMenuLabel>
+                    <div className="flex flex-col leading-tight">
+                      <span className="text-sm font-medium">shadcn</span>
+                      <span className="text-xs text-muted-foreground truncate">
+                        m@example.com
+                      </span>
+                    </div>
+                  </DropdownMenuLabel>
 
-    <DropdownMenuSeparator className="my-1" />
+                  <DropdownMenuSeparator className="my-1" />
 
-    <DropdownMenuItem className="rounded-md">
-      <Sparkles className="mr-2 h-4 w-4" />
-      Upgrade to Pro
-    </DropdownMenuItem>
+                  <DropdownMenuItem className="rounded-md">
+                    <Sparkles className="mr-2 h-4 w-4" />
+                    Upgrade to Pro
+                  </DropdownMenuItem>
 
-    <DropdownMenuSeparator className="my-1" />
+                  <DropdownMenuSeparator className="my-1" />
 
-    <DropdownMenuItem className="rounded-md">
-      <User className="mr-2 h-4 w-4" />
-      Account
-    </DropdownMenuItem>
+                  <DropdownMenuItem className="rounded-md">
+                    <User className="mr-2 h-4 w-4" />
+                    Account
+                  </DropdownMenuItem>
 
-    <DropdownMenuItem className="rounded-md">
-      <CreditCard className="mr-2 h-4 w-4" />
-      Billing
-    </DropdownMenuItem>
+                  <DropdownMenuItem className="rounded-md">
+                    <CreditCard className="mr-2 h-4 w-4" />
+                    Billing
+                  </DropdownMenuItem>
 
-    <DropdownMenuItem className="rounded-md">
-      <Bell className="mr-2 h-4 w-4" />
-      Notifications
-    </DropdownMenuItem>
+                  <DropdownMenuItem className="rounded-md">
+                    <Bell className="mr-2 h-4 w-4" />
+                    Notifications
+                  </DropdownMenuItem>
 
-    <DropdownMenuSeparator className="my-1" />
+                  <DropdownMenuSeparator className="my-1" />
 
-    <DropdownMenuItem
-      className="
+                  <DropdownMenuItem
+                    className="
         rounded-md text-red-600
         focus:bg-red-50 focus:text-red-600
       "
-    >
-      <LogOut className="mr-2 h-4 w-4" />
-      Log out
-    </DropdownMenuItem>
-  </DropdownMenuContent>
-</DropdownMenu>
+                  >
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Log out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
 
             </div>
           </div>
