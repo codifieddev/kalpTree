@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Store, Download, Star, Puzzle, ExternalLink, Search } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "App Store | Dzinly Admin",
+  title: "App Store | KalpTree Admin",
   description: "Browse and install apps and integrations",
 };
 

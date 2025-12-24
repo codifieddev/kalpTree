@@ -1,6 +1,6 @@
 
 # Recommended Project Structure Diagram
-dzinly-next/
+KalpTree-next/
 ├── public/
 ├── scripts/
 ├── styles/
@@ -81,7 +81,7 @@ dzinly-next/
 
 
 ```
-dzinly-next/
+KalpTree-next/
 ├── .env
 ├── .env.example
 ├── .gitignore
@@ -102,8 +102,8 @@ dzinly-next/
 ├── postcss.config.mjs
 ├── tsconfig.json
 ├── public/
-│   ├── dzinly-favicon.svg
-│   ├── dzinlylogo.svg
+│   ├── KalpTree-favicon.svg
+│   ├── KalpTreelogo.svg
 │   ├── favicon-logo.jpg
 │   ├── file.svg
 │   ├── globe.svg
@@ -283,9 +283,9 @@ dzinly-next/
 │       └── pages/
 ```
 
-# Project Structure: dzinly-next
+# Project Structure: KalpTree-next
 
-This document provides an overview of the folder and file structure for the `dzinly-next` project.
+This document provides an overview of the folder and file structure for the `KalpTree-next` project.
 
 ## Root Directory
 - `.env`, `.env.example` - Environment variable files

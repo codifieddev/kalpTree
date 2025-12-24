@@ -29,7 +29,7 @@ export { clientPromise };
 
 export async function getDatabase(): Promise<Db> {
   const client = await clientPromise;
-  return client.db(process.env.MONGODB_DB || 'dzinly');
+  return client.db(process.env.MONGODB_DB || 'KalpTree');
 }
 
 // Backward-compatible alias for older imports

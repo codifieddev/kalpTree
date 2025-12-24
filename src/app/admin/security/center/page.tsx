@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Shield, AlertTriangle, CheckCircle, Eye, Lock, Zap } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Security Center | Dzinly Admin",
+  title: "Security Center | KalpTree Admin",
   description: "Monitor and manage your website security",
 };
 

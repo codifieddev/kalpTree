@@ -20,7 +20,9 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
-} from "@radix-ui/react-select";
+  SelectValue,
+} from "@/components/ui/select";
+
 import { ArrowBigDown, Bell, Building2, ChevronDown, ChevronRight, ChevronsUpDown, CreditCard, Globe2, LayoutDashboard, LogOut, Sparkles, User } from "lucide-react";
 import { ScrollArea } from "@radix-ui/react-scroll-area";
 import { AnimatePresence, motion } from "framer-motion";
@@ -104,7 +106,7 @@ export function Sidebar({
     <TooltipProvider>
       <div
         className={cn(
-          "relative hidden md:flex h-screen",
+          "relative hidden md:flex h-screen  max-h-[80vh] md:max-h-[90vh] lg:max-h-[92vh] overflow-y-auto bg-[#f5f6f7]",
           collapsed ? "w-[84px]" : "w-[320px]"
         )}
       >
@@ -118,16 +120,16 @@ export function Sidebar({
           >
             <div className="flex h-full flex-col">
               <div className="border-b pb-4 ">
-                {/* Brand row */}
+              
                 <div className="flex justify-between items-center">
                   <div className={cn("px-4 pt-4 pb-0", collapsed && "px-3")}>
                     <div className="flex items-center gap-3">
-                      {/* <div className="grid h-10 w-10 place-items-center rounded-md">
+                      <div className="grid h-10 w-10 place-items-center rounded-md">
                         <img
                           src="../kalptree-favicon.svg"
                           className="w-10 h-10"
                         ></img>
-                      </div> */}
+                      </div>
                       {!collapsed && (
                         <div className="leading-tight">
                           <div className="text-md uppercase font-semibold">
@@ -144,17 +146,18 @@ export function Sidebar({
 
                 <div className="relative mt-2">
                   {tenants.length > 0 && (
-                    <div className={cn("px-3 pt-2", collapsed && "px-2")}>
+                    <div className={cn("px-3 pt-2 ", collapsed && "px-2")}>
                       <div className="relative">
                         <Select
                           value={currentTenant?._id || ""}
                           onValueChange={onTenantChange}
                           disabled={user?.role == "business"}
+                          
                         >
                           <SelectTrigger
                             className={cn(
                               "h-14 w-full rounded-lg bg-white border-2 border-gray-600 focus:ring-2 focus:ring-gray-600 focus:border-gray-600",
-                              "text-left px-4 pt-2",
+                              "text-left px-4 py-2 h-[500px]",
                               "[&>svg]:hidden",
                               collapsed && "justify-center px-2"
                             )}
@@ -167,7 +170,7 @@ export function Sidebar({
                             </div>
                           </SelectTrigger>
 
-                          <SelectContent className="w-[260px] rounded-lg border shadow-lg">
+                          <SelectContent className="w-[260px] rounded-lg border shadow-lg ">
                             <div className="px-3 py-2 text-xs font-medium text-muted-foreground">
                               Tenants
                             </div>
@@ -202,7 +205,7 @@ export function Sidebar({
                 </div>
                 <div className="relative mt-2">
                   {websites.length > 0 && (
-                    <div className={cn("px-3 pt-2", collapsed && "px-2")}>
+                    <div className={cn("px-3 pt-2 ", collapsed && "px-2")}>
                       <div className="relative">
                         <Select
                           value={currentWebsite?._id || ""}

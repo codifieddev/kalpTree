@@ -21,9 +21,9 @@ async function createCollections() {
     await client.connect();
     console.log('✅ Connected to MongoDB');
     
-    // Use 'dzinly' database explicitly
-    const db = client.db('dzinly');
-    console.log('📂 Using database: dzinly');
+    // Use 'KalpTree' database explicitly
+    const db = client.db('KalpTree');
+    console.log('📂 Using database: KalpTree');
     
     // List of all collections to create
     const collections = [

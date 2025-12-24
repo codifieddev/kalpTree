@@ -67,6 +67,7 @@ import {
   ClipboardList,
   ArrowLeftRight,
   User,
+  Sparkles,
 } from "lucide-react";
 
 import {
@@ -82,6 +83,27 @@ import { MobileSidebar } from "./Sidebar/mobileSidebar";
 import { HighLevelSidebar } from "./Sidebar/highlevelsidebar";
 import { useParams } from "next/navigation";
 
+import { Button } from "../ui/button";
+import { clearAttributes } from "@/hooks/slices/attribute/AttributeSlice";
+import { clearBrands } from "@/hooks/slices/brand/BrandSlice";
+import { clearSegments } from "@/hooks/slices/segment/SegmentSlice";
+import { clearCategories } from "@/hooks/slices/category/CategorySlice";
+import { Input } from "@/components/ui/input";
+import { Separator } from "@/components/ui/separator";
+import { FiSearch, FiBell, FiChevronLeft } from "react-icons/fi";
+import { HiSparkles } from "react-icons/hi2";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { signOut } from "next-auth/react";
+import { useDispatch } from "react-redux";
+import { GoSidebarCollapse, GoSidebarExpand } from "react-icons/go";
 // ---------------------------------------------------------------------------
 // Types & interfaces
 // ---------------------------------------------------------------------------
@@ -96,6 +118,9 @@ export type Website = {
   serviceType: "WEBSITE_ONLY" | "ECOMMERCE";
   status?: "active" | "paused" | "error";
 };
+
+
+
 
 export type User = {
   id: string;
@@ -705,8 +730,152 @@ export function AppShell({
 
   const isHighLevelCollapsed = !params.website ? false : true;
 
+
+
+  const handleSignOut = async () => {
+    try {
+      resetRedux();
+      localStorage.clear();
+      sessionStorage.clear();
+
+      await signOut({ callbackUrl: "/", redirect: true });
+    } catch (error) {
+      console.error("Error during sign out:", error);
+      await signOut({ callbackUrl: "/" });
+    }
+  };
+
+    const resetRedux = () => {
+      dispatch(clearAttributes());
+      dispatch(clearBrands());
+      dispatch(clearSegments());
+      dispatch(clearCategories());
+    };
+    const dispatch = useDispatch();
+
   return (
-    <div className="flex min-h-screen bg-[#e8e9eb] text-foreground overflow-hidden">
+
+    <>
+
+     <header className="h-16 w-full bg-white border-b border-gray-200 flex items-center justify-between px-5">
+      {/* LEFT */}
+      <div className="flex items-center gap-4">
+        {/* Logo */}
+        <div className="flex items-center gap-3">
+          <div className="h-10 w-10 rounded-full   flex items-center justify-center text-white text-xs font-semibold">
+            <img src="../kalptree-favicon.svg" alt="KalpTree" className="h-10 w-10" />
+          </div>
+
+          <div className="leading-[14px]">
+            <p className="text-sm font-semibold text-gray-900">TEST1</p>
+            <p className="text-[11px] text-gray-500">
+              Franchise panel
+            </p>
+          </div>
+        </div>
+
+        <Separator orientation="vertical" className="h-8" />
+
+        <div className="border-none border-black/10 p-3">
+        <span>
+                   <GoSidebarExpand className="h-4 w-4 " size={10} />
+</span>
+                {/* <Button
+                  variant="ghost"
+                
+                  className={cn(
+                    "w-full justify-between  hover:bg-transparent",
+                    "border-e border-black/5 bg-transparent rounded-none  text-black/70 "
+                  )}
+                >
+                   <GoSidebarExpand className="h-14 w-14 " size={48} />
+                  {!collapsed ? (
+                    <>
+                      <GoSidebarExpand className="h-14 w-14 " size={48} />
+                    </>
+                  ) : (
+                    <>
+                      <GoSidebarCollapse className="h-14 w-14  mx-auto" size={48} />
+                    </>
+                  )}
+                </Button> */}
+              </div>
+
+        {/* <h1 className="text-[15px] font-semibold text-gray-900">
+          Dashboard
+        </h1> */}
+
+      {currentWebsite && (
+          <div className="flex items-center gap-2 rounded-full border bg-muted/60 px-3 py-1 text-xs text-muted-foreground">
+            <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-primary/15 text-[10px] font-semibold text-primary">
+              {currentWebsite.name.charAt(0).toUpperCase()}
+            </span>
+            <span className="hidden md:inline">{currentWebsite.name}</span>
+            <span className="hidden text-[11px] text-muted-foreground/80 sm:inline">
+              {currentWebsite.primaryDomain || currentWebsite.systemSubdomain}
+            </span>
+          </div>
+        )}
+      </div>
+
+      {/* RIGHT */}
+      <div className="flex items-center gap-3">
+        {/* Search */}
+        <div className="relative">
+          <FiSearch className="absolute left-3 top-[9px] text-gray-400 text-sm" />
+          <Input
+            placeholder="Search"
+            className="h-8 w-52 rounded-full pl-9 text-sm border-gray-200 focus-visible:ring-0"
+          />
+        </div>
+
+        {/* Notification */}
+        <div className="relative cursor-pointer">
+          <FiBell className="text-gray-600 text-[18px]" />
+          <span className="absolute -top-1 -right-1 h-[6px] w-[6px] bg-red-500 rounded-full" />
+        </div>
+
+        {/* AI Assistant */}
+         <Button size="sm" className="text-xs">
+          <Sparkles className="h-3 w-3 " />
+          Ai Assistant
+        </Button>
+
+        {/* Avatar */}
+    <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              className=""
+            >
+              <Avatar className="h-7 w-7">
+                <AvatarFallback>
+                  {user?.email?.charAt(0).toUpperCase() || "U"}
+                </AvatarFallback>
+              </Avatar>
+            </Button>
+          </DropdownMenuTrigger>
+
+          <DropdownMenuContent align="end" className="bg-white rounded-md shadow-md w-40">
+            <DropdownMenuLabel className="hover:bg-primary hover:text-white p-2">{user?.email || "User"}</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem className="hover:bg-primary hover:text-white p-2">Profile</DropdownMenuItem>
+            <DropdownMenuItem className="hover:bg-primary hover:text-white p-2">Account settings</DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              onClick={handleSignOut}
+             className="hover:bg-primary hover:text-white p-2"  
+            >
+              Sign out
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+    </header>
+
+    
+    <div className="flex h-[92vh] bg-[#e8e9eb] text-foreground overflow-hidden">
       <HighLevelSidebar
         user={user}
         collapsed={isHighLevelCollapsed}
@@ -742,13 +911,13 @@ export function AppShell({
       )}
 
       <div className="flex flex-1 min-h-screen flex-col overflow-hidden">
-        <Topbar
+        {/* <Topbar
           currentWebsite={currentWebsite}
           user={user}
           onToggleMobileSidebar={() => setMobileSidebarOpen(true)}
           collapsed={sidebarCollapsed}
           onToggleCollapse={(event) => setSidebarCollapsed((prev) => !prev)}
-        />
+        /> */}
         <main className="flex-1 px-3 py-4 md:px-6 md:py-6 overflow-auto">
           <div className="mx-auto max-w-7xl">{children}</div>
         </main>
@@ -773,5 +942,6 @@ export function AppShell({
         </SheetContent>
       </Sheet>
     </div>
+    </>
   );
 }

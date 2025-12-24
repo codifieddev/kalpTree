@@ -30,7 +30,7 @@ export default function RootClientPage() {
         <div className="max-w-6xl mx-auto relative z-10 text-center">
           {/* Logo Container */}
           <div className="inline-flex items-center justify-center p-4 rounded-2xl mb-8 animate-fade-in">
-            <img src="/kalptree-white-logo.svg" alt="Dzinly Logo" className="w-56 h-auto brightness-0 invert" />
+            <img src="/kalptree-white-logo.svg" alt="KalpTree Logo" className="w-56 h-auto brightness-0 invert" />
           </div>
           
           <h1 className="text-5xl md:text-7xl font-black text-white mb-6  leading-[1.1]">
@@ -127,7 +127,7 @@ export default function RootClientPage() {
               Advanced Control for <br/>Global Teams
             </h2>
             <p className="text-muted-foreground text-lg mb-8 leading-relaxed">
-              Dzinly provides a centralized command center for managing thousands of users across unlimited franchise locations.
+              KalpTree provides a centralized command center for managing thousands of users across unlimited franchise locations.
             </p>
             <div className="space-y-4">
               <CheckItem text="Hierarchical data isolation between tenants" />
@@ -182,7 +182,7 @@ export default function RootClientPage() {
 
     <div className="grid md:grid-cols-3 gap-8">
       <TestimonialCard 
-        quote="The level of customization Dzinly offers is unmatched. We managed to stay 100% on-brand while scaling to 40 new locations."
+        quote="The level of customization KalpTree offers is unmatched. We managed to stay 100% on-brand while scaling to 40 new locations."
         author="Sarah Jenkins"
         role="CTO @ BuildRight"
         // Image="https://ui-avatars.com/api/?name=Sarah+Jenkins&background=6d455a&color=fff"
@@ -210,7 +210,7 @@ export default function RootClientPage() {
   <div className="max-w-6xl mx-auto">
     <div className="text-center mb-20">
       <h2 className="text-4xl font-bold text-primary mb-4">Common Questions</h2>
-      <p className="text-muted-foreground">Everything you need to know about the Dzinly Admin ecosystem.</p>
+      <p className="text-muted-foreground">Everything you need to know about the KalpTree Admin ecosystem.</p>
     </div>
 
     <div className="grid md:grid-cols-2 gap-10">
@@ -224,7 +224,7 @@ export default function RootClientPage() {
       />
       <FaqItem 
         question="Can I integrate my existing CRM?" 
-        answer="Yes. Our platform is API-first. You can connect Dzinly with Salesforce, HubSpot, or any custom internal tool using our secure Webhooks and REST API."
+        answer="Yes. Our platform is API-first. You can connect KalpTree with Salesforce, HubSpot, or any custom internal tool using our secure Webhooks and REST API."
       />
       <FaqItem 
         question="What kind of support do you offer?" 
@@ -252,7 +252,7 @@ export default function RootClientPage() {
           
           <h2 className="text-4xl md:text-5xl font-bold text-white mb-6 relative z-10">Ready to scale your franchise?</h2>
           <p className="text-primary-foreground/80 mb-10 max-w-xl mx-auto relative z-10 text-lg">
-            Join hundreds of high-growth companies using Dzinly to power their operations.
+            Join hundreds of high-growth companies using KalpTree to power their operations.
           </p>
           <div className="relative z-10 flex flex-col sm:flex-row gap-4 justify-center">
             <button 
@@ -300,7 +300,7 @@ export default function RootClientPage() {
             </div>
         </div>
         <div className="text-center text-slate-400 border-t border-slate-200 pt-8">
-            <p>&copy; 2024 Dzinly Inc. All rights reserved.</p>
+            <p>&copy; 2024 KalpTree Inc. All rights reserved.</p>
         </div>
       </footer>
     </main>

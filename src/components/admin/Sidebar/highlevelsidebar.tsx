@@ -14,9 +14,15 @@ import {
   LayoutDashboard,
   UserCircle,
   Shield,
+  User,
+  Sparkles,
+  LogOut,
+  Bell,
 } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 // Navigation structure matching the images
 const navigationItems = [
@@ -153,7 +159,7 @@ export function HighLevelSidebar({
     <div
       className={cn(
         "relative hidden md:flex h-screen",
-        collapsed ? "w-[84px]" : "w-[320px]"
+        collapsed ? "w-[84px]" : "w-[320px] "
       )}
     >
       <div className="w-full">
@@ -163,9 +169,9 @@ export function HighLevelSidebar({
             "shadow-[0_10px_35px_rgba(0,0,0,0.08)]"
           )}
         >
-          <div className="flex h-full flex-col">
+          <div className="flex h-[93%] flex-col">
             {/* Header */}
-            <div className="border-b pb-4">
+            {/* <div className="border-b pb-4">
               <div className="flex justify-between items-center">
                 <div className={cn("px-4 pt-4 pb-0", collapsed && "px-3")}>
                   <div className="flex items-center gap-3">
@@ -189,7 +195,7 @@ export function HighLevelSidebar({
                   </div>
                 </div>
               </div>
-            </div>
+            </div> */}
 
             {/* Navigation */}
             <div
@@ -374,10 +380,10 @@ export function HighLevelSidebar({
 
             {/* User menu */}
             <div className="border-t border-black/10 p-3">
-              <div className="mt-2">
+              {/* <div className="mt-0">
                 <button className="flex w-full items-center gap-3 rounded-md px-3 py-2 hover:bg-white/50 transition">
                   <div className="h-8 w-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-sm font-semibold">
-                    {user?.name?.[0] || "U"}
+                    {user?.name?.[0] || "U"} 
                   </div>
 
                   {!collapsed && (
@@ -395,7 +401,102 @@ export function HighLevelSidebar({
                     </>
                   )}
                 </button>
-              </div>
+              </div> */}
+
+                <DropdownMenu>
+  {/* TRIGGER */}
+  <DropdownMenuTrigger asChild>
+    <button
+      className="
+        flex w-full items-center gap-3
+        rounded-lg px-3 py-2
+        text-left transition-colors
+        hover:bg-muted
+        focus:outline-none
+      "
+    >
+      {/* <Avatar className="h-8 w-8">
+        <AvatarFallback className="font-semibold">SC</AvatarFallback>
+      </Avatar> */}
+
+                  <div className="rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-sm font-semibold">
+                   <span className="w-[40px] h-[40px] flex items-center justify-center"> SC </span>
+                  </div>
+
+      {/* <div className="flex flex-col flex-1 leading-tight">
+        <span className="text-sm font-medium">shadcn</span>
+        <span className="text-xs text-muted-foreground truncate">
+          m@example.com
+        </span> 
+      </div> */}
+
+      {/* <ChevronsUpDown className="h-4 w-4 text-muted-foreground shrink-0" /> */}
+    </button>
+  </DropdownMenuTrigger>
+
+  {/* DROPDOWN */}
+  <DropdownMenuContent
+    side="right"
+    align="start"
+    sideOffset={12}
+    className="
+      w-56 rounded-xl
+      border bg-background
+      shadow-lg p-1
+    "
+  >
+    {/* HEADER */}
+    <DropdownMenuLabel className="flex items-center gap-3 px-2 py-2">
+      <Avatar className="h-8 w-8">
+        <AvatarFallback className="font-semibold">SC</AvatarFallback>
+      </Avatar>
+
+      <div className="flex flex-col leading-tight">
+        <span className="text-sm font-medium">shadcn</span>
+        <span className="text-xs text-muted-foreground truncate">
+          m@example.com
+        </span>
+      </div>
+    </DropdownMenuLabel>
+
+    <DropdownMenuSeparator className="my-1" />
+
+    <DropdownMenuItem className="rounded-md">
+      <Sparkles className="mr-2 h-4 w-4" />
+      Upgrade to Pro
+    </DropdownMenuItem>
+
+    <DropdownMenuSeparator className="my-1" />
+
+    <DropdownMenuItem className="rounded-md">
+      <User className="mr-2 h-4 w-4" />
+      Account
+    </DropdownMenuItem>
+
+    <DropdownMenuItem className="rounded-md">
+      <CreditCard className="mr-2 h-4 w-4" />
+      Billing
+    </DropdownMenuItem>
+
+    <DropdownMenuItem className="rounded-md">
+      <Bell className="mr-2 h-4 w-4" />
+      Notifications
+    </DropdownMenuItem>
+
+    <DropdownMenuSeparator className="my-1" />
+
+    <DropdownMenuItem
+      className="
+        rounded-md text-red-600
+        focus:bg-red-50 focus:text-red-600
+      "
+    >
+      <LogOut className="mr-2 h-4 w-4" />
+      Log out
+    </DropdownMenuItem>
+  </DropdownMenuContent>
+</DropdownMenu>
+
             </div>
           </div>
         </div>

@@ -28,7 +28,7 @@ function loadEnvDotLocal() {
 async function main() {
   loadEnvDotLocal();
   const uri = process.env.MONGODB_URI;
-  const dbName = process.env.MONGODB_DB || 'dzinly';
+  const dbName = process.env.MONGODB_DB || 'KalpTree';
   if (!uri) throw new Error('Missing MONGODB_URI');
 
   const client = new MongoClient(uri);
@@ -94,7 +94,7 @@ async function main() {
         tenantId: new ObjectId(tenantId),
         slug: '/',
         title: 'Home',
-        content: '<h1>Welcome to Dzinly Demo</h1>',
+        content: '<h1>Welcome to KalpTree Demo</h1>',
         seo: {},
         status: 'published',
         createdAt: now,
@@ -153,9 +153,9 @@ async function main() {
       $set: {
         tenantId: new ObjectId(tenantId),
         slug: 'getting-started',
-        title: 'Getting Started with Dzinly',
+        title: 'Getting Started with KalpTree',
         excerpt: 'A quick intro to your new SaaS.',
-        content: '<p>Welcome to Dzinly!</p>',
+        content: '<p>Welcome to KalpTree!</p>',
         categoryId: 'guides',
         tags: ['welcome'],
         author: { userId: String(adminUserId), name: 'Demo Admin' },

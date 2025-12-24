@@ -31,20 +31,20 @@ import { Separator } from "@/components/ui/separator";
 
 // Scaffold Data
 const initialProfileData = {
-  brandName: "Dzinly",
+  brandName: "KalpTree",
   tagline: "AI-Powered Architecture & Design",
-  description: "Dzinly is the leading platform for visualizing home exteriors using advanced AI material rendering.",
+  description: "KalpTree is the leading platform for visualizing home exteriors using advanced AI material rendering.",
   industry: "Architecture",
   foundedYear: "2023",
-  website: "https://dzinly.com",
-  email: "contact@dzinly.com",
+  website: "https://KalpTree.com",
+  email: "contact@KalpTree.com",
   phone: "+1 (555) 123-4567",
   address: "123 Innovation Dr, Tech City, CA",
   socials: {
-    facebook: "dzinly",
-    instagram: "dzinly_ai",
-    linkedin: "dzinly-inc",
-    twitter: "dzinly_official",
+    facebook: "KalpTree",
+    instagram: "KalpTree_ai",
+    linkedin: "KalpTree-inc",
+    twitter: "KalpTree_official",
   }
 };
 

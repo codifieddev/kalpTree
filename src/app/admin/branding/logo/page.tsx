@@ -37,9 +37,9 @@ type LogoState = {
 };
 
 const initialLogos: LogoState = {
-  primary: { src: "/logos/dzinly-primary.svg", alt: "Dzinly Primary Logo" },
-  dark: { src: "/logos/dzinly-white.svg", alt: "Dzinly Dark Mode Logo" },
-  light: { src: "/logos/dzinly-black.svg", alt: "Dzinly Light Mode Logo" },
+  primary: { src: "/logos/KalpTree-primary.svg", alt: "KalpTree Primary Logo" },
+  dark: { src: "/logos/KalpTree-white.svg", alt: "KalpTree Dark Mode Logo" },
+  light: { src: "/logos/KalpTree-black.svg", alt: "KalpTree Light Mode Logo" },
   favicon: { src: "/logos/favicon.ico", alt: "Favicon" },
 };
 
@@ -246,7 +246,7 @@ export default function LogoSettingsPage() {
                                 ) : (
                                     <Globe className="w-3.5 h-3.5 text-muted-foreground" />
                                 )}
-                                <span className="truncate">Home - Dzinly AI</span>
+                                <span className="truncate">Home - KalpTree AI</span>
                             </div>
                         </div>
                         <div className="bg-background border rounded-b-lg h-32 flex items-center justify-center text-muted-foreground text-sm">

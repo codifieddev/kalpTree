@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 export const metadata: Metadata = {
-  title: "Email | Dzinly Admin",
+  title: "Email | KalpTree Admin",
   description: "Manage email settings and configuration",
 };
 

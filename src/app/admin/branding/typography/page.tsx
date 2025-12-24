@@ -167,7 +167,7 @@ export default function TypographyPage() {
                                 color: '#374151'
                             }}
                         >
-                            Dzinly transforms the way architects visualize exteriors. 
+                            KalpTree transforms the way architects visualize exteriors. 
                             Our advanced material rendering engine allows for real-time 
                             customization of textures, colors, and lighting, ensuring 
                             that every project matches the client's exact vision.
