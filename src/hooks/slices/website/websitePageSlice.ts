@@ -1,0 +1,181 @@
+import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
+import axios from "axios";
+// Thunks for CRUD operations
+export const fetchWebsitePages = createAsyncThunk<
+  WebsitePageModel[],
+  string,
+  { rejectValue: string }
+>("websitePage/fetchWebsitePages", async (websiteId, { rejectWithValue }) => {
+  try {
+    const response = await fetch(`/api/pages/websites?websiteId=${websiteId}`);
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || "Failed to fetch pages");
+    }
+    const data = await response.json();
+    return data;
+  } catch (err: any) {
+    return rejectWithValue(err.message || "Failed to fetch pages");
+  }
+});
+
+export const createWebsitePage = createAsyncThunk<
+  WebsitePageModel,
+  Partial<WebsitePageModel>,
+  { rejectValue: string }
+>("websitePage/createWebsitePage", async (page, { rejectWithValue }) => {
+  try {
+    const response = await fetch("/api/pages/websites", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(page),
+    });
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || "Failed to create page");
+    }
+    const data = await response.json();
+    return data;
+  } catch (err: any) {
+    return rejectWithValue(err.message || "Failed to create page");
+  }
+});
+
+export const updateWebsitePage = createAsyncThunk<
+  WebsitePageModel,
+  WebsitePageModel,
+  { rejectValue: string }
+>("websitePage/updateWebsitePage", async (page, { rejectWithValue }) => {
+  try {
+    const response = await axios.put(
+      `/api/admin/website/pages/${page._id}`,
+      page
+    );
+    return response.data;
+  } catch (err: any) {
+    return rejectWithValue(
+      err.response?.data?.message || "Failed to update page"
+    );
+  }
+});
+
+export const deleteWebsitePage = createAsyncThunk<
+  string,
+  string,
+  { rejectValue: string }
+>("websitePage/deleteWebsitePage", async (id, { rejectWithValue }) => {
+  try {
+    await axios.delete(`/api/pages/websites?id=${id}`);
+    return id;
+  } catch (err: any) {
+    return rejectWithValue(
+      err.response?.data?.message || "Failed to delete page"
+    );
+  }
+});
+import { WebsitePageModel } from "../../../components/admin/website/websitePage/WebsitePageType";
+
+interface WebsitePageState {
+  websitePages: WebsitePageModel[];
+  hasFetched: boolean;
+  isLoading: boolean;
+  error: string | null;
+}
+
+const initialState: WebsitePageState = {
+  websitePages: [],
+  hasFetched: false,
+  isLoading: false,
+  error: null,
+};
+
+const websitePageSlice = createSlice({
+  name: "websitePage",
+  initialState,
+  reducers: {
+    fetchPagesStart(state) {
+      state.isLoading = true;
+      state.error = null;
+    },
+    fetchPagesSuccess(state, action: PayloadAction<WebsitePageModel[]>) {
+      state.websitePages = action.payload;
+      state.isLoading = false;
+      state.hasFetched = true;
+      state.error = null;
+    },
+    fetchPagesFailure(state, action: PayloadAction<string>) {
+      state.isLoading = false;
+      state.error = action.payload;
+    },
+    addPage(state, action: PayloadAction<WebsitePageModel>) {
+      state.websitePages.push(action.payload);
+    },
+    updatePage(state, action: PayloadAction<WebsitePageModel>) {
+      const index = state.websitePages.findIndex(
+        (page) => page._id === action.payload._id
+      );
+      if (index !== -1) {
+        state.websitePages[index] = action.payload;
+      }
+    },
+    deletePage(state, action: PayloadAction<string>) {
+      state.websitePages = state.websitePages.filter(
+        (page) => page._id !== action.payload
+      );
+    },
+  },
+  extraReducers: (builder) => {
+    builder
+      // Fetch
+      .addCase(fetchWebsitePages.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(fetchWebsitePages.fulfilled, (state, action) => {
+        state.websitePages = action.payload;
+        state.isLoading = false;
+        state.hasFetched = true;
+      })
+      .addCase(fetchWebsitePages.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload || "Failed to fetch pages";
+      })
+
+      // Create
+      .addCase(createWebsitePage.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(createWebsitePage.fulfilled, (state, action) => {
+        state.websitePages.push(action.payload);
+      })
+
+      // Update
+
+      .addCase(updateWebsitePage.fulfilled, (state, action) => {
+        const idx = state.websitePages.findIndex(
+          (p) => p._id === action.payload._id
+        );
+        if (idx !== -1) state.websitePages[idx] = action.payload;
+      })
+      // Delete
+      .addCase(deleteWebsitePage.fulfilled, (state, action) => {
+        state.websitePages = state.websitePages.filter(
+          (p) => p._id !== action.payload
+        );
+      });
+  },
+});
+
+export const {
+  fetchPagesStart,
+  fetchPagesSuccess,
+  fetchPagesFailure,
+  addPage,
+  updatePage,
+  deletePage,
+} = websitePageSlice.actions;
+
+export default websitePageSlice.reducer;

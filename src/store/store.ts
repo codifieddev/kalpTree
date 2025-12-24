@@ -10,7 +10,7 @@ import productReducer from "../hooks/slices/product/ProductSlice";
 import tenantsReducer from "../hooks/slices/tenants/TenantSlice";
 import llmSettingReducer from "../hooks/slices/setting/llmSetting/LLMSettingSlice";
 import BlockReducer from "../hooks/slices/blocks/BlockSlice"
-
+import websitePageReducer from "../hooks/slices/website/websitePageSlice"
 
 export const store = configureStore({
   reducer: {
@@ -24,7 +24,8 @@ export const store = configureStore({
     websites: websitesReducer,
     tenants: tenantsReducer,
     llmSetting: llmSettingReducer,
-     block:BlockReducer
+     block:BlockReducer,
+     websitePage:websitePageReducer
   },
 });
 

@@ -1,6 +1,9 @@
 
 "use client";
+import { createWebsitePage } from "@/hooks/slices/website/websitePageSlice";
+import { AppDispatch } from "@/store/store";
 import { useState, useTransition } from "react";
+import { useDispatch } from "react-redux";
 
 // Field configuration type
 export type FieldConfig = {
@@ -43,10 +46,16 @@ export default function PageCreator({
 
   const [saving, start] = useTransition();
   const [msg, setMsg] = useState<string | null>(null);
-
-  // Generic change handler
+   const dispatch= useDispatch<AppDispatch>()
+  // Generic change handler with auto-slug
   const handleChange = (name: string, value: any) => {
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setFormData((prev) => {
+      const updated = { ...prev, [name]: value };
+      if (name === "title" && fields.some(f => f.name === "slug")) {
+        updated["slug"] = value.replace(/\s+/g, "-");
+      }
+      return updated;
+    });
   };
 
   // Array handlers
@@ -67,26 +76,34 @@ export default function PageCreator({
     setFormData((prev) => ({ ...prev, [name]: currentArray }));
   };
 
-  const onSubmit = (e: React.FormEvent) => {
+  const onSubmit = async(e: React.FormEvent) => {
     e.preventDefault();
     setMsg(null);
+  const result = await dispatch(createWebsitePage(formData));
+  if (createWebsitePage.fulfilled.match(result)) {
+    setMsg("Created successfully!");
+    setTimeout(() => {
+      window.location.href = onCreateRedirect;
+    }, 500);
+  } else {
+    setMsg("Create failed");
+  }
+    // start(async () => {
+    //   const res = await fetch(apiEndpoint, {
+    //     method: "POST",
+    //     headers: { "Content-Type": "application/json" },
+    //     body: JSON.stringify(formData),
+    //   });
 
-    start(async () => {
-      const res = await fetch(apiEndpoint, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
-
-      if (res.ok) {
-        setMsg("Created successfully!");
-        setTimeout(() => {
-          window.location.href = onCreateRedirect;
-        }, 500);
-      } else {
-        setMsg("Create failed");
-      }
-    });
+    //   if (res.ok) {
+    //     setMsg("Created successfully!");
+    //     setTimeout(() => {
+    //       window.location.href = onCreateRedirect;
+    //     }, 500);
+    //   } else {
+    //     setMsg("Create failed");
+    //   }
+    // });
   };
 
   const handleCancel = () => {
