@@ -6,7 +6,8 @@ import { DataTableExt } from '../../DataTableExt'
 
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
-import { deleteWebsitePage } from '@/hooks/slices/website/websitePageSlice';
+import { deleteWebsitePage, updateCurrentPage } from '@/hooks/slices/website/websitePageSlice';
+import { WebsitePageModel } from './WebsitePageType'
 
 const WebsitePageTable = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -64,9 +65,10 @@ const WebsitePageTable = () => {
     // }
   };
 
-  const handleView = (row: any) => {
-    const id = row?._id ?? row?.id;
+  const handleView = (row: WebsitePageModel) => {
+    const id = row?._id ;
     if (!id) return;
+    dispatch(updateCurrentPage(row))
     router.push(`/admin/pages/${id}`);
   };
 
