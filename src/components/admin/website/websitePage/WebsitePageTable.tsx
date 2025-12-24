@@ -82,6 +82,24 @@ const WebsitePageTable = () => {
     { key: 'createdAt', label: 'Created' },
   ];
 
+
+  const handleViewTab = (row: WebsitePageModel) => {
+    const currentSubdomain = Array.isArray(currentWebsite?.primaryDomain)
+      ? currentWebsite?.primaryDomain[0]
+      : currentWebsite?.primaryDomain;
+    const localsub = typeof currentSubdomain === 'string' ? currentSubdomain.split('.')[0] : '';
+    const isLocalHost = window.location.hostname.includes("localhost");
+    if (isLocalHost) {
+      
+      const url = `http://${localsub}.localhost:55803/${row.slug}`;
+   
+      window.open(url, '_blank');
+    } else {
+      const url = `https://${currentSubdomain}/${row.slug}`;
+      window.open(url, '_blank');
+    }
+  }
+
   return (
     <div>
       <DataTableExt
@@ -91,6 +109,7 @@ const WebsitePageTable = () => {
         initialColumns={initialColumns} 
         onDelete={handleDelete}
         onView={handleView}
+        opentab={handleViewTab}
       />
     </div>
   );
