@@ -105,6 +105,7 @@ import { signOut } from "next-auth/react";
 import { useDispatch } from "react-redux";
 import { GoSidebarCollapse, GoSidebarExpand } from "react-icons/go";
 import { useState } from "react";
+import { cn } from "@/lib/utils";
 // ---------------------------------------------------------------------------
 // Types & interfaces
 // ---------------------------------------------------------------------------
@@ -331,7 +332,7 @@ export const currentWebsiteSections: NavSection[] = [
         label: "Segment",
         href: "/admin/segment",
         icon: Layers,
-        permission:["product:read", "product:update", "product:delete"],
+        permission: ["product:read", "product:update", "product:delete"],
       },
       {
         label: "Attribute",
@@ -386,13 +387,13 @@ export const currentWebsiteSections: NavSection[] = [
         label: "Customers",
         href: "/admin/ecommerce/customers",
         icon: Users,
-        permission:["product:read", "product:update", "product:delete"],
+        permission: ["product:read", "product:update", "product:delete"],
       },
       {
         label: "Reports",
         href: "/admin/ecommerce/reports",
         icon: BarChart4,
-        permission:["product:read", "product:update", "product:delete"],
+        permission: ["product:read", "product:update", "product:delete"],
       },
       {
         label: "Abandoned Carts",
@@ -422,7 +423,7 @@ export const currentWebsiteSections: NavSection[] = [
         label: "Payments",
         href: "/admin/ecommerce/payments",
         icon: CreditCard,
-        permission:["product:read", "product:update", "product:delete"],
+        permission: ["product:read", "product:update", "product:delete"],
       },
       {
         label: "Invoices",
@@ -671,7 +672,7 @@ export const currentWebsiteSections: NavSection[] = [
         label: "Domains",
         href: "/admin/domain",
         icon: Globe,
-        permission:  ["content:read", "content:update", "content:delete"],
+        permission: ["content:read", "content:update", "content:delete"],
       },
     ],
   },
@@ -727,8 +728,8 @@ export function AppShell({
   websites = [],
   currentWebsite = null,
   user = null,
-  onWebsiteChange = () => {},
-  onTenantChange = () => {},
+  onWebsiteChange = () => { },
+  onTenantChange = () => { },
   tenants = [],
   currentTenant = null,
   loggedinTenant,
@@ -754,193 +755,195 @@ export function AppShell({
     }
   };
 
-    const resetRedux = () => {
-      dispatch(clearAttributes());
-      dispatch(clearBrands());
-      dispatch(clearSegments());
-      dispatch(clearCategories());
-    };
-    const dispatch = useDispatch();
+  const resetRedux = () => {
+    dispatch(clearAttributes());
+    dispatch(clearBrands());
+    dispatch(clearSegments());
+    dispatch(clearCategories());
+  };
+  const dispatch = useDispatch();
 
-const [showSidebar, setShowSidebar] = useState<boolean>(true);
+  // const [showSidebar, setShowSidebar] = useState<boolean>(true);
+
+  // const [collapsed, setCollapsed] = React.useState(false);
+
+
+    const [collapsed, setCollapsed] = React.useState(false);
+  const [showSidebar, setShowSidebar] = React.useState(true);
   return (
 
     <>
 
-     <header className="h-16 w-full bg-white border-b border-gray-200 flex items-center justify-between px-5">
-      {/* LEFT */}
-      <div className="flex items-center gap-4">
-        {/* Logo */}
-        <div className="flex items-center gap-3">
-          <div className="h-10 w-10 rounded-full   flex items-center justify-center text-white text-xs font-semibold">
-            <img src="../kalptree-favicon.svg" alt="KalpTree" className="h-10 w-10" />
+      <header className="h-16 w-full bg-white border-b border-gray-200 flex items-center justify-between px-5">
+        {/* LEFT */}
+        <div className="flex items-center gap-4">
+          {/* Logo */}
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-full   flex items-center justify-center text-white text-xs font-semibold">
+              <img src="../kalptree-favicon.svg" alt="KalpTree" className="h-10 w-10" />
+            </div>
+
+            <div className="leading-[14px]">
+              <p className="text-sm font-semibold text-gray-900">TEST1</p>
+              <p className="text-[11px] text-gray-500">
+                Franchise panel
+              </p>
+            </div>
           </div>
 
-          <div className="leading-[14px]">
-            <p className="text-sm font-semibold text-gray-900">TEST1</p>
-            <p className="text-[11px] text-gray-500">
-              Franchise panel
-            </p>
-          </div>
-        </div>
+          <Separator orientation="vertical" className="h-8" />
 
-        <Separator orientation="vertical" className="h-8" />
+         <div className="border-none border-black/10 p-3">
+  <button
+    type="button"
+    onClick={() => setCollapsed((v) => !v)}
+    className={cn(
+      "w-full rounded-md transition hover:bg-white/60",
+      collapsed ? "h-10 flex items-center justify-center" : "h-10 flex items-center justify-between px-3"
+    )}
+  >
+    <span className="text-black/70">
+      {collapsed ? <GoSidebarExpand size={20} /> : <GoSidebarCollapse size={20} />}
+    </span>
 
-        <div className="border-none border-black/10 p-3">
-        <span>
-                   <GoSidebarExpand className="h-4 w-4 " size={10} />
-</span>
-                {/* <Button
-                  variant="ghost"
-                
-                  className={cn(
-                    "w-full justify-between  hover:bg-transparent",
-                    "border-e border-black/5 bg-transparent rounded-none  text-black/70 "
-                  )}
-                >
-                   <GoSidebarExpand className="h-14 w-14 " size={48} />
-                  {!collapsed ? (
-                    <>
-                      <GoSidebarExpand className="h-14 w-14 " size={48} />
-                    </>
-                  ) : (
-                    <>
-                      <GoSidebarCollapse className="h-14 w-14  mx-auto" size={48} />
-                    </>
-                  )}
-                </Button> */}
-              </div>
+    {/* {!collapsed && (
+      <span className="text-[12px] text-black/60">
+        Collapse sidebar
+      </span>
+    )} */}
+  </button>
+</div>
 
-        {/* <h1 className="text-[15px] font-semibold text-gray-900">
+          {/* <h1 className="text-[15px] font-semibold text-gray-900">
           Dashboard
         </h1> */}
 
-      {currentWebsite && (
-          <div className="flex items-center gap-2 rounded-full border bg-muted/60 px-3 py-1 text-xs text-muted-foreground">
-            <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-primary/15 text-[10px] font-semibold text-primary">
-              {currentWebsite.name.charAt(0).toUpperCase()}
-            </span>
-            <span className="hidden md:inline">{currentWebsite.name}</span>
-            <span className="hidden text-[11px] text-muted-foreground/80 sm:inline">
-              {currentWebsite.primaryDomain || currentWebsite.systemSubdomain}
-            </span>
+          {currentWebsite && (
+            <div className="flex items-center gap-2 rounded-full border bg-muted/60 px-3 py-1 text-xs text-muted-foreground">
+              <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-primary/15 text-[10px] font-semibold text-primary">
+                {currentWebsite.name.charAt(0).toUpperCase()}
+              </span>
+              <span className="hidden md:inline">{currentWebsite.name}</span>
+              <span className="hidden text-[11px] text-muted-foreground/80 sm:inline">
+                {currentWebsite.primaryDomain || currentWebsite.systemSubdomain}
+              </span>
+            </div>
+          )}
+        </div>
+
+        {/* RIGHT */}
+        <div className="flex items-center gap-3">
+          {/* Search */}
+          <div className="relative">
+            <FiSearch className="absolute left-3 top-[9px] text-gray-400 text-sm" />
+            <Input
+              placeholder="Search"
+              className="h-8 w-52 rounded-full pl-9 text-sm border-gray-200 focus-visible:ring-0"
+            />
           </div>
-        )}
-      </div>
 
-      {/* RIGHT */}
-      <div className="flex items-center gap-3">
-        {/* Search */}
-        <div className="relative">
-          <FiSearch className="absolute left-3 top-[9px] text-gray-400 text-sm" />
-          <Input
-            placeholder="Search"
-            className="h-8 w-52 rounded-full pl-9 text-sm border-gray-200 focus-visible:ring-0"
-          />
+          {/* Notification */}
+          <div className="relative cursor-pointer">
+            <FiBell className="text-gray-600 text-[18px]" />
+            <span className="absolute -top-1 -right-1 h-[6px] w-[6px] bg-red-500 rounded-full" />
+          </div>
+
+          {/* AI Assistant */}
+          <Button size="sm" className="text-xs">
+            <Sparkles className="h-3 w-3 " />
+            Ai Assistant
+          </Button>
+
+          {/* Avatar */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className=""
+              >
+                <Avatar className="h-7 w-7">
+                  <AvatarFallback>
+                    {user?.email?.charAt(0).toUpperCase() || "U"}
+                  </AvatarFallback>
+                </Avatar>
+              </Button>
+            </DropdownMenuTrigger>
+
+            <DropdownMenuContent align="end" className="bg-white rounded-md shadow-md w-40">
+              <DropdownMenuLabel className="hover:bg-primary hover:text-white p-2">{user?.email || "User"}</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem className="hover:bg-primary hover:text-white p-2">Profile</DropdownMenuItem>
+              <DropdownMenuItem className="hover:bg-primary hover:text-white p-2">Account settings</DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                onClick={handleSignOut}
+                className="hover:bg-primary hover:text-white p-2"
+              >
+                Sign out
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
+      </header>
 
-        {/* Notification */}
-        <div className="relative cursor-pointer">
-          <FiBell className="text-gray-600 text-[18px]" />
-          <span className="absolute -top-1 -right-1 h-[6px] w-[6px] bg-red-500 rounded-full" />
-        </div>
 
-        {/* AI Assistant */}
-         <Button size="sm" className="text-xs">
-          <Sparkles className="h-3 w-3 " />
-          Ai Assistant
-        </Button>
-
-        {/* Avatar */}
-    <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="ghost"
-              size="icon"
-              className=""
-            >
-              <Avatar className="h-7 w-7">
-                <AvatarFallback>
-                  {user?.email?.charAt(0).toUpperCase() || "U"}
-                </AvatarFallback>
-              </Avatar>
-            </Button>
-          </DropdownMenuTrigger>
-
-          <DropdownMenuContent align="end" className="bg-white rounded-md shadow-md w-40">
-            <DropdownMenuLabel className="hover:bg-primary hover:text-white p-2">{user?.email || "User"}</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem className="hover:bg-primary hover:text-white p-2">Profile</DropdownMenuItem>
-            <DropdownMenuItem className="hover:bg-primary hover:text-white p-2">Account settings</DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem
-              onClick={handleSignOut}
-             className="hover:bg-primary hover:text-white p-2"  
-            >
-              Sign out
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
-    </header>
-
-    
-    <div className="flex h-[92vh] bg-[#e8e9eb] text-foreground overflow-hidden">
+      <div className="flex h-[92vh] bg-[#e8e9eb] text-foreground overflow-hidden">
      <HighLevelSidebar
-  showSidebar={showSidebar}
-  setShowSidebar={setShowSidebar}
-  user={user}
-  collapsed={sidebarCollapsed}
-  loggedinTenant={loggedinTenant}
-/>
+      user={user}
+      collapsed={collapsed}
+      setCollapsed={setCollapsed}
+      showSidebar={showSidebar}
+      setShowSidebar={setShowSidebar}
+    />
 
-{showSidebar && (
-  <Sidebar
-    tenants={tenants}
-    currentTenant={currentTenant}
-    onTenantChange={onTenantChange}
-    websites={websites}
-    currentWebsite={currentWebsite}
-    user={user}
-    onWebsiteChange={onWebsiteChange}
-    collapsed={sidebarCollapsed}
-    onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
-    loggedinTenant={loggedinTenant}
-  />
-)}
+        {showSidebar && (
+          <Sidebar
+            tenants={tenants}
+            currentTenant={currentTenant}
+            onTenantChange={onTenantChange}
+            websites={websites}
+            currentWebsite={currentWebsite}
+            user={user}
+            onWebsiteChange={onWebsiteChange}
+            collapsed={sidebarCollapsed}
+            onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
+            loggedinTenant={loggedinTenant}
+          />
+        )}
 
-      <div className="flex flex-1 min-h-screen flex-col overflow-hidden">
-        {/* <Topbar
+        <div className="flex flex-1 min-h-screen flex-col overflow-hidden">
+          {/* <Topbar
           currentWebsite={currentWebsite}
           user={user}
           onToggleMobileSidebar={() => setMobileSidebarOpen(true)}
           collapsed={sidebarCollapsed}
           onToggleCollapse={(event) => setSidebarCollapsed((prev) => !prev)}
         /> */}
-        <main className="flex-1 px-3 py-4 md:px-6 md:py-6 overflow-auto">
-          <div className="mx-auto max-w-7xl">{children}</div>
-        </main>
-      </div>
+          <main className="flex-1 px-3 py-4 md:px-6 md:py-6 overflow-auto">
+            <div className="mx-auto max-w-7xl">{children}</div>
+          </main>
+        </div>
 
-      <Sheet open={mobileSidebarOpen} onOpenChange={setMobileSidebarOpen}>
-        <SheetContent side="left" className="p-0 w-72">
-          <SheetHeader className="border-b px-4 py-3">
-            <SheetTitle className="text-sm font-semibold">
-              Navigation
-            </SheetTitle>
-          </SheetHeader>
-          <MobileSidebar
-            websites={websites}
-            currentWebsite={currentWebsite}
-            user={user}
-            onWebsiteChange={(websiteId) => {
-              onWebsiteChange(websiteId);
-              setMobileSidebarOpen(false);
-            }}
-          />
-        </SheetContent>
-      </Sheet>
-    </div>
+        <Sheet open={mobileSidebarOpen} onOpenChange={setMobileSidebarOpen}>
+          <SheetContent side="left" className="p-0 w-72">
+            <SheetHeader className="border-b px-4 py-3">
+              <SheetTitle className="text-sm font-semibold">
+                Navigation
+              </SheetTitle>
+            </SheetHeader>
+            <MobileSidebar
+              websites={websites}
+              currentWebsite={currentWebsite}
+              user={user}
+              onWebsiteChange={(websiteId) => {
+                onWebsiteChange(websiteId);
+                setMobileSidebarOpen(false);
+              }}
+            />
+          </SheetContent>
+        </Sheet>
+      </div>
     </>
   );
 }
