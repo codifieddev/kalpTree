@@ -300,14 +300,16 @@ export function HighLevelSidebar({
                   return (
                     <div key={item.id}>
                       <div className="relative">
-                        <div className="relative">
+                        <div className="relative" 
+                                    onClick={() => setShowSidebar((v: boolean) => !v)}
+                        >
                           <div
                             className={cn(
                               "w-full flex items-center gap-3 rounded-md px-3 py-2.5",
                               "text-left transition cursor-pointer",
                               isActive ? "bg-white text-black shadow-sm" : "bg-transparent hover:bg-white/50"
                             )}
-                            onClick={() => setShowSidebar((v: boolean) => !v)}
+                
                           >
                             <Icon className="h-5 w-5 text-black/70" />
 

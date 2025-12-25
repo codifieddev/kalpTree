@@ -104,7 +104,7 @@ export const Userdetails = ({
 
       <div>
         <label className="block text-sm font-semibold text-gray-700 mb-3">
-          Permission Roles
+          Permission Roles 
         </label>
         <div className="space-y-3">
           <label
