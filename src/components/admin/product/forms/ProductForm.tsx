@@ -1,10 +1,12 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { ProductModel } from "../type/ProductModel";
 import { MaterialBrandModel } from "../../brand/types/brandModel";
 import { MaterialCategory } from "../../category/types/CategoryModel";
 import { MaterialSegmentModel } from "../../segment/types/SegmentModel";
+import UploadImage from "../../uploadImage/UploadImage";
+import { toast } from "sonner";
 
 type ProductFormProps = {
   product: ProductModel;
@@ -12,7 +14,7 @@ type ProductFormProps = {
   fieldErrors: Record<string, string>;
   filterCategory: MaterialCategory[];
   listBrand: MaterialBrandModel[];
-  listSegment: MaterialSegmentModel[];
+  
 };
 
 export default function ProductForm({
@@ -21,8 +23,23 @@ export default function ProductForm({
   fieldErrors,
   filterCategory,
   listBrand,
-  listSegment,
+  
 }: ProductFormProps) {
+
+   const [imageLoading, setImageLoading] = useState(false);
+    const CheckJobImageUpload = (file: File) => {
+    if (!file.type.startsWith("image/")) {
+      toast.error("Please upload a valid image file");
+      return false;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      // 10MB limit
+      toast.error("File size must be less than 10MB");
+      return false;
+    }
+    setImageLoading(true);
+    return true;
+  };
   return (
     <>
       <div>
@@ -99,29 +116,7 @@ export default function ProductForm({
         </select>
       </div>
 
-      <div>
-        <label className="block text-sm font-medium">Segment</label>
-        <select
-          value={String(product.material_segment_id || "")}
-          onChange={(e) =>
-            setProduct({
-              ...product,
-              material_segment_id: e.target.value || undefined,
-            })
-          }
-          className="mt-1 block w-full rounded-md border p-2"
-        >
-          <option value="">Select segment</option>
-          {listSegment.map((segment) => (
-            <option
-              key={String((segment as any)._id || segment.id)}
-              value={String((segment as any)._id || segment.id)}
-            >
-              {segment.name}
-            </option>
-          ))}
-        </select>
-      </div>
+     
 
       <div>
         <label className="block text-sm font-medium">Base Price</label>
@@ -142,12 +137,21 @@ export default function ProductForm({
 
       <div>
         <label className="block text-sm font-medium">Photo URL</label>
-        <input
+        {/* <input
           type="text"
           value={product.photo || ""}
           onChange={(e) => setProduct({ ...product, photo: e.target.value })}
           className="mt-1 block w-full rounded-md border p-2"
           placeholder="https://example.com/photo.jpg"
+        /> */}
+         <UploadImage
+          createdProjectId={`${product.name}/logo` || null}
+          jobImageUpload={CheckJobImageUpload}
+          onUploadSuccess={(data) => {
+            setImageLoading(false);
+           setProduct({ ...product, photo: data })
+          }}
+          onUploadError={() => setImageLoading(false)}
         />
         {product.photo && (
           <div className="mt-2">

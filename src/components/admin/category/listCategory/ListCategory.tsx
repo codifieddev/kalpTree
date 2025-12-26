@@ -3,7 +3,7 @@ import { AppDispatch, RootState } from "@/store/store";
 import React, { useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { DataTableExt } from "@/components/admin/DataTableExt";
-import { removeCategory } from "@/hooks/slices/category/CategorySlice";
+import { addCategory, removeCategory } from "@/hooks/slices/category/CategorySlice";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
 import { MaterialCategory } from "../types/CategoryModel";
@@ -26,10 +26,59 @@ const ListCategory = () => {
   const { toast } = useToast();
   const router = useRouter();
 
-    const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<MaterialCategory | null>(null);
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [newCategory, setNewCategory] = useState<MaterialCategory | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [isSaving, setIsSaving] = useState(false);
+  const handleAdd = () => {
+    setNewCategory({ name: "", icon: "", sort_order: 0 ,websiteId:currentWebsite?._id,tenantId:user?.tenantId});
+    setFieldErrors({});
+    setIsAddDialogOpen(true);
+  };
+
+  const handleSaveAdd = async () => {
+    if (!newCategory) return;
+    setFieldErrors({});
+    const errors: Record<string, string> = {};
+    if (!newCategory.name?.trim()) {
+      errors.name = 'Name is required';
+    }
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors);
+      return;
+    }
+    setIsSaving(true);
+    try {
+      const res = await fetch(`/api/admin/category`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newCategory),
+      });
+        const data = await res.json().catch(() => null);
+ if (!res.ok) {
+        const msg =
+          data?.error ??
+          data?.message ??
+          (typeof data === "string" ? data : undefined) ??
+          "Failed to create";
+        throw new Error(msg);
+      }
+         const created = data?.item ?? data;
+      toast({ title: 'Created', description: `Category ${newCategory.name} created successfully` });
+      setIsAddDialogOpen(false);
+      setNewCategory(null);
+       dispatch(addCategory(created));
+      // window.location.reload();
+    } catch (err: any) {
+      console.error('Failed to create category', err);
+      toast({ title: 'Create failed', description: String(err?.message || err), variant: 'destructive' });
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
 
   const product_categories = useMemo(() => {
@@ -150,15 +199,57 @@ const ListCategory = () => {
 
   return (
     <div>
+
       <DataTableExt
         title="Categories"
         data={product_categories ?? []}
-        createHref="/admin/category/create"
+        onCreate={handleAdd}
         initialColumns={initialColumns}
         onDelete={(row) => handleDelete(row)}
         onView={(row) => handleView(row)}
         opentab={() => {}}
       />
+      {/* Add Category Dialog */}
+      <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Add Category</DialogTitle>
+          </DialogHeader>
+          {newCategory && (
+            <div className="space-y-4">
+              <CategoryForm
+                category={newCategory}
+                setCategory={value => {
+                  if (typeof value === 'function') {
+                    setNewCategory(prev => prev ? value(prev) : prev);
+                  } else {
+                    setNewCategory(value);
+                  }
+                }}
+                fieldErrors={fieldErrors}
+              />
+              <div className="flex justify-end gap-2 pt-4">
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setIsAddDialogOpen(false);
+                    setNewCategory(null);
+                  }}
+                  disabled={isSaving}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={handleSaveAdd}
+                  disabled={isSaving}
+                >
+                  {isSaving ? 'Saving...' : 'Add Category'}
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
 
          {/* Edit Category Dialog */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>

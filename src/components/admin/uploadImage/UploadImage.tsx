@@ -23,7 +23,7 @@ interface FileWithPreview extends File {
   preview?: string;
 }
 
-const UploadImage: React.FC<UploadImageProps> = ({
+const   UploadImage: React.FC<UploadImageProps> = ({
   onUploadSuccess,
   onUploadError,
   maxSize = 10 * 1024 * 1024, // 10MB default

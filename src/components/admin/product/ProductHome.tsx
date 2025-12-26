@@ -11,7 +11,7 @@ const ProductHome = () => {
   <>
   <ProductTable/>
   <GetAllProduct/>
- <GetAllSegment/>
+ 
    <GetAllAttribute/>
   <GetAllcategory/>
    <GetAllBrand />
