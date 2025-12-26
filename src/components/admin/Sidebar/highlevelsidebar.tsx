@@ -79,12 +79,12 @@ const navigationItems = [
     id: "billing",
     label: "Billing",
     icon: CreditCard,
-    href: "/billing",
+    href: "/admin/billing",
     hasSubmenu: true,
     submenuItems: [
-      { label: "Subscriptions", href: "/billing/subscriptions" },
-      { label: "Payment history", href: "/billing/history" },
-      { label: "Payment methods", href: "/billing/methods" },
+      { label: "Subscriptions", href: "/admin/billing/subscriptions" },
+      { label: "Payment history", href: "/admin/billing/payment-history" },
+      { label: "Payment methods", href: "/admin/billing/payment-methods" },
     ],
   },
   {
@@ -261,7 +261,7 @@ export function HighLevelSidebar({
                     <div key={item.id}>
                       <div
                         className={cn(
-                          "w-full flex items-center gap-3 rounded-md px-3 py-2.5",
+                          "w-full flex items-center gap-3 rounded-md px-3 py-2.5 1",
                           "text-left transition",
                           isActive
                             ? "bg-white text-black shadow-sm"

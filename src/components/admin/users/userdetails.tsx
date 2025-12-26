@@ -10,10 +10,10 @@ export const Userdetails = ({
   return (
     <div className="space-y-6">
       {/* Agency Fields - Only visible for superadmin */}
-      {role=="superadmin" && (
+      {true && (
         <>
-          <div className="bg-purple-50 border-2 border-purple-200 rounded-md p-6 mb-6">
-            <h3 className="text-lg font-bold text-purple-900 mb-4 flex items-center gap-2">
+          <div className="bg-gray-100 border-2 border-primary-200 rounded-md p-6 mb-6">
+            <h3 className="text-lg font-bold text-black mb-4 flex items-center gap-2">
               <span className="w-2 h-2 bg-purple-600 rounded-full"></span>
               Agency Account Details
             </h3>
@@ -29,7 +29,7 @@ export const Userdetails = ({
                   value={formData.agency_name || ""}
                   onChange={handleInputChange}
                   required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                  className="w-full bg-white px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
                   placeholder="Digital Agency Co"
                 />
               </div>
@@ -61,7 +61,7 @@ export const Userdetails = ({
                   value={formData.agency_email || ""}
                   onChange={handleInputChange}
                   required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                  className="w-full bg-white px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
                   placeholder="agency@example.com"
                 />
               </div>
@@ -77,7 +77,7 @@ export const Userdetails = ({
                     value={formData.agency_password || ""}
                     onChange={handleInputChange}
                     required
-                    className="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                    className="w-full px-4 py-3 border border-gray-300 bg-white rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
                     placeholder="••••••••"
                   />
                   <button
@@ -112,7 +112,7 @@ export const Userdetails = ({
                       value="WEBSITE_ONLY"
                       checked={formData.agency_service === "WEBSITE_ONLY"}
                       onChange={handleInputChange}
-                      className="mt-1 w-4 h-4 text-purple-600 focus:ring-purple-500"
+                      className="mt-1 w-4 h-4 bg-white text-purple-600 focus:ring-primary-500"
                     />
                     <div className="ml-3">
                       <div className="font-semibold text-gray-900">
@@ -137,7 +137,7 @@ export const Userdetails = ({
                       value="ECOMMERCE"
                       checked={formData.agency_service === "ECOMMERCE"}
                       onChange={handleInputChange}
-                      className="mt-1 w-4 h-4 text-purple-600 focus:ring-purple-500"
+                      className="mt-1 bg-white w-4 h-4 text-purple-600 focus:ring-purple-500"
                     />
                     <div className="ml-3">
                       <div className="font-semibold text-gray-900">
@@ -175,7 +175,7 @@ export const Userdetails = ({
               value={formData.email}
               onChange={handleInputChange}
               required
-              className="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
+              className="w-full px-4 py-3 border border-gray-300 bg-white rounded-md focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
               placeholder="user@example.com"
             />
           </div>
@@ -191,7 +191,7 @@ export const Userdetails = ({
                 value={formData.password}
                 onChange={handleInputChange}
                 required
-                className="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
+                className="w-full px-4 py-3 border border-gray-300 bg-white rounded-md focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
                 placeholder="••••••••"
               />
               <button
@@ -218,7 +218,7 @@ export const Userdetails = ({
               value={formData.business_name}
               onChange={handleInputChange}
               required
-              className="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
+              className="w-full px-4 py-3 border border-gray-300 bg-white rounded-md focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
               placeholder="KalpTree"
             />
           </div>

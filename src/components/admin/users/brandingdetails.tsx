@@ -7,7 +7,7 @@ export const Brandingdetails = ({
 }: any) => {
   return (
     <div className="space-y-6">
-      <div className="bg-gradient-to-r from-indigo-50 to-purple-50 p-6 rounded-xl border border-indigo-100">
+      <div className="bg-gray-100 p-6 rounded-xl border border-indigo-100">
         <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
           <Upload className="w-5 h-5 text-indigo-600" />
           Logo Upload
@@ -163,7 +163,7 @@ export const Brandingdetails = ({
         </div>
       </div>
 
-      <div className="bg-gradient-to-r from-blue-50 to-cyan-50 p-6 rounded-xl border border-blue-100">
+      <div className="bg-gray-100 p-6 rounded-xl border border-blue-100">
         <h3 className="font-semibold text-gray-900 mb-4">Typography</h3>
         <div className="space-y-3">
           {[
