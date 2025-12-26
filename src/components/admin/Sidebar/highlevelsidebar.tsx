@@ -50,6 +50,17 @@ const navigationItems = [
     ],
   },
   {
+    id: "agencies",
+    label: "Agencies",
+    icon: LayoutDashboard,
+    href: "/admin/agencies",
+    hasSubmenu: true,
+    submenuItems: [
+      { label: "Agencies list", href: "/admin/agencies" },
+      { label: "Add New Agency", href: "/admin/agencies/createnew" },
+    ],
+  },
+  {
     id: "domains",
     label: "Domains",
     icon: Globe,

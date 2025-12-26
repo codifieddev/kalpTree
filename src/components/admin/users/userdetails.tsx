@@ -12,7 +12,7 @@ export const Userdetails = ({
       {/* Agency Fields - Only visible for superadmin */}
       {role=="superadmin" && (
         <>
-          <div className="bg-purple-50 border-2 border-purple-200 rounded-xl p-6 mb-6">
+          <div className="bg-purple-50 border-2 border-purple-200 rounded-md p-6 mb-6">
             <h3 className="text-lg font-bold text-purple-900 mb-4 flex items-center gap-2">
               <span className="w-2 h-2 bg-purple-600 rounded-full"></span>
               Agency Account Details
@@ -29,7 +29,7 @@ export const Userdetails = ({
                   value={formData.agency_name || ""}
                   onChange={handleInputChange}
                   required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
                   placeholder="Digital Agency Co"
                 />
               </div>
@@ -38,7 +38,7 @@ export const Userdetails = ({
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
                   Agency URL Suffix
                 </label>
-                <div className="flex items-center border border-gray-300 rounded-xl overflow-hidden focus-within:ring-2 focus-within:ring-purple-500 bg-white">
+                <div className="flex items-center border border-gray-300 rounded-md overflow-hidden focus-within:ring-2 focus-within:ring-purple-500 bg-white">
                   <input
                     type="text"
                     name="agency_url_suffix"
@@ -61,7 +61,7 @@ export const Userdetails = ({
                   value={formData.agency_email || ""}
                   onChange={handleInputChange}
                   required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
                   placeholder="agency@example.com"
                 />
               </div>
@@ -77,7 +77,7 @@ export const Userdetails = ({
                     value={formData.agency_password || ""}
                     onChange={handleInputChange}
                     required
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
                     placeholder="••••••••"
                   />
                   <button
@@ -100,7 +100,7 @@ export const Userdetails = ({
                 </label>
                 <div className="space-y-3">
                   <label
-                    className={`flex items-start p-4 rounded-xl border-2 cursor-pointer transition-all ${
+                    className={`flex items-start p-4 rounded-md border-2 cursor-pointer transition-all ${
                       formData.agency_service === "WEBSITE_ONLY"
                         ? "border-purple-500 bg-purple-50"
                         : "border-gray-200 hover:border-gray-300"
@@ -125,7 +125,7 @@ export const Userdetails = ({
                   </label>
 
                   <label
-                    className={`flex items-start p-4 rounded-xl border-2 cursor-pointer transition-all ${
+                    className={`flex items-start p-4 rounded-md border-2 cursor-pointer transition-all ${
                       formData.agency_service === "ECOMMERCE"
                         ? "border-purple-500 bg-purple-50"
                         : "border-gray-200 hover:border-gray-300"
@@ -158,9 +158,9 @@ export const Userdetails = ({
       )}
 
       {/* Business User Fields */}
-      <div className="bg-indigo-50 border-2 border-indigo-200 rounded-xl p-6">
-        <h3 className="text-lg font-bold text-indigo-900 mb-4 flex items-center gap-2">
-          <span className="w-2 h-2 bg-indigo-600 rounded-full"></span>
+      <div className="bg-gray-100 border-2 border-primary-200 rounded-md p-6">
+        <h3 className="text-lg font-bold text-primary-900 mb-4 flex items-center gap-2">
+          <span className="w-2 h-2 bg-primary-600 rounded-full"></span>
           Business Account Details
         </h3>
 
@@ -175,7 +175,7 @@ export const Userdetails = ({
               value={formData.email}
               onChange={handleInputChange}
               required
-              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+              className="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
               placeholder="user@example.com"
             />
           </div>
@@ -191,7 +191,7 @@ export const Userdetails = ({
                 value={formData.password}
                 onChange={handleInputChange}
                 required
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                className="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
                 placeholder="••••••••"
               />
               <button
@@ -218,7 +218,7 @@ export const Userdetails = ({
               value={formData.business_name}
               onChange={handleInputChange}
               required
-              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+              className="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
               placeholder="KalpTree"
             />
           </div>
@@ -227,7 +227,7 @@ export const Userdetails = ({
             <label className="block text-sm font-semibold text-gray-700 mb-2">
               Website URL
             </label>
-            <div className="flex items-center border border-gray-300 rounded-xl overflow-hidden focus-within:ring-2 focus-within:ring-indigo-500 bg-white">
+            <div className="flex items-center border border-gray-300 rounded-md overflow-hidden focus-within:ring-2 focus-within:ring-primary-500 bg-white">
               <input
                 type="text"
                 name="businsess_url"
@@ -242,7 +242,7 @@ export const Userdetails = ({
                 onClick={() => {
                   console.log("Check URL:", formData.businsess_url);
                 }}
-                className="px-4 py-3 bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-700 transition-all"
+                className="px-4 py-3 bg-primary text-white text-sm font-semibold hover:bg-primary transition-all"
               >
                 Check
               </button>
@@ -260,9 +260,9 @@ export const Userdetails = ({
         <div className="space-y-3">
           {role === "superadmin" ? (
             <label
-              className={`flex items-start p-4 rounded-xl border-2 cursor-pointer transition-all ${
+              className={`flex items-start p-4 rounded-md border-2 cursor-pointer transition-all ${
                 formData.role === "agency"
-                  ? "border-indigo-500 bg-indigo-50"
+                  ? "border-primary-500 bg-gray-100"
                   : "border-gray-200 hover:border-gray-300"
               }`}
             >
@@ -272,7 +272,7 @@ export const Userdetails = ({
                 value="agency"
                 checked={formData.role === "agency"}
                 onChange={handleInputChange}
-                className="mt-1 w-4 h-4 text-indigo-600 focus:ring-indigo-500"
+                className="mt-1 w-4 h-4 text-primary-600 focus:ring-primary-500"
               />
               <div className="ml-3">
                 <div className="font-semibold text-gray-900">Agency Owner</div>
@@ -283,9 +283,9 @@ export const Userdetails = ({
             </label>
           ) : (
             <label
-              className={`flex items-start p-4 rounded-xl border-2 cursor-pointer transition-all ${
+              className={`flex items-start p-4 rounded-md border-2 cursor-pointer transition-all ${
                 formData.role === "business"
-                  ? "border-indigo-500 bg-indigo-50"
+                  ? "border-primary-500 bg-gray-100"
                   : "border-gray-200 hover:border-gray-300"
               }`}
             >
@@ -295,7 +295,7 @@ export const Userdetails = ({
                 value="business"
                 checked={formData.role === "business"}
                 onChange={handleInputChange}
-                className="mt-1 w-4 h-4 text-indigo-600 focus:ring-indigo-500"
+                className="mt-1 w-4 h-4 text-primary-600 focus:ring-primary-500"
               />
               <div className="ml-3">
                 <div className="font-semibold text-gray-900">
@@ -316,9 +316,9 @@ export const Userdetails = ({
         </label>
         <div className="space-y-3">
           <label
-            className={`flex items-start p-4 rounded-xl border-2 cursor-pointer transition-all ${
+            className={`flex items-start p-4 rounded-md border-2 cursor-pointer transition-all ${
               formData.service === "WEBSITE_ONLY"
-                ? "border-indigo-500 bg-indigo-50"
+                ? "border-primary-500 bg-gray-100"
                 : "border-gray-200 hover:border-gray-300"
             }`}
           >
@@ -328,7 +328,7 @@ export const Userdetails = ({
               value="WEBSITE_ONLY"
               checked={formData.service === "WEBSITE_ONLY"}
               onChange={handleInputChange}
-              className="mt-1 w-4 h-4 text-indigo-600 focus:ring-indigo-500"
+              className="mt-1 w-4 h-4 text-primary-600 focus:ring-primary-500"
             />
             <div className="ml-3">
               <div className="font-semibold text-gray-900">Website Only</div>
@@ -339,9 +339,9 @@ export const Userdetails = ({
           </label>
 
           <label
-            className={`flex items-start p-4 rounded-xl border-2 cursor-pointer transition-all ${
+            className={`flex items-start p-4 rounded-md border-2 cursor-pointer transition-all ${
               formData.service === "ECOMMERCE"
-                ? "border-indigo-500 bg-indigo-50"
+                ? "border-primary-500 bg-gray-100"
                 : "border-gray-200 hover:border-gray-300"
             }`}
           >
@@ -351,7 +351,7 @@ export const Userdetails = ({
               value="ECOMMERCE"
               checked={formData.service === "ECOMMERCE"}
               onChange={handleInputChange}
-              className="mt-1 w-4 h-4 text-indigo-600 focus:ring-indigo-500"
+              className="mt-1 w-4 h-4 text-primary-600 focus:ring-primary-500"
             />
             <div className="ml-3">
               <div className="font-semibold text-gray-900">E-commerce</div>

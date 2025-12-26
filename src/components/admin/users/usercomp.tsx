@@ -252,11 +252,11 @@ export default function BusinessCreatePage({ user }: any) {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 p-8">
+    <div className="min-h-screen bg-transparent p-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent mb-2">
+          <h1 className="text-4xl font-bold  text-black mb-2">
             {user.role === "superadmin" ? "Agency & Business Management" : "Business Management"}
           </h1>
           <p className="text-gray-600">
@@ -267,7 +267,7 @@ export default function BusinessCreatePage({ user }: any) {
         </div>
 
         {/* Create User Form */}
-        <div className="bg-white rounded-3xl shadow-2xl overflow-hidden border border-indigo-100">
+        <div className="bg-white rounded-3xl shadow-2xl overflow-hidden border border-primary-100">
           {/* Tabs */}
           <div className="border-b border-gray-200 bg-gradient-to-r from-gray-50 to-white">
             <div className="flex">
@@ -279,7 +279,7 @@ export default function BusinessCreatePage({ user }: any) {
                     onClick={() => setActiveTab(tab.id)}
                     className={`flex-1 px-6 py-4 font-semibold transition-all relative ${
                       activeTab === tab.id
-                        ? "text-indigo-600"
+                        ? "text-primary"
                         : "text-gray-500 hover:text-gray-700"
                     }`}
                   >
@@ -288,7 +288,7 @@ export default function BusinessCreatePage({ user }: any) {
                       <span>{tab.label}</span>
                     </div>
                     {activeTab === tab.id && (
-                      <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-t-full" />
+                      <div className="absolute bottom-0 left-0 right-0 h-1 bg-primary rounded-t-full" />
                     )}
                   </button>
                 );
@@ -355,7 +355,7 @@ export default function BusinessCreatePage({ user }: any) {
                   }
                 }}
                 disabled={activeTab === "user"}
-                className="px-6 py-3 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all font-semibold"
+                className="px-6 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all font-semibold"
               >
                 Previous
               </button>
@@ -365,7 +365,7 @@ export default function BusinessCreatePage({ user }: any) {
                   <button
                     onClick={handleSubmit}
                     disabled={isSubmitting}
-                    className="px-8 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl hover:from-indigo-700 hover:to-purple-700 disabled:from-indigo-400 disabled:to-purple-400 disabled:cursor-not-allowed transition-all transform hover:scale-105 font-semibold shadow-lg"
+                    className="px-8 py-3 bg-gradient-to-r from-primary-600 to-purple-600 text-white rounded-xl hover:from-primary-700 hover:to-purple-700 disabled:from-primary-400 disabled:to-purple-400 disabled:cursor-not-allowed transition-all transform hover:scale-105 font-semibold shadow-lg"
                   >
                     {isSubmitting ? "Creating Account..." : "Create Account"}
                   </button>
@@ -379,7 +379,7 @@ export default function BusinessCreatePage({ user }: any) {
                         setActiveTab(tabs[currentIndex + 1].id);
                       }
                     }}
-                    className="px-8 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl hover:from-indigo-700 hover:to-purple-700 transition-all transform hover:scale-105 font-semibold shadow-lg"
+                    className="px-8 py-2 bg-primary text-white rounded-md hover:bg-primary-dark transition-all transform hover:scale-105 font-semibold shadow-lg"
                   >
                     Next
                   </button>
