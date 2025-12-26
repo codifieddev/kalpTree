@@ -28,11 +28,11 @@ export default async function EntityIndexPage(props: any) {
   return (
     <div className="mx-auto max-w-full px-6">
       <div className="flex items-center justify-between mb-6">
-        hima
-        {/* <EntityCreateModal entity={entity} /> */}
+       
+        <EntityCreateModal entity={entity} />
       </div>
-{/* 
-      <EntityComponent /> */}
+
+      <EntityComponent />
     </div>
   );
 }

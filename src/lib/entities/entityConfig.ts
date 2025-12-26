@@ -19,13 +19,7 @@ import {
   listAttributes, 
   deleteAttribute 
 } from "@/lib/material/product_attribute";
-import { 
-  getSegmentById, 
-  updateSegment, 
-  createSegment, 
-  listSegments, 
-  deleteSegment 
-} from "@/lib/material/product_segments";
+
 import { 
   getProductById, 
   updateProduct, 
@@ -64,13 +58,7 @@ export const entityConfig: Record<string, EntityOperations> = {
     update: updateAttribute,
     delete: deleteAttribute,
   },
-  segment: {
-    create: createSegment,
-    list: listSegments,
-    getById: getSegmentById,
-    update: updateSegment,
-    delete: deleteSegment,
-  },
+
   products: {
     create: createProduct,
     list: listProducts,

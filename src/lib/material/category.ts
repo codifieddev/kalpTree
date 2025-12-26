@@ -19,10 +19,10 @@ export async function createCategory(
   const col = db.collection<MaterialCategory>(COLLECTION);
 
   // prevent duplicate name (case-insensitive)
-  const exists = await col.findOne({
-    name: { $regex: `^${escapeRegExp(data.name)}$`, $options: "i" },
-  });
-  if (exists) throw new Error("Category with same name already exists");
+  // const exists = await col.findOne({
+  //   name: { $regex: `^${escapeRegExp(data.name)}$`, $options: "i" },
+  // });
+  // if (exists) throw new Error("Category with same name already exists");
 
   const now = new Date();
 
@@ -34,7 +34,7 @@ export async function createCategory(
   };
 
   const result = await col.insertOne(doc as any);
-  console.log("result-----", result)
+
   return { ...doc, _id: result.insertedId };
 }
 
@@ -104,6 +104,8 @@ export async function updateCategory(
 export async function deleteCategory(
   id: string | ObjectId
 ): Promise<boolean> {
+
+  
   const db = await getDatabase();
   const col = db.collection<MaterialCategory>(COLLECTION);
 

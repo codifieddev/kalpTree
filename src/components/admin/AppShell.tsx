@@ -327,12 +327,7 @@ export const currentWebsiteSections: NavSection[] = [
         icon: Award,
         permission: ["product:read", "product:update", "product:delete"],
       },
-      {
-        label: "Segment",
-        href: "/admin/segment",
-        icon: Layers,
-        permission: ["product:read", "product:update", "product:delete"],
-      },
+  
       {
         label: "Attribute",
         href: "/admin/attribute",
