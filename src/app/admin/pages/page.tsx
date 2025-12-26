@@ -10,7 +10,7 @@ export default async function PagesAdmin() {
   const user = session?.user.id;
   const role = session?.user.role;
   const tenant = await websiteService.listByUserId(user!, role);
-  const tenantId = String(tenant[0]._id);
+  const tenantId = String(tenant[0]?._id);
 
   if (!tenantId) {
     return (
