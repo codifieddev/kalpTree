@@ -56,7 +56,7 @@ const navigationItems = [
     href: "/admin/agencies",
     hasSubmenu: true,
     submenuItems: [
-      { label: "Agencies list", href: "/admin/agencies" },
+      { label: "Agencies list", href: "/admin/agencies/agencies-list" },
       { label: "Add New Agency", href: "/admin/agencies/createnew" },
     ],
   },
@@ -72,9 +72,9 @@ const navigationItems = [
       { label: "Transfers", href: "/domains/transfers" },
     ],
   },
-  { id: "horizons", label: "Horizons", icon: Layers, href: "/horizons" },
-  { id: "emails", label: "Emails", icon: Mail, href: "/emails" },
-  { id: "vps", label: "VPS", icon: Server, href: "/vps" },
+  // { id: "horizons", label: "Horizons", icon: Layers, href: "/horizons" },
+  // { id: "emails", label: "Emails", icon: Mail, href: "/emails" },
+  // { id: "vps", label: "VPS", icon: Server, href: "/vps" },
   {
     id: "billing",
     label: "Billing",
@@ -91,12 +91,12 @@ const navigationItems = [
     id: "all-services",
     label: "All services",
     icon: Package,
-    href: "/services",
+    href: "/admin/all-services",
     badge: "New",
     hasSubmenu: true,
     submenuItems: [
-      { label: "Marketplace", href: "/services/marketplace" },
-      { label: "AI tools", href: "/services/ai-tools" },
+      { label: "Marketplace", href: "/admin/all-services/marketplace" },
+      { label: "AI tools", href: "/admin/all-services/ai-tools" },
     ],
   },
   {
