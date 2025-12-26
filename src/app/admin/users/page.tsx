@@ -1,5 +1,6 @@
 import { auth } from "@/auth";
-import UsersPage from "@/components/admin/users/usercomp";
+import BusinessCreatePage from "@/components/admin/users/usercomp";
+
 
 export default async function Users() {
   const session = await auth();
@@ -7,7 +8,7 @@ export default async function Users() {
 
   return (
     <>
-      <UsersPage user={user} />
+      <BusinessCreatePage user={user} />
     </>
   );
 }

@@ -43,17 +43,29 @@ function Badge({
       : "bg-slate-50 text-slate-700 border-slate-200";
 
   return (
-    <span className={`inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-semibold ${cls}`}>
+    <span
+      className={`inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-semibold ${cls}`}
+    >
       {children}
     </span>
   );
 }
 
-function BusinessIcon({ tone = "blue" }: { tone?: "blue" | "dark" | "purple" }) {
+function BusinessIcon({
+  tone = "blue",
+}: {
+  tone?: "blue" | "dark" | "purple";
+}) {
   const bg =
-    tone === "purple" ? "bg-purple-600" : tone === "dark" ? "bg-slate-900" : "bg-[#0b6d8e]";
+    tone === "purple"
+      ? "bg-purple-600"
+      : tone === "dark"
+      ? "bg-slate-900"
+      : "bg-[#0b6d8e]";
   return (
-    <div className={`h-14 w-14 rounded-md ${bg} grid place-items-center text-white font-bold`}>
+    <div
+      className={`h-14 w-14 rounded-md ${bg} grid place-items-center text-white font-bold`}
+    >
       <Users className="h-6 w-6" />
     </div>
   );
@@ -116,9 +128,12 @@ export default async function Website() {
                 <Sparkles className="h-5 w-5 text-slate-700" />
               </div>
               <div>
-                <div className="text-sm font-semibold text-slate-900">Quick tip</div>
+                <div className="text-sm font-semibold text-slate-900">
+                  Quick tip
+                </div>
                 <div className="text-xs text-muted-foreground">
-                  Create a new business to separate websites, users, and billing.
+                  Create a new business to separate websites, users, and
+                  billing.
                 </div>
               </div>
             </div>
@@ -173,14 +188,25 @@ export default async function Website() {
                 <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                   {/* LEFT */}
                   <div className="flex items-start gap-5">
-                    <BusinessIcon tone={idx % 3 === 0 ? "blue" : idx % 3 === 1 ? "dark" : "purple"} />
+                    <BusinessIcon
+                      tone={
+                        idx % 3 === 0
+                          ? "blue"
+                          : idx % 3 === 1
+                          ? "dark"
+                          : "purple"
+                      }
+                    />
 
                     <div className="min-w-0">
                       <div className="flex flex-wrap items-center gap-2">
                         <div className="text-[26px] font-semibold text-slate-900 truncate">
                           {b.name}
                         </div>
-                        <Link href={b.href} className="text-slate-400 hover:text-slate-600">
+                        <Link
+                          href={b.href}
+                          className="text-slate-400 hover:text-slate-600"
+                        >
                           <ExternalLink className="h-5 w-5" />
                         </Link>
 
@@ -189,7 +215,9 @@ export default async function Website() {
                       </div>
 
                       {b.subtext ? (
-                        <div className="mt-1 text-sm text-muted-foreground">{b.subtext}</div>
+                        <div className="mt-1 text-sm text-muted-foreground">
+                          {b.subtext}
+                        </div>
                       ) : null}
 
                       <div className="mt-3 flex flex-wrap items-center gap-2">
@@ -198,9 +226,12 @@ export default async function Website() {
                           variant="secondary"
                           className="h-10 rounded-full px-4 text-sm font-semibold text-white"
                         >
-                          <Link href={`${b.href}/websites`} className="flex items-center gap-2">
+                          <Link
+                            href={`${b.href}/websites`}
+                            className="flex items-center gap-2"
+                          >
                             <Globe className="h-4 w-4" />
-                             Websites{" "}
+                            Websites{" "}
                             <span className="ml-1 rounded-full bg-white/50 px-2 py-0.5 text-xs">
                               {b.websitesCount ?? 0}
                             </span>
@@ -212,7 +243,10 @@ export default async function Website() {
                           variant="secondary"
                           className="h-10 rounded-full px-4 text-sm font-semibold text-white"
                         >
-                          <Link href={`${b.href}/users`} className="flex items-center gap-2">
+                          <Link
+                            href={`${b.href}/users`}
+                            className="flex items-center gap-2"
+                          >
                             <Users className="h-4 w-4" />
                             Members{" "}
                             <span className="ml-1 rounded-full bg-white/50 px-2 py-0.5 text-xs">
@@ -233,14 +267,25 @@ export default async function Website() {
 
                   {/* RIGHT */}
                   <div className="flex flex-wrap items-center gap-3 justify-start lg:justify-end">
-                    <Button asChild variant="outline" className="h-10 rounded-xl px-5 text-sm font-semibold">
-                      <Link href={`${b.href}/settings`} className="flex items-center gap-2">
+                    <Button
+                      asChild
+                      variant="outline"
+                      className="h-10 rounded-xl px-5 text-sm font-semibold"
+                    >
+                      <Link
+                        href={`${b.href}/settings`}
+                        className="flex items-center gap-2"
+                      >
                         <Settings className="h-4 w-4" />
                         Settings
                       </Link>
                     </Button>
 
-                    <Button asChild variant="outline" className="h-10 rounded-xl px-5 text-sm font-semibold">
+                    <Button
+                      asChild
+                      variant="outline"
+                      className="h-10 rounded-xl px-5 text-sm font-semibold"
+                    >
                       <Link href={b.href} className="flex items-center gap-2">
                         Open Dashboard
                         <ArrowRight className="h-4 w-4" />
@@ -255,4 +300,32 @@ export default async function Website() {
       </div>
     </div>
   );
+}
+{
+  /* import { auth } from "@/auth";
+import { BusinessShowcase } from "@/components/admin/business/showbusiness";
+
+export default async function Website() {
+  const session = await auth();
+
+  const user = session?.user;
+
+  const res = await fetch(
+    `${process.env.NEXTAUTH_URL}/api/tenants?id=${user?.id}&role=${user?.role}`
+  );
+
+  const result = await res.json();
+
+  if (result.item.length <= 0) {
+    <div className="space-y-6">
+      <h1>No Businesses Added Yet</h1>
+    </div>;
+  }
+
+  return (
+    <div className="space-y-6">
+      <BusinessShowcase business={result.item} />
+    </div>
+  );
+} */
 }

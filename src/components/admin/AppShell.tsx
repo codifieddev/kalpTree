@@ -121,9 +121,6 @@ export type Website = {
   status?: "active" | "paused" | "error";
 };
 
-
-
-
 export type User = {
   id: string;
   email: string;
@@ -161,7 +158,6 @@ type NavSection = {
   items: NavItem[];
   permission?: string;
 };
-
 
 export const currentWebsiteSections: NavSection[] = [
   {
@@ -695,11 +691,6 @@ export function useHasPermission(user: User | null) {
   );
 }
 
-
-
-
-
-
 // Section "header icon" like screenshot (one icon per group)
 export const sectionIconMap: Record<
   string,
@@ -721,15 +712,13 @@ export function FiCloseHint() {
   return <div className="text-[11px] text-black/35">hover</div>;
 }
 
-
-
 export function AppShell({
   children,
   websites = [],
   currentWebsite = null,
   user = null,
-  onWebsiteChange = () => { },
-  onTenantChange = () => { },
+  onWebsiteChange = () => {},
+  onTenantChange = () => {},
   tenants = [],
   currentTenant = null,
   loggedinTenant,
@@ -739,8 +728,6 @@ export function AppShell({
   const params = useParams();
 
   const isHighLevelCollapsed = !params.website ? false : true;
-
-
 
   const handleSignOut = async () => {
     try {
@@ -763,21 +750,27 @@ export function AppShell({
   };
   const dispatch = useDispatch();
 
-  // const [showSidebar, setShowSidebar] = useState<boolean>(true);
-
-  // const [collapsed, setCollapsed] = React.useState(false);
-
-
-    const [collapsed, setCollapsed] = React.useState(false);
+  const [collapsed, setCollapsed] = React.useState(false);
   const [showSidebar, setShowSidebar] = React.useState(true);
   return (
-
     <>
-
       <header className="h-16 w-full bg-white border-b border-gray-200 flex items-center justify-between px-5">
         {/* LEFT */}
         <div className="flex items-center gap-4">
           {/* Logo */}
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-full   flex items-center justify-center text-white text-xs font-semibold">
+              <img
+                src="../kalptree-favicon.svg"
+                alt="KalpTree"
+                className="h-10 w-10"
+              />
+            </div>
+
+            {/* <header className="h-16 w-full bg-white border-b border-gray-200 flex items-center justify-between px-5">
+        LEFT
+        <div className="flex items-center gap-4">
+          Logo
           <div className="flex items-center gap-3">
             <div className="h-10 w-10 rounded-full   flex items-center justify-center text-white text-xs font-semibold">
               <img src="../kalptree-favicon.svg" alt="KalpTree" className="h-10 w-10" />
@@ -788,31 +781,62 @@ export function AppShell({
               <p className="text-[11px] text-gray-500">
                 Franchise panel
               </p>
-            </div>
           </div>
 
           <Separator orientation="vertical" className="h-8" />
 
-         <div className="border-none border-black/10 p-3">
-  <button
-    type="button"
-    onClick={() => setCollapsed((v) => !v)}
-    className={cn(
-      "w-full rounded-md transition hover:bg-white/60",
-      collapsed ? "h-10 flex items-center justify-center" : "h-10 flex items-center justify-between px-3"
-    )}
-  >
-    <span className="text-black/70">
-      {collapsed ? <GoSidebarExpand size={20} /> : <GoSidebarCollapse size={20} />}
-    </span>
+         <div className="border-none border-black/10 p-3"> */}
+            <button
+              type="button"
+              onClick={() => setCollapsed((v) => !v)}
+              className={cn(
+                "w-full rounded-md transition hover:bg-white/60",
+                collapsed
+                  ? "h-10 flex items-center justify-center"
+                  : "h-10 flex items-center justify-between px-3"
+              )}
+            >
+              <span className="text-black/70">
+                {collapsed ? (
+                  <GoSidebarExpand size={20} />
+                ) : (
+                  <GoSidebarCollapse size={20} />
+                )}
+              </span>
 
-    {/* {!collapsed && (
+              {/* {!collapsed && (
       <span className="text-[12px] text-black/60">
         Collapse sidebar
       </span>
     )} */}
-  </button>
-</div>
+            </button>
+          </div>
+          {/* <div className="border-none border-black/10 p-3">
+            <span>
+              <GoSidebarExpand className="h-4 w-4 " size={10} />
+            </span>
+            <Button
+                  variant="ghost"
+                
+                  className={cn(
+                    "w-full justify-between  hover:bg-transparent",
+                    "border-e border-black/5 bg-transparent rounded-none  text-black/70 "
+                  )}
+                >
+                   <GoSidebarExpand className="h-14 w-14 " size={48} />
+                  {!collapsed ? (
+                    <>
+                      <GoSidebarExpand className="h-14 w-14 " size={48} />
+                    </>
+                  ) : (
+                    <>
+                      <GoSidebarCollapse className="h-14 w-14  mx-auto" size={48} />
+                    </>
+                  )}
+                </Button>
+          </div> */}
+
+          {/* comm */}
 
           {/* <h1 className="text-[15px] font-semibold text-gray-900">
           Dashboard
@@ -857,24 +881,44 @@ export function AppShell({
           {/* Avatar */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className=""
-              >
+              <Button variant="ghost" size="icon" className="">
+                {/* <Button variant="ghost" size="icon" className="">
                 <Avatar className="h-7 w-7">
                   <AvatarFallback>
                     {user?.email?.charAt(0).toUpperCase() || "U"}
                   </AvatarFallback>
-                </Avatar>
+                </Avatar> */}
               </Button>
             </DropdownMenuTrigger>
 
-            <DropdownMenuContent align="end" className="bg-white rounded-md shadow-md w-40">
-              <DropdownMenuLabel className="hover:bg-primary hover:text-white p-2">{user?.email || "User"}</DropdownMenuLabel>
+            <DropdownMenuContent
+              align="end"
+              className="bg-white rounded-md shadow-md w-40"
+            >
+              <DropdownMenuLabel className="hover:bg-primary hover:text-white p-2">
+                {user?.email || "User"}
+              </DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem className="hover:bg-primary hover:text-white p-2">Profile</DropdownMenuItem>
-              <DropdownMenuItem className="hover:bg-primary hover:text-white p-2">Account settings</DropdownMenuItem>
+              <DropdownMenuItem className="hover:bg-primary hover:text-white p-2">
+                Profile
+              </DropdownMenuItem>
+              <DropdownMenuItem className="hover:bg-primary hover:text-white p-2">
+                Account settings
+              </DropdownMenuItem>
+              {/* <DropdownMenuContent
+              align="end"
+              className="bg-white rounded-md shadow-md w-40"
+            >
+              <DropdownMenuLabel className="hover:bg-primary hover:text-white p-2">
+                {user?.email || "User"}
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem className="hover:bg-primary hover:text-white p-2">
+                Profile
+              </DropdownMenuItem>
+              <DropdownMenuItem className="hover:bg-primary hover:text-white p-2">
+                Account settings
+              </DropdownMenuItem> */}
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 onClick={handleSignOut}
@@ -887,15 +931,14 @@ export function AppShell({
         </div>
       </header>
 
-
       <div className="flex h-[92vh] bg-[#e8e9eb] text-foreground overflow-hidden">
-     <HighLevelSidebar
-      user={user}
-      collapsed={collapsed}
-      setCollapsed={setCollapsed}
-      showSidebar={showSidebar}
-      setShowSidebar={setShowSidebar}
-    />
+        <HighLevelSidebar
+          user={user}
+          collapsed={collapsed}
+          setCollapsed={setCollapsed}
+          showSidebar={showSidebar}
+          setShowSidebar={setShowSidebar}
+        />
 
         {showSidebar && (
           <Sidebar
@@ -911,6 +954,30 @@ export function AppShell({
             loggedinTenant={loggedinTenant}
           />
         )}
+
+        {/* <div className="flex h-[92vh] bg-[#e8e9eb] text-foreground overflow-hidden">
+        <HighLevelSidebar
+          showSidebar={showSidebar}
+          setShowSidebar={setShowSidebar}
+          user={user}
+          collapsed={sidebarCollapsed}
+          loggedinTenant={loggedinTenant}
+        />
+
+        {showSidebar && (
+          <Sidebar
+            tenants={tenants}
+            currentTenant={currentTenant}
+            onTenantChange={onTenantChange}
+            websites={websites}
+            currentWebsite={currentWebsite}
+            user={user}
+            onWebsiteChange={onWebsiteChange}
+            collapsed={sidebarCollapsed}
+            onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
+            loggedinTenant={loggedinTenant}
+          />
+        )} */}
 
         <div className="flex flex-1 min-h-screen flex-col overflow-hidden">
           {/* <Topbar

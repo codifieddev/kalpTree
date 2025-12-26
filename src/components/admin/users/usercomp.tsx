@@ -13,13 +13,21 @@ import { Userdetails } from "./userdetails";
 import { Businessdetails } from "./businessdetails";
 import { Brandingdetails } from "./brandingdetails";
 
-export default function UsersPage({ user }: any) {
+export default function BusinessCreatePage({ user }: any) {
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("user");
   const [formData, setFormData] = useState({
+    // Agency fields (for superadmin only)
+    agency_name: "",
+    agency_url_suffix: "",
+    agency_email: "",
+    agency_password: "",
+    agency_service: "ECOMMERCE",
+
+    // Business user fields
     email: "",
     password: "",
-    role: "business",
+    role: user.role === "superadmin" ? "agency" : "business",
     service: "ECOMMERCE",
     business_name: "",
     businsess_url: "",
@@ -52,6 +60,8 @@ export default function UsersPage({ user }: any) {
   const [message, setMessage] = useState({ type: "", text: "" });
   const [expandedUser, setExpandedUser] = useState(null);
   const [logoPreview, setLogoPreview] = useState<any>(null);
+
+  console.log(formData)
 
   const slugify = (text: string) =>
     text
@@ -88,6 +98,18 @@ export default function UsersPage({ user }: any) {
       return;
     }
 
+    // Handle agency name (alphanumeric + space only)
+    if (name === "agency_name") {
+      if (!/^[a-zA-Z0-9 ]*$/.test(value)) return;
+
+      setFormData((prev: any) => ({
+        ...prev,
+        agency_name: value,
+        agency_url_suffix: slugify(value),
+      }));
+      return;
+    }
+
     // Handle file upload
     if (type === "file") {
       const file = files?.[0];
@@ -120,6 +142,15 @@ export default function UsersPage({ user }: any) {
       setMessage({ type: "", text: "" });
 
       const fd = new FormData();
+
+      // Agency fields (if superadmin)
+      if (user.role === "superadmin") {
+        fd.append("agency_name", formData.agency_name);
+        fd.append("agency_url_suffix", formData.agency_url_suffix);
+        fd.append("agency_email", formData.agency_email);
+        fd.append("agency_password", formData.agency_password);
+        fd.append("agency_service", formData.agency_service);
+      }
 
       // Root fields
       fd.append("email", formData.email);
@@ -158,9 +189,17 @@ export default function UsersPage({ user }: any) {
 
       if (result.tenantId) {
         setFormData({
+          // Agency fields
+          agency_name: "",
+          agency_url_suffix: "",
+          agency_email: "",
+          agency_password: "",
+          agency_service: "ECOMMERCE",
+
+          // Business fields
           email: "",
           password: "",
-          role: "business",
+          role: user.role === "superadmin" ? "agency" : "business",
           service: "ECOMMERCE",
           business_name: "",
           businsess_url: "",
@@ -188,11 +227,20 @@ export default function UsersPage({ user }: any) {
 
           createdById: user.id,
         });
+        setLogoPreview(null);
+        setMessage({ 
+          type: "success", 
+          text: "Account created successfully!" 
+        });
       }
 
       setIsSubmitting(false);
     } catch (error) {
       console.error(error);
+      setMessage({ 
+        type: "error", 
+        text: "Failed to create account. Please try again." 
+      });
       setIsSubmitting(false);
     }
   };
@@ -209,10 +257,12 @@ export default function UsersPage({ user }: any) {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-4xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent mb-2">
-            Business Management
+            {user.role === "superadmin" ? "Agency & Business Management" : "Business Management"}
           </h1>
           <p className="text-gray-600">
-            Create and manage business accounts with complete branding
+            {user.role === "superadmin" 
+              ? "Create agency and business accounts with complete branding" 
+              : "Create and manage business accounts with complete branding"}
           </p>
         </div>
 
@@ -272,6 +322,7 @@ export default function UsersPage({ user }: any) {
                 formData={formData}
                 showPassword={showPassword}
                 setShowPassword={setShowPassword}
+                role={user.role}
               />
             )}
 
@@ -316,7 +367,7 @@ export default function UsersPage({ user }: any) {
                     disabled={isSubmitting}
                     className="px-8 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl hover:from-indigo-700 hover:to-purple-700 disabled:from-indigo-400 disabled:to-purple-400 disabled:cursor-not-allowed transition-all transform hover:scale-105 font-semibold shadow-lg"
                   >
-                    {isSubmitting ? "Creating User..." : "Create User"}
+                    {isSubmitting ? "Creating Account..." : "Create Account"}
                   </button>
                 ) : (
                   <button
@@ -337,19 +388,6 @@ export default function UsersPage({ user }: any) {
             </div>
           </div>
         </div>
-
-        {/* Users List */}
-        {/* <div className="mt-8 bg-white rounded-3xl shadow-2xl p-8 border border-indigo-100">
-          <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2">
-            <User className="w-6 h-6 text-indigo-600" />
-            All Users
-          </h2>
-
-          <div className="text-center py-12 text-gray-500">
-            <UserPlus className="w-16 h-16 mx-auto mb-4 text-gray-300" />
-            <p>No users found. Create your first user above!</p>
-          </div>
-        </div> */}
       </div>
     </div>
   );
