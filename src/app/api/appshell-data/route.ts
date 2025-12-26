@@ -3,6 +3,7 @@ import { auth } from "@/auth";
 import { websiteService } from "@/lib/websites/website-service";
 import { ObjectId } from "mongodb";
 import { NextResponse } from "next/server";
+import { getCollection } from "../tenants/[id]/route";
 
 export function serializeMongoDoc<T>(doc: T): any {
   if (doc === null || doc === undefined) return doc;
@@ -49,6 +50,10 @@ export async function GET() {
       }
     : null;
 
+
+  
+  let agencies: any[] = [];
+  let currentagency: any | null = null
   let tenants: any[] = [];
   let currentTenant: any | null = null;
   let websites: any[] = [];
@@ -75,7 +80,9 @@ export async function GET() {
       }));
 
       const cookieStore = await cookies();
-      const currentTenantId = cookieStore.get("current_selected_tenant_id")?.value;
+      const currentTenantId = cookieStore.get(
+        "current_selected_tenant_id"
+      )?.value;
 
       if (currentTenantId) {
         currentTenant = tenants.find((t) => t._id === currentTenantId) || null;
@@ -86,7 +93,9 @@ export async function GET() {
       }
 
       if (currentTenant?._id) {
-        const websiteDocs = await websiteService.listByTenant(currentTenant._id);
+        const websiteDocs = await websiteService.listByTenant(
+          currentTenant._id
+        );
 
         websites = websiteDocs.map((doc) => ({
           _id: doc._id.toString(),
@@ -102,7 +111,8 @@ export async function GET() {
         const currentWebsiteId = cookieStore.get("current_website_id")?.value;
 
         if (currentWebsiteId) {
-          currentWebsite = websites.find((w) => w._id === currentWebsiteId) || null;
+          currentWebsite =
+            websites.find((w) => w._id === currentWebsiteId) || null;
         }
 
         if (!currentWebsite && websites.length > 0) {
@@ -126,7 +136,9 @@ export async function GET() {
       }));
 
       const cookieStore = await cookies();
-      const currentTenantId = cookieStore.get("current_selected_tenant_id")?.value;
+      const currentTenantId = cookieStore.get(
+        "current_selected_tenant_id"
+      )?.value;
 
       if (currentTenantId) {
         currentTenant = tenants.find((t) => t._id === currentTenantId) || null;
@@ -137,7 +149,9 @@ export async function GET() {
       }
 
       if (currentTenant?._id) {
-        const websiteDocs = await websiteService.listByTenant(currentTenant._id);
+        const websiteDocs = await websiteService.listByTenant(
+          currentTenant._id
+        );
 
         websites = websiteDocs.map((doc) => ({
           _id: doc._id.toString(),
@@ -154,7 +168,8 @@ export async function GET() {
         const currentWebsiteId = cookieStore.get("current_website_id")?.value;
 
         if (currentWebsiteId) {
-          currentWebsite = websites.find((w) => w._id === currentWebsiteId) || null;
+          currentWebsite =
+            websites.find((w) => w._id === currentWebsiteId) || null;
         }
 
         if (!currentWebsite && websites.length > 0) {
@@ -164,6 +179,13 @@ export async function GET() {
     } catch (error) {
       console.error("Failed to load franchise data:", error);
     }
+  } else if (user?.role == "superadmin") {
+    let agencyColl = await getCollection("tenants")
+    let agenciess = (await agencyColl.find({type: "agency"}).toArray()).map((d)=>{
+      return {
+        ...d, _id: String(d._id)
+      }
+    })
   }
 
   return NextResponse.json({

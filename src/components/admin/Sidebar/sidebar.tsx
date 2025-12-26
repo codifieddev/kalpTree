@@ -133,7 +133,7 @@ export function Sidebar({
                       {!collapsed && (
                         <div className="leading-tight">
                           <div className="text-md uppercase font-semibold">
-                            {loggedinTenant.name}
+                            {user?.role=="superadmin" ? "Superadmin" : loggedinTenant.name}
                           </div>
                           <div className="text-[11px] text-black/45">
                             {sentenceCase(user?.role)} panel
