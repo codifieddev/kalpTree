@@ -12,18 +12,44 @@ import {
   Sparkles,
   Crown,
   BadgeCheck,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
+import { auth } from "@/auth";
 
 type Business = {
-  id: string;
+  _id: string;
+  slug: string;
   name: string;
-  subtext?: string; // like "Agency panel" / "Franchise panel"
+  email: string;
+  plan: "trial" | "free" | "pro" | "agency";
+  subscriptionStatus: "active" | "paused" | "cancelled";
+  customDomainVerified: boolean;
+  branding?: {
+    colors?: {
+      primary?: string;
+      secondary?: string;
+    };
+  };
+  paymentGateways?: Record<string, any>;
+  features?: {
+    websiteEnabled?: boolean;
+    ecommerceEnabled?: boolean;
+    blogEnabled?: boolean;
+    invoicesEnabled?: boolean;
+  };
+  settings?: {
+    locale?: string;
+    currency?: string;
+    timezone?: string;
+  };
+  status: "active" | "paused" | "inactive";
+  createdAt: string;
+  updatedAt: string;
+  createdById: string;
+  type?: "business" | "franchise" | "agency";
   websitesCount?: number;
   membersCount?: number;
-  status?: "active" | "paused";
-  plan?: "Free" | "Pro" | "Agency";
-  primaryDomain?: string;
-  href: string; // open business dashboard
 };
 
 function Badge({
@@ -71,43 +97,109 @@ function BusinessIcon({
   );
 }
 
-export default async function Website() {
-  // ✅ Replace this demo with your API later
-  const businesses: Business[] = [
-    {
-      id: "b1",
-      name: "TEST1",
-      subtext: "Franchise panel",
-      websitesCount: 3,
-      membersCount: 12,
-      status: "active",
-      plan: "Agency",
-      primaryDomain: "test.localhost:55803",
-      href: "/admin/businesses/test1",
-    },
-    {
-      id: "b2",
-      name: "Creative Consult",
-      subtext: "Agency panel",
-      websitesCount: 8,
-      membersCount: 6,
-      status: "active",
-      plan: "Pro",
-      primaryDomain: "creativeconsult.co.in",
-      href: "/admin/businesses/creative-consult",
-    },
-    {
-      id: "b3",
-      name: "Goodyear Live",
-      subtext: "Business panel",
-      websitesCount: 1,
-      membersCount: 3,
-      status: "paused",
-      plan: "Free",
-      primaryDomain: "livegoodyear.creativeconsult.co.in",
-      href: "/admin/businesses/goodyear-live",
-    },
-  ];
+function getPlanBadge(plan: string) {
+  const normalizedPlan = plan.toLowerCase();
+  if (normalizedPlan === "agency") {
+    return (
+      <Badge variant="purple">
+        <Crown className="mr-1 h-3.5 w-3.5" />
+        Agency
+      </Badge>
+    );
+  } else if (normalizedPlan === "pro") {
+    return (
+      <Badge variant="green">
+        <BadgeCheck className="mr-1 h-3.5 w-3.5" />
+        Pro
+      </Badge>
+    );
+  } else if (normalizedPlan === "trial") {
+    return (
+      <Badge variant="amber">
+        <Sparkles className="mr-1 h-3.5 w-3.5" />
+        Trial
+      </Badge>
+    );
+  } else {
+    return <Badge>Free</Badge>;
+  }
+}
+
+function getStatusBadge(status: string) {
+  if (status === "active") {
+    return <Badge variant="green">Active</Badge>;
+  } else if (status === "paused") {
+    return <Badge variant="amber">Paused</Badge>;
+  } else {
+    return <Badge>Inactive</Badge>;
+  }
+}
+
+function getSubtext(type?: string) {
+  if (!type) return null;
+  if (type === "franchise") return "Franchise panel";
+  if (type === "agency") return "Agency panel";
+  return "Business panel";
+}
+
+export default async function BusinessList({
+  searchParams,
+}: {
+  searchParams: { page?: string };
+}) {
+  const params = await searchParams;
+  const session = await auth();
+  const user = session?.user;
+  const itemsPerPage = 2;
+  const currentPage = Number(params.page) || 1;
+
+  const res = await fetch(
+    `${process.env.NEXTAUTH_URL}/api/tenants?id=${user?.id}&role=${user?.role}&page=${currentPage}&limit=${itemsPerPage}`
+  );
+
+  const result = await res.json();
+  const businesses: Business[] = result.item || [];
+  const totalCount = result.totalCount || businesses.length;
+
+  const totalPages = Math.ceil(totalCount / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = Math.min(startIndex + itemsPerPage, totalCount);
+
+  console.log(totalPages);
+
+  if (businesses.length === 0) {
+    return (
+      <div className="w-full max-w-[1200px] space-y-6">
+        <div className="flex flex-col gap-1">
+          <h2 className="text-[26px] font-semibold text-slate-900">
+            Businesses
+          </h2>
+          <p className="text-sm text-muted-foreground">
+            No businesses found. Create your first business to get started.
+          </p>
+        </div>
+        <Card className="rounded-3xl border bg-white shadow-sm">
+          <CardContent className="p-12 text-center">
+            <div className="mx-auto h-16 w-16 rounded-full bg-slate-100 grid place-items-center mb-4">
+              <Users className="h-8 w-8 text-slate-400" />
+            </div>
+            <h3 className="text-lg font-semibold text-slate-900 mb-2">
+              No Businesses Yet
+            </h3>
+            <p className="text-sm text-muted-foreground mb-6">
+              Create your first business to manage websites, users, and billing.
+            </p>
+            <Button asChild className="rounded-full">
+              <Link href="/admin/businesses/create">
+                <Plus className="mr-2 h-4 w-4" />
+                Add Business
+              </Link>
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full max-w-[1200px] space-y-6">
@@ -157,33 +249,16 @@ export default async function Website() {
         </div>
       </div>
 
-      {/* List (Hostinger-ish cards) */}
+      {/* List */}
       <div className="space-y-4">
         {businesses.map((b, idx) => {
-          const planBadge =
-            b.plan === "Agency" ? (
-              <Badge variant="purple">
-                <Crown className="mr-1 h-3.5 w-3.5" />
-                Agency
-              </Badge>
-            ) : b.plan === "Pro" ? (
-              <Badge variant="green">
-                <BadgeCheck className="mr-1 h-3.5 w-3.5" />
-                Pro
-              </Badge>
-            ) : (
-              <Badge>Free</Badge>
-            );
-
-          const statusBadge =
-            b.status === "active" ? (
-              <Badge variant="green">Active</Badge>
-            ) : (
-              <Badge variant="amber">Paused</Badge>
-            );
+          const planBadge = getPlanBadge(b.plan);
+          const statusBadge = getStatusBadge(b.status);
+          const subtext = getSubtext(b.type);
+          const href = `/admin/businesses/${b._id}`;
 
           return (
-            <Card key={b.id} className="rounded-3xl border bg-white shadow-sm">
+            <Card key={b._id} className="rounded-3xl border bg-white shadow-sm">
               <CardContent className="p-6">
                 <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                   {/* LEFT */}
@@ -204,7 +279,7 @@ export default async function Website() {
                           {b.name}
                         </div>
                         <Link
-                          href={b.href}
+                          href={href}
                           className="text-slate-400 hover:text-slate-600"
                         >
                           <ExternalLink className="h-5 w-5" />
@@ -214,9 +289,9 @@ export default async function Website() {
                         {statusBadge}
                       </div>
 
-                      {b.subtext ? (
+                      {subtext ? (
                         <div className="mt-1 text-sm text-muted-foreground">
-                          {b.subtext}
+                          {subtext}
                         </div>
                       ) : null}
 
@@ -227,7 +302,7 @@ export default async function Website() {
                           className="h-10 rounded-full px-4 text-sm font-semibold text-white"
                         >
                           <Link
-                            href={`${b.href}/websites`}
+                            href={`${href}/websites`}
                             className="flex items-center gap-2"
                           >
                             <Globe className="h-4 w-4" />
@@ -244,7 +319,7 @@ export default async function Website() {
                           className="h-10 rounded-full px-4 text-sm font-semibold text-white"
                         >
                           <Link
-                            href={`${b.href}/users`}
+                            href={`${href}/users`}
                             className="flex items-center gap-2"
                           >
                             <Users className="h-4 w-4" />
@@ -255,10 +330,10 @@ export default async function Website() {
                           </Link>
                         </Button>
 
-                        {b.primaryDomain ? (
+                        {b.email ? (
                           <Badge>
                             <Globe className="mr-1 h-3.5 w-3.5" />
-                            {b.primaryDomain}
+                            {b.email}
                           </Badge>
                         ) : null}
                       </div>
@@ -273,7 +348,7 @@ export default async function Website() {
                       className="h-10 rounded-xl px-5 text-sm font-semibold"
                     >
                       <Link
-                        href={`${b.href}/settings`}
+                        href={`${href}/settings`}
                         className="flex items-center gap-2"
                       >
                         <Settings className="h-4 w-4" />
@@ -286,7 +361,7 @@ export default async function Website() {
                       variant="outline"
                       className="h-10 rounded-xl px-5 text-sm font-semibold"
                     >
-                      <Link href={b.href} className="flex items-center gap-2">
+                      <Link href={href} className="flex items-center gap-2">
                         Open Dashboard
                         <ArrowRight className="h-4 w-4" />
                       </Link>
@@ -298,34 +373,92 @@ export default async function Website() {
           );
         })}
       </div>
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between">
+          <div className="text-sm text-muted-foreground">
+            Showing {startIndex + 1} to {endIndex} of {totalCount} businesses
+          </div>
+
+          <div className="flex items-center gap-2">
+            <Button
+              asChild
+              variant="outline"
+              size="sm"
+              disabled={currentPage === 1}
+              className="rounded-full"
+            >
+              <Link
+                href={`?page=${currentPage - 1}`}
+                className={
+                  currentPage === 1 ? "pointer-events-none opacity-50" : ""
+                }
+              >
+                <ChevronLeft className="h-4 w-4" />
+                Previous
+              </Link>
+            </Button>
+
+            <div className="flex items-center gap-1">
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                (page) => {
+                  const showPage =
+                    page === 1 ||
+                    page === totalPages ||
+                    (page >= currentPage - 1 && page <= currentPage + 1);
+
+                  const showEllipsis =
+                    (page === currentPage - 2 && currentPage > 3) ||
+                    (page === currentPage + 2 && currentPage < totalPages - 2);
+
+                  if (showEllipsis) {
+                    return (
+                      <span key={page} className="px-2 text-muted-foreground">
+                        ...
+                      </span>
+                    );
+                  }
+
+                  if (!showPage) return null;
+
+                  return (
+                    <Button
+                      key={page}
+                      asChild
+                      variant={currentPage === page ? "default" : "outline"}
+                      size="sm"
+                      className="rounded-full w-10 h-10 p-0"
+                    >
+                      <Link href={`?page=${page}`}>{page}</Link>
+                    </Button>
+                  );
+                }
+              )}
+            </div>
+
+            <Button
+              asChild
+              variant="outline"
+              size="sm"
+              disabled={currentPage === totalPages}
+              className="rounded-full"
+            >
+              <Link
+                href={`?page=${currentPage + 1}`}
+                className={
+                  currentPage === totalPages
+                    ? "pointer-events-none opacity-50"
+                    : ""
+                }
+              >
+                Next
+                <ChevronRight className="h-4 w-4" />
+              </Link>
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   );
-}
-{
-  /* import { auth } from "@/auth";
-import { BusinessShowcase } from "@/components/admin/business/showbusiness";
-
-export default async function Website() {
-  const session = await auth();
-
-  const user = session?.user;
-
-  const res = await fetch(
-    `${process.env.NEXTAUTH_URL}/api/tenants?id=${user?.id}&role=${user?.role}`
-  );
-
-  const result = await res.json();
-
-  if (result.item.length <= 0) {
-    <div className="space-y-6">
-      <h1>No Businesses Added Yet</h1>
-    </div>;
-  }
-
-  return (
-    <div className="space-y-6">
-      <BusinessShowcase business={result.item} />
-    </div>
-  );
-} */
 }
