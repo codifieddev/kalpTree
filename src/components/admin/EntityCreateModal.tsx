@@ -406,7 +406,7 @@ export default function EntityCreateModal({ entity }: Props) {
                   fieldErrors={fieldErrors}
                   filterCategory={filterCategory}
                   listBrand={filterBrand}
-                  listSegment={filterSegment}
+                 
                 />
               ) : (
                 <>

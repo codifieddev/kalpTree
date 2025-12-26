@@ -1,13 +1,32 @@
 "use client";
 import { AppDispatch, RootState } from "@/store/store";
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { DataTableExt } from "@/components/admin/DataTableExt";
-import { removeProduct } from "@/hooks/slices/product/ProductSlice";
+import { addProduct, removeProduct } from "@/hooks/slices/product/ProductSlice";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
 
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import ProductForm from "../forms/ProductForm";
+import { ProductModel } from "../type/ProductModel";
+
 const ProductTable = () => {
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [editingProduct, setEditingProduct] = useState<ProductModel | null>(
+    null
+  );
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [newProduct, setNewProduct] = useState<ProductModel | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const [isSaving, setIsSaving] = useState(false);
+
   const { listProduct, isProductLoading } = useSelector(
     (state: RootState) => state.product
   );
@@ -15,6 +34,7 @@ const ProductTable = () => {
   const { listBrand } = useSelector((state: RootState) => state.brand);
   const { listSegment } = useSelector((state: RootState) => state.segment);
   const { currentWebsite } = useSelector((state: RootState) => state.websites);
+  const { user } = useSelector((state: RootState) => state.user);
   const dispatch = useDispatch<AppDispatch>();
   const { toast } = useToast();
   const router = useRouter();
@@ -44,6 +64,70 @@ const ProductTable = () => {
     }
     return [];
   }, [listCategory, listBrand, listSegment, listProduct]);
+
+  const handleAdd = () => {
+    setNewProduct({
+      name: "",
+      brand_id: "",
+      product_category_id: "",
+      description: "",
+      photo: "",
+      base_price: 0,
+      product_variants: [],
+      websiteId: currentWebsite?._id,
+      tenantId: user?.tenantId,
+    });
+    setFieldErrors({});
+    setIsAddDialogOpen(true);
+  };
+
+  const handleSaveAdd = async () => {
+    if (!newProduct) return;
+    setFieldErrors({});
+    const errors: Record<string, string> = {};
+    if (!newProduct.name?.trim()) {
+      errors.name = "Name is required";
+    }
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors);
+      return;
+    }
+    setIsSaving(true);
+    try {
+      const res = await fetch(`/api/admin/category`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newProduct),
+      });
+      const data = await res.json().catch(() => null);
+      if (!res.ok) {
+        const msg =
+          data?.error ??
+          data?.message ??
+          (typeof data === "string" ? data : undefined) ??
+          "Failed to create";
+        throw new Error(msg);
+      }
+      const created = data?.item ?? data;
+      toast({
+        title: "Created",
+        description: `Category ${newProduct.name} created successfully`,
+      });
+      setIsAddDialogOpen(false);
+      setNewProduct(null);
+      dispatch(addProduct(created));
+      // window.location.reload();
+    } catch (err: any) {
+      console.error("Failed to create category", err);
+      toast({
+        title: "Create failed",
+        description: String(err?.message || err),
+        variant: "destructive",
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   const handleDelete = async (row: any) => {
     const id = row?._id ?? row?.id;
@@ -84,6 +168,56 @@ const ProductTable = () => {
     router.push(`/admin/products/${id}`);
   };
 
+  const handleSaveEdit = async () => {
+    if (!editingProduct) return;
+
+    setFieldErrors({});
+    const errors: Record<string, string> = {};
+
+    if (!editingProduct.name?.trim()) {
+      errors.name = "Name is required";
+    }
+
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors);
+      return;
+    }
+
+    setIsSaving(true);
+    try {
+      const id = (editingProduct as ProductModel)._id ?? editingProduct.id;
+      const { _id, ...updateData } = editingProduct as any;
+
+      const res = await fetch(`/api/admin/category`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...updateData, id }),
+      });
+
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body?.error || `HTTP ${res.status}`);
+      }
+
+      toast({
+        title: "Updated",
+        description: `Category ${editingProduct.name} updated successfully`,
+      });
+      setIsEditDialogOpen(false);
+      setEditingProduct(null);
+      window.location.reload();
+    } catch (err: any) {
+      console.error("Failed to update category", err);
+      toast({
+        title: "Update failed",
+        description: String(err?.message || err),
+        variant: "destructive",
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   const initialColumns = [
     { key: "_id", label: "ID", hidden: true },
     { key: "id", label: "ID", hidden: true },
@@ -102,11 +236,96 @@ const ProductTable = () => {
       <DataTableExt
         title="Products"
         data={products ?? []}
-        createHref="/admin/products/create"
+        onCreate={handleAdd}
         initialColumns={initialColumns}
         onDelete={(row) => handleDelete(row)}
         onView={(row) => handleView(row)}
+        opentab={() => {}}
       />
+
+      {/* Add Product Dialog */}
+      <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Add Category</DialogTitle>
+          </DialogHeader>
+          {newProduct && (
+            <div className="space-y-4">
+              <ProductForm
+                product={newProduct}
+                setProduct={(value) => {
+                  if (typeof value === "function") {
+                    setNewProduct((prev) => (prev ? value(prev) : prev));
+                  } else {
+                    setNewProduct(value);
+                  }
+                }}
+                fieldErrors={fieldErrors}
+                filterCategory={listCategory}
+                listBrand={listBrand}
+              />
+              <div className="flex justify-end gap-2 pt-4">
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setIsAddDialogOpen(false);
+                    setNewProduct(null);
+                  }}
+                  disabled={isSaving}
+                >
+                  Cancel
+                </Button>
+                <Button onClick={handleSaveAdd} disabled={isSaving}>
+                  {isSaving ? "Saving..." : "Add Category"}
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit PRODUCT Dialog */}
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Edit Category</DialogTitle>
+          </DialogHeader>
+
+          {editingProduct && (
+            <div className="space-y-4">
+              <ProductForm
+                product={editingProduct}
+                setProduct={(value) => {
+                  if (typeof value === "function") {
+                    setEditingProduct((prev) => (prev ? value(prev) : null));
+                  } else {
+                    setEditingProduct(value);
+                  }
+                }}
+                fieldErrors={fieldErrors}
+                filterCategory={listCategory}
+                listBrand={listBrand}
+              />
+
+              <div className="flex justify-end gap-2 pt-4">
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setIsEditDialogOpen(false);
+                    setEditingProduct(null);
+                  }}
+                  disabled={isSaving}
+                >
+                  Cancel
+                </Button>
+                <Button onClick={handleSaveEdit} disabled={isSaving}>
+                  {isSaving ? "Saving..." : "Save Changes"}
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

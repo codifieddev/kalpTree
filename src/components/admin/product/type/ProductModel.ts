@@ -6,6 +6,7 @@ import { MaterialSegmentModel } from "../../segment/types/SegmentModel";
 
 export interface ProductModel {
   id?: number;
+  _id?:string;
   name?: string;
   brand_id?:string|ObjectId
   brand?:MaterialBrandModel ;
