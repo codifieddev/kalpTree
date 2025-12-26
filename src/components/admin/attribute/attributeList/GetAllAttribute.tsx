@@ -15,10 +15,10 @@ const GetAllAttribute = () => {
     if (!hasFetched &&
        !isAttributeLoading &&
          currentWebsite &&
-      currentWebsite.websiteId
+      currentWebsite._id
     )
        {
-      dispatch(fetchAttributes({websiteId:currentWebsite.websiteId}));
+      dispatch(fetchAttributes({websiteId:currentWebsite._id}));
     }
   }, [hasFetched, isAttributeLoading,currentWebsite, dispatch]);
   return (

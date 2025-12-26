@@ -33,7 +33,7 @@ export default function EntityCreateModal({ entity }: Props) {
   const currentUser = useSelector((state: RootState) => state.user.user);
 
   const filterCategory = listCategory.filter(
-    (item) => item.websiteId === currentWebsite?.websiteId
+    (item) => item.websiteId === currentWebsite?._id
   );
   const filterBrand = listBrand.filter(
     (item) => (item as any).websiteId === currentWebsite?._id
