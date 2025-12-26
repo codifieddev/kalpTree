@@ -189,12 +189,12 @@ export async function GET() {
       }
     }
   } else if (user?.role == "business") {
-    currentWebsite = await websiteColl
+    websites = await websiteColl
       .find({
         tenantId: new ObjectId(user.tenantId),
       })
       .toArray();
-    websites = currentWebsite.map((doc: any) => ({
+    websites = websites.map((doc: any) => ({
       _id: doc._id.toString(),
       websiteId: doc.websiteId,
       name: doc.name,
