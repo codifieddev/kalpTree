@@ -106,7 +106,7 @@ export class WebsiteService {
     if (role == "business") {
       getTenants = await coll.find({ userId: userId }).toArray();
     } else {
-      getTenants = await coll.find({ createdById: userId }).toArray();
+      getTenants = await coll.find({ tenantId: userId }).toArray();
     }
     return getTenants;
   }

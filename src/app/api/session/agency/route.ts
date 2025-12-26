@@ -6,16 +6,16 @@ import { websiteService } from "@/lib/websites/website-service";
 import { getCollection } from "../../tenants/[id]/route";
 import { ObjectId } from "mongodb";
 
-const bodySchema = z.object({ tenantId: z.string().min(1) });
+const bodySchema = z.object({ agencyId: z.string().min(1) });
 
-export async function GET() {
-  const session = await auth();
-  if (!session)
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  const jar = await cookies();
-  const websiteId = jar.get("current_website_id")?.value || null;
-  return NextResponse.json({ websiteId });
-}
+// export async function GET() {
+//   const session = await auth();
+//   if (!session)
+//     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+//   const jar = await cookies();
+//   const websiteId = jar.get("current_website_id")?.value || null;
+//   return NextResponse.json({ websiteId });
+// }
 
 export async function POST(req: Request) {
   const session = await auth();
@@ -26,13 +26,15 @@ export async function POST(req: Request) {
   if (!parsed.success)
     return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
 
-
   const agencycoll = await getCollection("tenants");
   const websitecoll = await getCollection("websites");
-  // Verify that userid belongs to the same tenant
+  const foundAgencies = await agencycoll.findOne({
+    _id: new ObjectId(parsed.data.agencyId),
+  });
 
+  // Verify that userid belongs to the same tenant
   const foundBusiness = await agencycoll.findOne({
-    _id: new ObjectId(parsed.data.tenantId),
+    tenantId: foundAgencies._id,
   });
 
   if (!foundBusiness)
@@ -44,11 +46,19 @@ export async function POST(req: Request) {
 
   const res = NextResponse.json({
     ok: true,
-    tenant: String(foundBusiness._id),
+    agency: String(foundAgencies._id),
+    business: String(foundBusiness._id),
     website_id: String(firstWebsite._id),
   });
 
   const thirtyDays = 30 * 24 * 60 * 60; // seconds
+  res.cookies.set("current_selected_agency_id", String(foundAgencies["_id"]), {
+    httpOnly: true,
+    sameSite: "lax",
+    secure: false,
+    path: "/",
+    maxAge: thirtyDays,
+  });
   res.cookies.set(
     "current_selected_business_id",
     String(foundBusiness["_id"]),

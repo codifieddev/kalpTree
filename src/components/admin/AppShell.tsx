@@ -142,6 +142,9 @@ type AppShellProps = {
   currentTenant: any | null;
   onTenantChange?: (tenantId: string) => void;
   loggedinTenant: any;
+  currentagency: any;
+  agencies: any[];
+  onAgencyChage?: (agencyId: string) => void;
 };
 
 type NavItem = {
@@ -719,9 +722,12 @@ export function AppShell({
   user = null,
   onWebsiteChange = () => {},
   onTenantChange = () => {},
+  onAgencyChage = () => {},
   tenants = [],
   currentTenant = null,
   loggedinTenant,
+  currentagency = null,
+  agencies = [],
 }: AppShellProps) {
   const [mobileSidebarOpen, setMobileSidebarOpen] = React.useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = React.useState(false);
@@ -741,6 +747,7 @@ export function AppShell({
       await signOut({ callbackUrl: "/" });
     }
   };
+
 
   const resetRedux = () => {
     dispatch(clearAttributes());
@@ -766,26 +773,6 @@ export function AppShell({
                 className="h-10 w-10"
               />
             </div>
-
-            {/* <header className="h-16 w-full bg-white border-b border-gray-200 flex items-center justify-between px-5">
-        LEFT
-        <div className="flex items-center gap-4">
-          Logo
-          <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-full   flex items-center justify-center text-white text-xs font-semibold">
-              <img src="../kalptree-favicon.svg" alt="KalpTree" className="h-10 w-10" />
-            </div>
-
-            <div className="leading-[14px]">
-              <p className="text-sm font-semibold text-gray-900">TEST1</p>
-              <p className="text-[11px] text-gray-500">
-                Franchise panel
-              </p>
-          </div>
-
-          <Separator orientation="vertical" className="h-8" />
-
-         <div className="border-none border-black/10 p-3"> */}
             <button
               type="button"
               onClick={() => setCollapsed((v) => !v)}
@@ -803,49 +790,13 @@ export function AppShell({
                   <GoSidebarCollapse size={20} />
                 )}
               </span>
-
-              {/* {!collapsed && (
-      <span className="text-[12px] text-black/60">
-        Collapse sidebar
-      </span>
-    )} */}
             </button>
           </div>
-          {/* <div className="border-none border-black/10 p-3">
-            <span>
-              <GoSidebarExpand className="h-4 w-4 " size={10} />
-            </span>
-            <Button
-                  variant="ghost"
-                
-                  className={cn(
-                    "w-full justify-between  hover:bg-transparent",
-                    "border-e border-black/5 bg-transparent rounded-none  text-black/70 "
-                  )}
-                >
-                   <GoSidebarExpand className="h-14 w-14 " size={48} />
-                  {!collapsed ? (
-                    <>
-                      <GoSidebarExpand className="h-14 w-14 " size={48} />
-                    </>
-                  ) : (
-                    <>
-                      <GoSidebarCollapse className="h-14 w-14  mx-auto" size={48} />
-                    </>
-                  )}
-                </Button>
-          </div> */}
-
-          {/* comm */}
-
-          {/* <h1 className="text-[15px] font-semibold text-gray-900">
-          Dashboard
-        </h1> */}
 
           {currentWebsite && (
             <div className="flex items-center gap-2 rounded-full border bg-muted/60 px-3 py-1 text-xs text-muted-foreground">
               <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-primary/15 text-[10px] font-semibold text-primary">
-                {currentWebsite.name.charAt(0).toUpperCase()}
+                {currentWebsite.name && currentWebsite.name.charAt(0).toUpperCase()}
               </span>
               <span className="hidden md:inline">{currentWebsite.name}</span>
               <span className="hidden text-[11px] text-muted-foreground/80 sm:inline">
@@ -881,13 +832,13 @@ export function AppShell({
           {/* Avatar */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
+              {/* <Button variant="ghost" size="icon" className=""> */}
               <Button variant="ghost" size="icon" className="">
-                {/* <Button variant="ghost" size="icon" className="">
                 <Avatar className="h-7 w-7">
                   <AvatarFallback>
                     {user?.email?.charAt(0).toUpperCase() || "U"}
                   </AvatarFallback>
-                </Avatar> */}
+                </Avatar>
               </Button>
             </DropdownMenuTrigger>
 
@@ -905,20 +856,6 @@ export function AppShell({
               <DropdownMenuItem className="hover:bg-primary hover:text-white p-2">
                 Account settings
               </DropdownMenuItem>
-              {/* <DropdownMenuContent
-              align="end"
-              className="bg-white rounded-md shadow-md w-40"
-            >
-              <DropdownMenuLabel className="hover:bg-primary hover:text-white p-2">
-                {user?.email || "User"}
-              </DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem className="hover:bg-primary hover:text-white p-2">
-                Profile
-              </DropdownMenuItem>
-              <DropdownMenuItem className="hover:bg-primary hover:text-white p-2">
-                Account settings
-              </DropdownMenuItem> */}
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 onClick={handleSignOut}
@@ -952,41 +889,13 @@ export function AppShell({
             collapsed={sidebarCollapsed}
             onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
             loggedinTenant={loggedinTenant}
+            agencies={agencies}
+            currentagency={currentagency}
+            onAgencyChage={onAgencyChage}
           />
         )}
 
-        {/* <div className="flex h-[92vh] bg-[#e8e9eb] text-foreground overflow-hidden">
-        <HighLevelSidebar
-          showSidebar={showSidebar}
-          setShowSidebar={setShowSidebar}
-          user={user}
-          collapsed={sidebarCollapsed}
-          loggedinTenant={loggedinTenant}
-        />
-
-        {showSidebar && (
-          <Sidebar
-            tenants={tenants}
-            currentTenant={currentTenant}
-            onTenantChange={onTenantChange}
-            websites={websites}
-            currentWebsite={currentWebsite}
-            user={user}
-            onWebsiteChange={onWebsiteChange}
-            collapsed={sidebarCollapsed}
-            onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
-            loggedinTenant={loggedinTenant}
-          />
-        )} */}
-
         <div className="flex flex-1 min-h-screen flex-col overflow-hidden">
-          {/* <Topbar
-          currentWebsite={currentWebsite}
-          user={user}
-          onToggleMobileSidebar={() => setMobileSidebarOpen(true)}
-          collapsed={sidebarCollapsed}
-          onToggleCollapse={(event) => setSidebarCollapsed((prev) => !prev)}
-        /> */}
           <main className="flex-1 px-3 py-4 md:px-6 md:py-6 overflow-auto">
             <div className="mx-auto max-w-7xl">{children}</div>
           </main>

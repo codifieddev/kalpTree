@@ -27,6 +27,8 @@ type AppShellClientProps = {
   tenants: any[];
   currentTenant: any;
   loggedinTenant: any | null;
+  currentagency: any;
+  agencies: any[];
 };
 
 export function AppShellClient({
@@ -37,9 +39,14 @@ export function AppShellClient({
   tenants,
   currentTenant: initialCurrentTenant,
   loggedinTenant,
+  currentagency: initialCurrentAgency,
+  agencies,
 }: AppShellClientProps) {
+
+
   const [currentWebsite, setCurrentWebsite] = useState(initialCurrentWebsite);
   const [currentTenant, setCurrentTenant] = useState(initialCurrentTenant);
+  const [currentAgency, setCurrentAgency] = useState(initialCurrentAgency);
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
   const dispatch = useDispatch<AppDispatch>();
@@ -63,12 +70,12 @@ export function AppShellClient({
         },
         body: JSON.stringify({ websiteId }),
       });
-      
+
       if (response.ok) {
         // Clear Redux state first to prevent old data from being used
         resetRedux();
         // Navigate to /admin (which will load fresh data for new website)
-        window.location.href = `/admin/websites/${newWebsite!.primaryDomain}`;
+        // window.location.href = `/admin/websites/${newWebsite!.primaryDomain}`;
         // router.push("/admin")
       } else {
         console.error("Failed to update website context");
@@ -82,7 +89,7 @@ export function AppShellClient({
   };
 
   const handleTenantChange = async (tenantId: string) => {
-    console.log(tenantId);
+   
     const newTenant = tenants.find((w) => w._id === tenantId) || null;
     setCurrentTenant(newTenant);
     try {
@@ -99,16 +106,46 @@ export function AppShellClient({
         // Clear Redux state first to prevent old data from being used
         resetRedux();
         // Navigate to /admin (which will load fresh data for new website)
-        window.location.href = "/admin";
+        // window.location.href = "/admin";
         // router.push("/admin")
       } else {
-        console.error("Failed to update website context");
+        console.error("Failed to update Business context");
         // Revert the optimistic update
         setCurrentTenant(initialCurrentTenant);
       }
     } catch (error) {
-      console.error("Error updating website context:", error);
+      console.error("Error updating Business context:", error);
       setCurrentTenant(initialCurrentTenant);
+    }
+  };
+
+  const handleAgencyChange = async (agencyId: string) => {
+    const newagency = tenants.find((w) => w._id === agencyId) || null;
+    setCurrentAgency(newagency);
+    try {
+      // Call API to update the current website cookie
+      const response = await fetch("/api/session/agency", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ agencyId }),
+      });
+      if (response.ok) {
+        const json = await response.json();
+        // Clear Redux state first to prevent old data from being used
+        resetRedux();
+        // Navigate to /admin (which will load fresh data for new website)
+        // window.location.href = "/admin";
+        // router.push("/admin")
+      } else {
+        console.error("Failed to update agency context");
+        // Revert the optimistic update
+        setCurrentAgency(initialCurrentAgency);
+      }
+    } catch (error) {
+      console.error("Error updating agency context:", error);
+      setCurrentAgency(initialCurrentAgency);
     }
   };
 
@@ -137,9 +174,12 @@ export function AppShellClient({
       user={user}
       onWebsiteChange={handleWebsiteChange}
       onTenantChange={handleTenantChange}
+      onAgencyChage={handleAgencyChange}
       tenants={tenants}
       currentTenant={currentTenant}
       loggedinTenant={loggedinTenant}
+      agencies={agencies}
+      currentagency={currentAgency}
     >
       {children}
     </AppShell>
