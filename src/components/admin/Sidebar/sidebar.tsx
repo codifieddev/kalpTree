@@ -152,7 +152,7 @@ export function Sidebar({
                     <div className="flex items-center gap-3">
                       <div className="grid h-10 w-10 place-items-center rounded-md">
                         <img
-                          src="../kalptree-favicon.svg"
+                          src="../kalptree-main-logo.svg"
                           className="w-10 h-10"
                         ></img>
                       </div>
