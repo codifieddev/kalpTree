@@ -77,12 +77,9 @@ export async function DELETE(req: NextRequest, ctx: any) {
 
     // Get id from query or body
     const idFromQuery = req.nextUrl?.searchParams?.get("id");
+    console.log("idFromQuery")
     let id = idFromQuery;
-    if (!id) {
-      const body = await req.json().catch(() => null);
-      id = body?.id ?? body?._id;
-    }
-
+    
     if (!id) {
       return NextResponse.json({ error: "Missing id" }, { status: 400 });
     }

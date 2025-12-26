@@ -49,11 +49,12 @@ export async function createAttribute(
   const db = await getDatabase();
   const col = db.collection<MaterialAttributes>(COLLECTION);
 
-  // prevent duplicate name (case-insensitive)
+  // prevent duplicate name (case-insensitive) for the same websiteId
   const exists = await col.findOne({
     name: { $regex: `^${escapeRegExp(data.name)}$`, $options: "i" },
+    websiteId: data.websiteId
   } as any);
-  if (exists) throw new Error("Attribute with same name already exists");
+  if (exists) throw new Error("Attribute with same name already exists for this website");
 
   const now = new Date();
 

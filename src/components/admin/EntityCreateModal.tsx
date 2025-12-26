@@ -33,7 +33,7 @@ export default function EntityCreateModal({ entity }: Props) {
   const currentUser = useSelector((state: RootState) => state.user.user);
 
   const filterCategory = listCategory.filter(
-    (item) => item.websiteId === currentWebsite?._id
+    (item) => item.websiteId === currentWebsite?.websiteId
   );
   const filterBrand = listBrand.filter(
     (item) => (item as any).websiteId === currentWebsite?._id
@@ -90,6 +90,8 @@ export default function EntityCreateModal({ entity }: Props) {
     ai_summary: null,
   });
 
+
+  
   // Generic simple state for other entities
   const [name, setName] = useState("");
   const [extra, setExtra] = useState("");
@@ -383,13 +385,7 @@ export default function EntityCreateModal({ entity }: Props) {
                   setCategory={setCategory}
                   fieldErrors={fieldErrors}
                 />
-              ) : entity === "segment" ? (
-                <SegmentForm
-                  segment={segment}
-                  setSegment={setSegment}
-                  fieldErrors={fieldErrors}
-                />
-              ) : entity === "brand" ? (
+              )  : entity === "brand" ? (
                 <BrandForm
                   brand={brand}
                   setBrand={setBrand}

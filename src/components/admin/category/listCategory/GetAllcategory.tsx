@@ -17,8 +17,8 @@ const GetAllcategory = () => {
     if (!hasFetched && 
       !isCategoryLoading &&
     currentWebsite &&
-  currentWebsite._id) {
-      dispatch(fetchCategories({websiteId:currentWebsite._id}));
+  currentWebsite.websiteId) {
+      dispatch(fetchCategories({websiteId:currentWebsite.websiteId}));
     }
   }, [hasFetched, isCategoryLoading, user,dispatch,currentWebsite]);
 

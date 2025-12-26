@@ -7,7 +7,15 @@ import { removeAttribute } from '@/hooks/slices/attribute/AttributeSlice';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
 import { MaterialAttributes } from '../types/attributeModel';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
+import { Button } from "@/components/ui/button";
+import AttributeForm from '../forms/AttributeForm';
 const AttributeTable = () => {
 
   const { listAttribute, isAttributeLoading } = useSelector(
@@ -20,7 +28,17 @@ const AttributeTable = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { toast } = useToast();
   const router = useRouter();
+    const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [editingAttribute, setEditingAttribute] = useState<MaterialAttributes | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const [isSaving, setIsSaving] = useState(false);
 
+  
+    const currentUser = useSelector((state: RootState) => state.user.user);
+  
+    const filterCategory = listCategory.filter(
+      (item) => item.websiteId === currentWebsite?.websiteId
+    );
   const product_attribute = useMemo(() => {
     if (
       listCategory &&
@@ -67,11 +85,63 @@ const AttributeTable = () => {
   };
 
   const handleView = (row: any) => {
-    const id = row?._id ?? row?.id;
+     const id = row?._id ?? row?.id;
     if (!id) return;
-    // navigate to edit/view page under admin
-    router.push(`/admin/attribute/${id}`);
+    setEditingAttribute(row);
+    setFieldErrors({});
+    setIsEditDialogOpen(true);
   };
+ const handleSaveEdit = async () => {
+    if (!editingAttribute) return;
+    
+    setFieldErrors({});
+    const errors: Record<string, string> = {};
+    
+    if (!editingAttribute.name?.trim()) {
+      errors.name = 'Name is required';
+    }
+    
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors);
+      return;
+    }
+    
+    setIsSaving(true);
+    try {
+      const id = (editingAttribute as any)._id ?? editingAttribute.id;
+      const { _id, ...updateData } = editingAttribute as any;
+      
+      const res = await fetch(`/api/admin/attribute`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...updateData, id }),
+      });
+      
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body?.error || `HTTP ${res.status}`);
+      }
+      
+      toast({ 
+        title: 'Updated', 
+        description: `Category ${editingAttribute.name} updated successfully` 
+      });
+      setIsEditDialogOpen(false);
+      setEditingAttribute(null);
+      window.location.reload();
+    } catch (err: any) {
+      console.error('Failed to update category', err);
+      toast({ 
+        title: 'Update failed', 
+        description: String(err?.message || err),
+        variant: 'destructive'
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+
 
   const initialColumns = [
     { key: '_id', label: 'ID', hidden: true },
@@ -94,7 +164,53 @@ const AttributeTable = () => {
         initialColumns={initialColumns}
         onDelete={(row) => handleDelete(row)}
         onView={(row) => handleView(row)}
+         opentab={() => {}}
       />
+
+              {/* Edit Category Dialog */}
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Edit Category</DialogTitle>
+          </DialogHeader>
+          
+          {editingAttribute && (
+            <div className="space-y-4">
+              <AttributeForm
+                attribute={editingAttribute}
+                setAttribute={(value) => {
+                  if (typeof value === 'function') {
+                    setEditingAttribute(prev => prev ? value(prev) : null);
+                  } else {
+                    setEditingAttribute(value);
+                  }
+                }}
+                fieldErrors={fieldErrors}
+                filterCategory={filterCategory}
+              />
+              
+              <div className="flex justify-end gap-2 pt-4">
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setIsEditDialogOpen(false);
+                    setEditingAttribute(null);
+                  }}
+                  disabled={isSaving}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={handleSaveEdit}
+                  disabled={isSaving}
+                >
+                  {isSaving ? 'Saving...' : 'Save Changes'}
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
