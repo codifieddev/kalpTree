@@ -370,11 +370,11 @@ export function DataTableExt({
       <div className="flex items-center justify-between">
         <div className="text-xl font-semibold">{title} </div>
         <div className="flex items-center gap-2">
-          {/* {createHref && (
+          {createHref && (
             <Link href={createHref} className="text-sm">
               <Button size="sm">Create New</Button>
             </Link>
-          )} */}
+          )}
         </div>
       </div>
 

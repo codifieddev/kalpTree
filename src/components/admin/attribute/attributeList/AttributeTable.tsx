@@ -37,7 +37,7 @@ const AttributeTable = () => {
     const currentUser = useSelector((state: RootState) => state.user.user);
   
     const filterCategory = listCategory.filter(
-      (item) => item.websiteId === currentWebsite?.websiteId
+      (item) => item.websiteId === currentWebsite?._id
     );
   const product_attribute = useMemo(() => {
     if (
