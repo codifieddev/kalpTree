@@ -5,20 +5,21 @@ import categoryReducer from "../hooks/slices/category/CategorySlice";
 import websitesReducer from "../hooks/slices/websites/WebsiteSlice";
 import attributeReducer from "../hooks/slices/attribute/AttributeSlice";
 import brandReducer from "../hooks/slices/brand/BrandSlice";
-import segmentReducer from "../hooks/slices/segment/SegmentSlice";
+
 import productReducer from "../hooks/slices/product/ProductSlice";
 import tenantsReducer from "../hooks/slices/tenants/TenantSlice";
 import llmSettingReducer from "../hooks/slices/setting/llmSetting/LLMSettingSlice";
 import BlockReducer from "../hooks/slices/blocks/BlockSlice"
 import websitePageReducer from "../hooks/slices/website/websitePageSlice"
-
+import agencyReducer from "../hooks/slices/user/agencySlice"
 export const store = configureStore({
   reducer: {
     user: userSlice,
+    agency:agencyReducer,
     pageEdit: pageEditReducer,
     category: categoryReducer,
     brand: brandReducer,
-    segment: segmentReducer,
+
     attribute: attributeReducer,
     product: productReducer,
     websites: websitesReducer,

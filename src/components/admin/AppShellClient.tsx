@@ -11,7 +11,7 @@ import {
 } from "@/hooks/slices/websites/WebsiteSlice";
 import { clearAttributes } from "@/hooks/slices/attribute/AttributeSlice";
 import { clearBrands } from "@/hooks/slices/brand/BrandSlice";
-import { clearSegments } from "@/hooks/slices/segment/SegmentSlice";
+
 import { clearCategories } from "@/hooks/slices/category/CategorySlice";
 import { clearProducts } from "@/hooks/slices/product/ProductSlice";
 import {
@@ -52,12 +52,12 @@ export function AppShellClient({
   const query = useSearchParams();
   const tenantId = query.get("tenantId");
   const businessid = query.get("businessid");
-  const url = params.website;
-
+  // const url = params.website;
+const url = Array.isArray(params.website) ? params.website[0] : params.website;
   const resetRedux = () => {
     dispatch(clearAttributes());
     dispatch(clearBrands());
-    dispatch(clearSegments());
+
     dispatch(clearCategories());
     dispatch(clearProducts());
   };
