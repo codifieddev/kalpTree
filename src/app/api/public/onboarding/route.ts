@@ -46,6 +46,7 @@ export async function POST(req: Request) {
         createdById: createdById,
         branding: branding,
         businessdetails: businessdetails,
+        type:"agency"
       });
 
       let agency_logo_url = "";
@@ -79,7 +80,7 @@ export async function POST(req: Request) {
         branding: newBranding,
       });
 
-      createByTenant = String(tenant._id);
+      createByTenant = agencyid
 
       const t = await userService.createUser({
         email: agency_email,
@@ -95,9 +96,11 @@ export async function POST(req: Request) {
       name: business_name,
       email: email,
       plan: "trial",
-      createdById: createByTenant ? createByTenant : createdById,
+      createdById: createdById,
       branding: branding,
       businessdetails: businessdetails,
+      type: "business",
+      tenantId: createByTenant,
     });
 
     const id = String(tenant._id);
@@ -134,7 +137,7 @@ export async function POST(req: Request) {
       password: password,
       name: business_name,
       role: role,
-      createdById: createByTenant ? createByTenant : createdById,
+      createdById: createdById,
       tenantId: tenant._id,
     });
 

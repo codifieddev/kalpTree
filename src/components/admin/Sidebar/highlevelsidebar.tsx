@@ -147,7 +147,6 @@ export function HighLevelSidebar({
     setOpenItems((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
-  console.log(params)
 
   const toggleCollapsed = () => setCollapsed((v) => !v);
 

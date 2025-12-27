@@ -258,7 +258,7 @@ export const Userdetails = ({
           Permission Roles 
         </label>
         <div className="space-y-3">
-          {role === "superadmin" ? (
+          {false ? (
             <label
               className={`flex items-start p-4 rounded-md border-2 cursor-pointer transition-all ${
                 formData.role === "agency"

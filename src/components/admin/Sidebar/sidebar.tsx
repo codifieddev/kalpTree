@@ -230,69 +230,65 @@ export function Sidebar({
                   </div>
                 )}
 
-                {user?.role == "agency" ||
-                  (user?.role == "superadmin" && (
-                    <div className="relative mt-2">
-                      {tenants.length > 0 && (
-                        <div className={cn("px-3 pt-2 ", collapsed && "px-2")}>
-                          <div className="relative">
-                            <Select
-                              value={currentTenant?._id || ""}
-                              onValueChange={onTenantChange}
-                            >
-                              <SelectTrigger
-                                className={cn(
-                                  "h-14 w-full rounded-lg bg-white border-2 border-gray-600 focus:ring-2 focus:ring-gray-600 focus:border-gray-600",
-                                  "text-left px-4 py-2 h-[500px]",
-                                  "[&>svg]:hidden",
-                                  collapsed && "justify-center px-2"
-                                )}
-                              >
-                                <div className="flex items-center justify-between w-full">
-                                  <span className="text-base text-gray-900">
-                                    {currentTenant?.name || ""}
-                                  </span>
-                                  <ChevronDown className="h-4 w-4 text-black/70" />
-                                </div>
-                              </SelectTrigger>
-
-                              <SelectContent className="w-[260px] rounded-lg border shadow-lg ">
-                                <div className="px-3 py-2 text-xs font-medium text-muted-foreground">
-                                  Tenants
-                                </div>
-
-                                {tenants.map((tenant) => (
-                                  <SelectItem
-                                    key={tenant._id}
-                                    value={tenant._id}
-                                  >
-                                    <div className="flex items-center gap-2">
-                                      <Building2 className="h-4 w-4 text-black/60" />
-                                      <span className="text-sm font-medium">
-                                        {tenant.name}
-                                      </span>
-                                    </div>
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-
-                            {/* Floating Label */}
-                            <label
+                {(user?.role == "agency" || user?.role == "superadmin") && (
+                  <div className="relative mt-2">
+                    {tenants.length > 0 && (
+                      <div className={cn("px-3 pt-2 ", collapsed && "px-2")}>
+                        <div className="relative">
+                          <Select
+                            value={currentTenant?._id || ""}
+                            onValueChange={onTenantChange}
+                          >
+                            <SelectTrigger
                               className={cn(
-                                "absolute left-7 transition-all duration-200 pointer-events-none bg-white px-1",
-                                currentTenant?._id
-                                  ? "-top-2.5 text-xs text-gray-600"
-                                  : "top-6 text-base text-gray-500"
+                                "h-14 w-full rounded-lg bg-white border-2 border-gray-600 focus:ring-2 focus:ring-gray-600 focus:border-gray-600",
+                                "text-left px-4 py-2 h-[500px]",
+                                "[&>svg]:hidden",
+                                collapsed && "justify-center px-2"
                               )}
                             >
-                              Select Businesses
-                            </label>
-                          </div>
+                              <div className="flex items-center justify-between w-full">
+                                <span className="text-base text-gray-900">
+                                  {currentTenant?.name || ""}
+                                </span>
+                                <ChevronDown className="h-4 w-4 text-black/70" />
+                              </div>
+                            </SelectTrigger>
+
+                            <SelectContent className="w-[260px] rounded-lg border shadow-lg ">
+                              <div className="px-3 py-2 text-xs font-medium text-muted-foreground">
+                                Tenants
+                              </div>
+
+                              {tenants.map((tenant) => (
+                                <SelectItem key={tenant._id} value={tenant._id}>
+                                  <div className="flex items-center gap-2">
+                                    <Building2 className="h-4 w-4 text-black/60" />
+                                    <span className="text-sm font-medium">
+                                      {tenant.name}
+                                    </span>
+                                  </div>
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+
+                          {/* Floating Label */}
+                          <label
+                            className={cn(
+                              "absolute left-7 transition-all duration-200 pointer-events-none bg-white px-1",
+                              currentTenant?._id
+                                ? "-top-2.5 text-xs text-gray-600"
+                                : "top-6 text-base text-gray-500"
+                            )}
+                          >
+                            Select Businesses
+                          </label>
                         </div>
-                      )}
-                    </div>
-                  ))}
+                      </div>
+                    )}
+                  </div>
+                )}
                 <div className="relative mt-2">
                   {websites.length > 0 && (
                     <div className={cn("px-3 pt-2 ", collapsed && "px-2")}>

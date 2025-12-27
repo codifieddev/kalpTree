@@ -18,6 +18,7 @@ import {
   setCurrentTenants,
   setTenants,
 } from "@/hooks/slices/tenants/TenantSlice";
+import { toCreateHref } from "@/lib/utils";
 
 type AppShellClientProps = {
   children: React.ReactNode;
@@ -53,7 +54,9 @@ export function AppShellClient({
   const tenantId = query.get("tenantId");
   const businessid = query.get("businessid");
   // const url = params.website;
-const url = Array.isArray(params.website) ? params.website[0] : params.website;
+  const url = Array.isArray(params.website)
+    ? params.website[0]
+    : params.website;
   const resetRedux = () => {
     dispatch(clearAttributes());
     dispatch(clearBrands());
@@ -62,16 +65,8 @@ const url = Array.isArray(params.website) ? params.website[0] : params.website;
     dispatch(clearProducts());
   };
   const handleWebsiteChange = async (websiteId: string) => {
-    let newWebsite;
-    if (url) {
-      newWebsite = websites.find((w) => w.primaryDomain?.includes(url)) || null;
-    } else {
-      newWebsite = websites.find((w) => w._id === websiteId) || null;
-    }
+    const newWebsite = websites.find((w) => w._id === websiteId) || null;
     setCurrentWebsite(newWebsite);
-    console.log(newWebsite)
-    const id = newWebsite?._id === websiteId
-    
     try {
       // Call API to update the current website cookie
       const response = await fetch(`/api/session/website`, {
@@ -79,14 +74,24 @@ const url = Array.isArray(params.website) ? params.website[0] : params.website;
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ id }),
+        body: JSON.stringify({ websiteId }),
       });
+
+      let href = toCreateHref(
+        newWebsite?.primaryDomain != undefined &&
+          typeof newWebsite.primaryDomain == "string"
+          ? newWebsite!.primaryDomain
+          : "",
+        tenantId,
+        businessid,
+        user?.role!
+      );
 
       if (response.ok) {
         // Clear Redux state first to prevent old data from being used
         resetRedux();
         // Navigate to /admin (which will load fresh data for new website)
-        // window.location.href = `/admin/websites/${newWebsite!.primaryDomain}`;
+        window.location.href = href;
         // router.push("/admin")
       } else {
         console.error("Failed to update website context");
@@ -114,12 +119,16 @@ const url = Array.isArray(params.website) ? params.website[0] : params.website;
           body: JSON.stringify({ tenantId }),
         }
       );
+
       if (response.ok) {
         const json = await response.json();
+        const { website_id, tenant } = json;
+        console.log(tenant);
+        const href = `/admin/websites/${website_id}?businessid=${businessid}&tenantId=${tenant}`;
         // Clear Redux state first to prevent old data from being used
         resetRedux();
         // Navigate to /admin (which will load fresh data for new website)
-        // window.location.href = "/admin";
+        window.location.href = href;
         // router.push("/admin")
       } else {
         console.error("Failed to update Business context");
@@ -149,10 +158,12 @@ const url = Array.isArray(params.website) ? params.website[0] : params.website;
       );
       if (response.ok) {
         const json = await response.json();
+        const { website_id, business, agency } = json;
+        const href = `/admin/websites/${website_id}?businessid=${agency}&tenantId=${business}`;
         // Clear Redux state first to prevent old data from being used
         resetRedux();
         // Navigate to /admin (which will load fresh data for new website)
-        // window.location.href = "/admin";
+        window.location.href = href;
         // router.push("/admin")
       } else {
         console.error("Failed to update agency context");

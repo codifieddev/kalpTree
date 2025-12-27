@@ -112,7 +112,7 @@ const ROLE_MAP = {
 
 type Role = keyof typeof ROLE_MAP;
 
-function toCreateHref(
+export function toCreateHref(
   url: string,
   tenantId: string | null = null,
   businessId: string | null = null,
@@ -151,6 +151,7 @@ export default async function BusinesswithID({
 
   const totalWebsites = websites.length;
   const primaryDomain = websites?.[0]?.primaryDomain?.[0] || "—";
+
 
   return (
     <div className="w-full max-w-[1200px] space-y-6">
@@ -365,7 +366,7 @@ export default async function BusinesswithID({
                     business._id,
                     business.tenantId,
                     user?.role!
-                  );      
+                  );
                   return (
                     <div
                       key={`${w.name || "website"}-${idx}`}

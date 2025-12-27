@@ -36,6 +36,8 @@ export class TenantService {
     createdById: ObjectId | string;
     businessdetails?: any;
     branding?: any;
+    type: string;
+    tenantId?: string;
   }): Promise<Tenant> {
     const collection = await this.getCollection();
 
@@ -50,6 +52,7 @@ export class TenantService {
     }
 
     const tenant: Omit<TenantModel, "_id"> = {
+      type: data.type,
       slug: data.slug ? data.slug.toLowerCase() : "",
       name: data.name,
       email: data.email,
@@ -75,6 +78,12 @@ export class TenantService {
       createdAt: new Date(),
       updatedAt: new Date(),
     };
+
+    const tenantID = data.tenantId ? new ObjectId(data.tenantId) : "";
+
+    if (tenantID) {
+      tenant.tenantId = tenantID;
+    }
 
     const result = await collection.insertOne(tenant as Tenant);
     return { ...tenant, _id: result.insertedId } as Tenant;

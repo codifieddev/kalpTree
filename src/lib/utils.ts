@@ -14,7 +14,6 @@ export const s3 = new S3Client({
   },
 });
 
-
 export function generateFileName(originalName: string) {
   const ext = originalName.split(".").pop()?.toLowerCase() || "png";
 
@@ -32,4 +31,30 @@ export function generateFileName(originalName: string) {
     .slice(0, 15); // YYYY-MM-DD-HHMMSS
 
   return `${baseName}-${timestamp}.${ext}`;
+}
+
+const ROLE_MAP = {
+  superadmin: "",
+  agency: "",
+  business: "",
+} as const;
+
+type Role = keyof typeof ROLE_MAP;
+
+export function toCreateHref(
+  url: string,
+  tenantId: string | null = null,
+  businessId: string | null = null,
+  role: string
+) {
+  if (!(role in ROLE_MAP)) {
+    throw new Error("Invalid role");
+  }
+  const obj: Record<Role, string> = {
+    superadmin: `/admin/websites/${url}?businessid=${businessId}&tenantId=${tenantId}`,
+    agency: `/admin/websites/${url}?businessid=${businessId}`,
+    business: `/admin/websites/${url}`,
+  };
+
+  return obj[role as Role];
 }

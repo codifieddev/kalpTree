@@ -42,10 +42,12 @@ export async function POST(req: Request) {
     tenantId: foundBusiness._id,
   });
 
+  console.log(firstWebsite)
+
   const res = NextResponse.json({
     ok: true,
     tenant: String(foundBusiness._id),
-    website_id: String(firstWebsite._id),
+    website_id: firstWebsite.primaryDomain[0],
   });
 
   const thirtyDays = 30 * 24 * 60 * 60; // seconds

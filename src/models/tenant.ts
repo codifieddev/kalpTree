@@ -6,6 +6,7 @@ export interface TenantModel {
   slug: string;
   name: string;
   email: string;
+  type?: string;
   customDomainVerified: boolean;
   plan: "trial" | "basic" | "pro" | "enterprise";
   subscriptionStatus: "active" | "suspended" | "cancelled";
@@ -32,6 +33,7 @@ export interface TenantModel {
   userId?: ObjectId | string;
   createdById?: string | ObjectId
   businessdetails?: any;
+  tenantId?: string | ObjectId
 }
 
 // Example usage:

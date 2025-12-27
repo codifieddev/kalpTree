@@ -86,7 +86,7 @@ export interface Tenant extends Omit<BaseDocument, "tenantId"> {
       keySecret: string; // Store encrypted
     };
   };
-
+  tenantId?: ObjectId | string
   // Feature flags
   features: {
     websiteEnabled: boolean;

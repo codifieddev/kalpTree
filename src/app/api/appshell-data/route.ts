@@ -179,12 +179,12 @@ export async function GET(req: NextRequest) {
     }
 
     if (currentbusiness?._id) {
-      currentWebsite = await websiteColl
+      websites = await websiteColl
         .find({
           tenantId: new ObjectId(currentbusiness._id),
         })
         .toArray();
-      websites = currentWebsite.map((doc: any) => ({
+      websites = websites.map((doc: any) => ({
         _id: doc._id.toString(),
         websiteId: doc.websiteId,
         name: doc.name,
