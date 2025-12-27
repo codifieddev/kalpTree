@@ -2,7 +2,7 @@ import { cookies } from "next/headers";
 import { auth } from "@/auth";
 import { websiteService } from "@/lib/websites/website-service";
 import { ObjectId } from "mongodb";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { getCollection } from "../tenants/[id]/route";
 
 export function serializeMongoDoc<T>(doc: T): any {
@@ -35,7 +35,12 @@ export function serializeMongoDoc<T>(doc: T): any {
   return doc;
 }
 
-export async function GET() {
+export async function GET(req: NextRequest) {
+  const query = (await req).nextUrl.searchParams;
+  const tenantId = query.get("tenantId");
+  const businessid = query.get("businessid");
+  const url = query.get("url");
+
   const cookieStore = await cookies();
   const session = await auth();
   const user = session?.user
@@ -79,7 +84,11 @@ export async function GET() {
     }
 
     if (!currentagency && agencies.length > 0) {
-      currentagency = agencies[0];
+      if (businessid != "null") {
+        currentagency = agencies.find((a) => a._id === businessid) || null;
+      } else {
+        currentagency = agencies[0];
+      }
     }
 
     if (currentagency?._id) {
@@ -103,7 +112,11 @@ export async function GET() {
           business.find((t) => t._id === currentBusinessId) || null;
       }
       if (!currentBusinessId && business.length > 0) {
-        currentbusiness = business[0];
+        if (tenantId != "null") {
+          currentbusiness = business.find((t) => t._id === tenantId) || null;
+        } else {
+          currentbusiness = business[0];
+        }
       }
 
       if (currentbusiness?._id) {
@@ -132,7 +145,12 @@ export async function GET() {
         }
 
         if (!currentWebsite && websites.length > 0) {
-          currentWebsite = websites[0];
+          if (url != "undefined") {
+            currentWebsite =
+              websites.find((w) => w.primaryDomain.includes(url)) || null;
+          } else {
+            currentWebsite = websites[0];
+          }
         }
       }
     }
@@ -226,4 +244,14 @@ export async function GET() {
     agencies,
     currentagency,
   });
+}
+
+export async function POST(req: NextRequest) {
+  const response = NextResponse.json({ success: true });
+
+  response.cookies.delete("current_selected_agency_id");
+  response.cookies.delete("current_selected_business_id");
+  response.cookies.delete("current_website_id");
+
+  return response;
 }

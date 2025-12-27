@@ -1,8 +1,8 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import clsx from "clsx"
-import { signOut } from "next-auth/react"
+import * as React from "react";
+import clsx from "clsx";
+import { signOut } from "next-auth/react";
 import {
   Book,
   ChevronRight,
@@ -15,20 +15,16 @@ import {
   CreditCard,
   Bell,
   LogOut,
-  SquareTerminal
-} from "lucide-react"
+  SquareTerminal,
+} from "lucide-react";
 
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@/components/ui/avatar"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from "@/components/ui/collapsible"
+} from "@/components/ui/collapsible";
 
 import {
   DropdownMenu,
@@ -38,7 +34,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu";
 
 import {
   Sidebar,
@@ -55,7 +51,7 @@ import {
   SidebarGroupLabel,
   SidebarRail,
   useSidebar,
-} from "@/components/ui/sidebar"
+} from "@/components/ui/sidebar";
 
 // Data
 const data = {
@@ -73,31 +69,44 @@ const data = {
     { title: "Categories", url: "/admin/categories", icon: Settings },
     // Extend with orders, tags etc. as needed
   ],
-}
+};
 
 type AppSidebarProps = {
-  handleSwitchTab: (tab: string) => void
-} & Omit<React.ComponentProps<typeof Sidebar>, "children">
+  handleSwitchTab: (tab: string) => void;
+} & Omit<React.ComponentProps<typeof Sidebar>, "children">;
 
 export function AppSidebar({ handleSwitchTab, ...rest }: AppSidebarProps) {
   const { open } = useSidebar();
+
+  const handleDeleteAllCookies = async () => {
+    const res = await fetch("/api/appshell-data", {
+      method: "POST",
+    });
+    const result = await res.json();
+
+    if (result.success) {
+      await signOut();
+    }
+  };
+
   return (
-     <Sidebar
+    <Sidebar
       className="border-r relative"
       side="left"
       variant="sidebar"
       collapsible="icon"
       {...rest}
     >
-
-
       {/* --- HEADER --- */}
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton size="lg" className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground">
+            <SidebarMenuButton
+              size="lg"
+              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+            >
               <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-gray-900 text-sidebar-primary-foreground">
-                 <span className="text-white font-bold">A</span>
+                <span className="text-white font-bold">A</span>
               </div>
               {open && (
                 <div className="grid flex-1 text-left text-sm leading-tight">
@@ -113,14 +122,27 @@ export function AppSidebar({ handleSwitchTab, ...rest }: AppSidebarProps) {
       {/* --- CONTENT --- */}
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel className={open ? "" : "hidden"}>Platform</SidebarGroupLabel>
+          <SidebarGroupLabel className={open ? "" : "hidden"}>
+            Platform
+          </SidebarGroupLabel>
           <SidebarMenu>
             {data.navMain.map((item) => (
               <SidebarMenuItem key={item.title}>
                 <SidebarMenuButton asChild tooltip={item.title}>
-                  <a href={item.url} className={clsx("flex items-center gap-2 w-full", open ? "justify-start" : "justify-center") }>
+                  <a
+                    href={item.url}
+                    className={clsx(
+                      "flex items-center gap-2 w-full",
+                      open ? "justify-start" : "justify-center"
+                    )}
+                  >
                     {item.icon && <item.icon className="shrink-0" />}
-                    <span className="truncate" style={{ display: open ? "inline" : "none" }}>{item.title}</span>
+                    <span
+                      className="truncate"
+                      style={{ display: open ? "inline" : "none" }}
+                    >
+                      {item.title}
+                    </span>
                   </a>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -144,7 +166,9 @@ export function AppSidebar({ handleSwitchTab, ...rest }: AppSidebarProps) {
                     <AvatarFallback className="rounded-lg">CN</AvatarFallback>
                   </Avatar>
                   <div className="grid flex-1 text-left text-sm leading-tight">
-                    <span className="truncate font-semibold">{data.user.name}</span>
+                    <span className="truncate font-semibold">
+                      {data.user.name}
+                    </span>
                     <span className="truncate text-xs">{data.user.email}</span>
                   </div>
                   <ChevronsUpDown className="ml-auto size-4" />
@@ -159,12 +183,19 @@ export function AppSidebar({ handleSwitchTab, ...rest }: AppSidebarProps) {
                 <DropdownMenuLabel className="p-0 font-normal">
                   <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                     <Avatar className="h-8 w-8 rounded-lg">
-                      <AvatarImage src={data.user.avatar} alt={data.user.name} />
+                      <AvatarImage
+                        src={data.user.avatar}
+                        alt={data.user.name}
+                      />
                       <AvatarFallback className="rounded-lg">CN</AvatarFallback>
                     </Avatar>
                     <div className="grid flex-1 text-left text-sm leading-tight">
-                      <span className="truncate font-semibold">{data.user.name}</span>
-                      <span className="truncate text-xs">{data.user.email}</span>
+                      <span className="truncate font-semibold">
+                        {data.user.name}
+                      </span>
+                      <span className="truncate text-xs">
+                        {data.user.email}
+                      </span>
                     </div>
                   </div>
                 </DropdownMenuLabel>
@@ -191,9 +222,7 @@ export function AppSidebar({ handleSwitchTab, ...rest }: AppSidebarProps) {
                   </DropdownMenuItem>
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={async()=>{
-                   signOut()
-                }}>
+                <DropdownMenuItem onClick={handleDeleteAllCookies}>
                   <LogOut className="mr-2 size-4" />
                   Log out
                 </DropdownMenuItem>
@@ -204,5 +233,5 @@ export function AppSidebar({ handleSwitchTab, ...rest }: AppSidebarProps) {
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>
-  )
+  );
 }

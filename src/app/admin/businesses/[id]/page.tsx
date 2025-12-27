@@ -3,17 +3,32 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { ArrowLeft, Building2, CheckCircle2, Clock, CreditCard, ExternalLink, Globe, LayoutDashboard, Mail, Palette, Settings, ShieldCheck, Sparkles, Store, XCircle } from "lucide-react";
+import {
+  ArrowLeft,
+  Building2,
+  CheckCircle2,
+  Clock,
+  CreditCard,
+  ExternalLink,
+  Globe,
+  LayoutDashboard,
+  Mail,
+  Palette,
+  Settings,
+  ShieldCheck,
+  Sparkles,
+  Store,
+  XCircle,
+} from "lucide-react";
 import Link from "next/link";
-
-
-
 
 function cn(...c: (string | null | undefined | false)[]) {
   return c.filter(Boolean).join(" ");
 }
 
 type Business = {
+  _id: string;
+  tenantId: string;
   name: string;
   email?: string;
   plan?: string;
@@ -60,7 +75,9 @@ function statusPill(status?: string) {
     <Badge
       className={cn(
         "rounded-full",
-        ok ? "bg-emerald-600 text-white hover:bg-emerald-600" : "bg-slate-700 text-white hover:bg-slate-700"
+        ok
+          ? "bg-emerald-600 text-white hover:bg-emerald-600"
+          : "bg-slate-700 text-white hover:bg-slate-700"
       )}
     >
       {status || "—"}
@@ -68,51 +85,7 @@ function statusPill(status?: string) {
   );
 }
 
-// ✅ Replace with your real API call
-async function getBusinessById(_id: string): Promise<Business> {
-  // Example:
-  // const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/businesses/${_id}`, { cache: "no-store" });
-  // if (!res.ok) throw new Error("Failed to load business");
-  // return res.json();
-
-  // Demo: your JSON mapped to UI (no _id/slug rendered)
-  return {
-    name: "Test2",
-    email: "test2@gmail.com",
-    plan: "trial",
-    subscriptionStatus: "active",
-    customDomainVerified: false,
-    branding: { colors: { primary: "#3b82f6", secondary: "#f4e04f" } },
-    features: {
-      websiteEnabled: true,
-      ecommerceEnabled: true,
-      blogEnabled: true,
-      invoicesEnabled: true,
-    },
-    settings: { locale: "en-US", currency: "USD", timezone: "UTC" },
-    status: "active",
-    createdAt: "2025-12-18T12:22:32.287Z",
-    updatedAt: "2025-12-18T12:22:32.287Z",
-    websites: [
-      {
-        name: "test website",
-        primaryDomain: ["test.localhost:55803"],
-        serviceType: "ECOMMERCE",
-        status: "active",
-        createdAt: "2025-12-22T12:29:13.312Z",
-        updatedAt: "2025-12-22T12:29:13.312Z",
-      },
-    ],
-  };
-}
-
-function FeatureRow({
-  label,
-  enabled,
-}: {
-  label: string;
-  enabled?: boolean;
-}) {
+function FeatureRow({ label, enabled }: { label: string; enabled?: boolean }) {
   return (
     <div className="flex items-center justify-between gap-3 rounded-md border bg-white px-4 py-3">
       <div className="text-sm font-medium text-slate-900">{label}</div>
@@ -131,6 +104,32 @@ function FeatureRow({
   );
 }
 
+const ROLE_MAP = {
+  superadmin: "",
+  agency: "",
+  business: "",
+} as const;
+
+type Role = keyof typeof ROLE_MAP;
+
+function toCreateHref(
+  url: string,
+  tenantId: string | null = null,
+  businessId: string | null = null,
+  role: string
+) {
+  if (!(role in ROLE_MAP)) {
+    throw new Error("Invalid role");
+  }
+  const obj: Record<Role, string> = {
+    superadmin: `/admin/websites/${url}?businessid=${businessId}&tenantId=${tenantId}`,
+    agency: `/admin/websites/${url}?businessid=${businessId}`,
+    business: `/admin/websites/${url}`,
+  };
+
+  return obj[role as Role];
+}
+
 export default async function BusinesswithID({
   params,
 }: {
@@ -143,14 +142,13 @@ export default async function BusinesswithID({
   const tenant = await fetch(
     `${process.env.NEXTAUTH_URL}/api/tenants/singletenant/${id}`
   );
-  const resultTenant = await tenant.json();
-
-  const business = await getBusinessById(params.id);
+  const business = (await tenant.json()).item as Business;
 
   const primary = business.branding?.colors?.primary || "#111827";
   const secondary = business.branding?.colors?.secondary || "#e5e7eb";
 
   const websites = business.websites || [];
+
   const totalWebsites = websites.length;
   const primaryDomain = websites?.[0]?.primaryDomain?.[0] || "—";
 
@@ -175,7 +173,9 @@ export default async function BusinesswithID({
                   Businesses
                 </Link>
                 <span>/</span>
-                <span className="text-slate-900">{business.name || "Business"}</span>
+                <span className="text-slate-900">
+                  {business.name || "Business"}
+                </span>
               </div>
 
               <div className="flex items-center gap-3 flex-wrap">
@@ -189,7 +189,10 @@ export default async function BusinesswithID({
                     {business.name || "Business"}
                   </h1>
                   <div className="mt-1 flex items-center gap-2 flex-wrap">
-                    <Badge className="rounded-full text-white" variant="secondary">
+                    <Badge
+                      className="rounded-full text-white"
+                      variant="secondary"
+                    >
                       {(business.plan || "—").toUpperCase()}
                     </Badge>
                     {statusPill(business.subscriptionStatus)}
@@ -225,7 +228,9 @@ export default async function BusinesswithID({
           {/* STATS STRIP */}
           <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             <div className="rounded-md border bg-gray-100 p-4">
-              <div className="text-xs text-muted-foreground font-semibold">Primary domain</div>
+              <div className="text-xs text-muted-foreground font-semibold">
+                Primary domain
+              </div>
               <div className="mt-2 flex items-center gap-2 text-sm font-semibold text-slate-900">
                 <Globe className="h-4 w-4 text-slate-600" />
                 <span className="truncate">{primaryDomain}</span>
@@ -233,15 +238,21 @@ export default async function BusinesswithID({
             </div>
 
             <div className="rounded-md border bg-gray-100 p-4">
-              <div className="text-xs text-muted-foreground font-semibold">Websites</div>
+              <div className="text-xs text-muted-foreground font-semibold">
+                Websites
+              </div>
               <div className="mt-2 text-2xl font-semibold text-slate-900">
                 {totalWebsites}
               </div>
-              <div className="text-xs text-muted-foreground font-semibold">Total projects</div>
+              <div className="text-xs text-muted-foreground font-semibold">
+                Total projects
+              </div>
             </div>
 
             <div className="rounded-md border bg-gray-100 p-4">
-              <div className="text-xs text-muted-foreground font-semibold">Domain verified</div>
+              <div className="text-xs text-muted-foreground font-semibold">
+                Domain verified
+              </div>
               <div className="mt-2 flex items-center gap-2 text-sm font-semibold text-slate-900">
                 {business.customDomainVerified ? (
                   <CheckCircle2 className="h-4 w-4 text-emerald-600" />
@@ -253,7 +264,9 @@ export default async function BusinesswithID({
             </div>
 
             <div className="rounded-md border bg-gray-100 p-4">
-              <div className="text-xs text-muted-foreground font-semibold">Last updated</div>
+              <div className="text-xs text-muted-foreground font-semibold">
+                Last updated
+              </div>
               <div className="mt-2 flex items-center gap-2 text-sm font-semibold text-slate-900">
                 <Clock className="h-4 w-4 text-slate-600" />
                 {fmtDate(business.updatedAt)}
@@ -289,7 +302,11 @@ export default async function BusinesswithID({
                   </Link>
                 </Button>
 
-                <Button variant="outline" className="rounded-md h-12 justify-between" asChild>
+                <Button
+                  variant="outline"
+                  className="rounded-md h-12 justify-between"
+                  asChild
+                >
                   <Link href={`/admin/businesses/${params.id}/domains`}>
                     <span className="inline-flex items-center gap-2">
                       <Globe className="h-4 w-4" /> Domain & SSL
@@ -298,7 +315,11 @@ export default async function BusinesswithID({
                   </Link>
                 </Button>
 
-                <Button variant="outline" className="rounded-md h-12 justify-between" asChild>
+                <Button
+                  variant="outline"
+                  className="rounded-md h-12 justify-between"
+                  asChild
+                >
                   <Link href={`/admin/businesses/${params.id}/branding`}>
                     <span className="inline-flex items-center gap-2">
                       <Palette className="h-4 w-4" /> Branding
@@ -307,7 +328,11 @@ export default async function BusinesswithID({
                   </Link>
                 </Button>
 
-                <Button variant="outline" className="rounded-md h-12 justify-between" asChild>
+                <Button
+                  variant="outline"
+                  className="rounded-md h-12 justify-between"
+                  asChild
+                >
                   <Link href={`/admin/businesses/${params.id}/billing`}>
                     <span className="inline-flex items-center gap-2">
                       <CreditCard className="h-4 w-4" /> Billing
@@ -333,8 +358,14 @@ export default async function BusinesswithID({
 
             <CardContent className="p-5 pt-0 space-y-3">
               {websites.length ? (
-                websites.map((w, idx) => {
+                websites.map((w: any, idx: number) => {
                   const dom = w.primaryDomain?.[0] || "—";
+                  let href = toCreateHref(
+                    dom,
+                    business._id,
+                    business.tenantId,
+                    user?.role!
+                  );      
                   return (
                     <div
                       key={`${w.name || "website"}-${idx}`}
@@ -347,7 +378,10 @@ export default async function BusinesswithID({
                               {w.name || "Website"}
                             </div>
                             {statusPill(w.status)}
-                            <Badge className="rounded-full text-white" variant="secondary" >
+                            <Badge
+                              className="rounded-full text-white"
+                              variant="secondary"
+                            >
                               {w.serviceType || "—"}
                             </Badge>
                           </div>
@@ -356,25 +390,29 @@ export default async function BusinesswithID({
                             <Globe className="h-4 w-4" />
                             <span className="truncate">{dom}</span>
                             {dom !== "—" ? (
-                              <a
-                                href={`https://${dom}`}
+                              <Link
+                                href={href}
                                 target="_blank"
                                 rel="noreferrer"
                                 className="inline-flex items-center gap-1 text-slate-900 hover:underline"
                               >
                                 <ExternalLink className="h-4 w-4" />
-                              </a>
+                              </Link>
                             ) : null}
                           </div>
                         </div>
 
                         <div className="text-xs text-muted-foreground font-semibold space-y-1">
                           <div>
-                            <span className="font-medium text-slate-700">Created:</span>{" "}
+                            <span className="font-medium text-slate-700">
+                              Created:
+                            </span>{" "}
                             {fmtDate(w.createdAt)}
                           </div>
                           <div>
-                            <span className="font-medium text-slate-700">Updated:</span>{" "}
+                            <span className="font-medium text-slate-700">
+                              Updated:
+                            </span>{" "}
                             {fmtDate(w.updatedAt)}
                           </div>
                         </div>
@@ -384,13 +422,18 @@ export default async function BusinesswithID({
                 })
               ) : (
                 <div className="rounded-md border bg-slate-50 p-6 text-center">
-                  <div className="text-sm font-semibold text-slate-900">No websites yet</div>
+                  <div className="text-sm font-semibold text-slate-900">
+                    No websites yet
+                  </div>
                   <div className="text-sm text-muted-foreground mt-1">
-                    Add a website to start managing pages, domains and ecommerce.
+                    Add a website to start managing pages, domains and
+                    ecommerce.
                   </div>
                   <div className="mt-4">
                     <Button className="rounded-full" asChild>
-                      <Link href={`/admin/businesses/${params.id}/websites/new`}>
+                      <Link
+                        href={`/admin/businesses/${params.id}/websites/new`}
+                      >
                         Add Website
                       </Link>
                     </Button>
@@ -414,10 +457,22 @@ export default async function BusinesswithID({
 
             <CardContent className="p-5 pt-0">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <FeatureRow label="Website" enabled={business.features?.websiteEnabled} />
-                <FeatureRow label="Ecommerce" enabled={business.features?.ecommerceEnabled} />
-                <FeatureRow label="Blog" enabled={business.features?.blogEnabled} />
-                <FeatureRow label="Invoices" enabled={business.features?.invoicesEnabled} />
+                <FeatureRow
+                  label="Website"
+                  enabled={business.features?.websiteEnabled}
+                />
+                <FeatureRow
+                  label="Ecommerce"
+                  enabled={business.features?.ecommerceEnabled}
+                />
+                <FeatureRow
+                  label="Blog"
+                  enabled={business.features?.blogEnabled}
+                />
+                <FeatureRow
+                  label="Invoices"
+                  enabled={business.features?.invoicesEnabled}
+                />
               </div>
             </CardContent>
           </Card>
@@ -440,25 +495,43 @@ export default async function BusinesswithID({
             <CardContent className="p-5 pt-0 space-y-4">
               <div className="rounded-md border bg-slate-50 p-4 space-y-3">
                 <div className="flex items-center justify-between">
-                  <div className="text-sm font-semibold text-slate-900">Primary</div>
-                  <div className="text-xs text-muted-foreground font-semibold">{primary}</div>
+                  <div className="text-sm font-semibold text-slate-900">
+                    Primary
+                  </div>
+                  <div className="text-xs text-muted-foreground font-semibold">
+                    {primary}
+                  </div>
                 </div>
                 <div className="h-10 rounded-md border bg-white overflow-hidden">
-                  <div className="h-full w-full" style={{ backgroundColor: primary }} />
+                  <div
+                    className="h-full w-full"
+                    style={{ backgroundColor: primary }}
+                  />
                 </div>
 
                 <Separator />
 
                 <div className="flex items-center justify-between">
-                  <div className="text-sm font-semibold text-slate-900">Secondary</div>
-                  <div className="text-xs text-muted-foreground font-semibold">{secondary}</div>
+                  <div className="text-sm font-semibold text-slate-900">
+                    Secondary
+                  </div>
+                  <div className="text-xs text-muted-foreground font-semibold">
+                    {secondary}
+                  </div>
                 </div>
                 <div className="h-10 rounded-md border bg-white overflow-hidden">
-                  <div className="h-full w-full" style={{ backgroundColor: secondary }} />
+                  <div
+                    className="h-full w-full"
+                    style={{ backgroundColor: secondary }}
+                  />
                 </div>
               </div>
 
-              <Button variant="outline" className="rounded-full w-full bg-primary/10 hover:no-underline" asChild>
+              <Button
+                variant="outline"
+                className="rounded-full w-full bg-primary/10 hover:no-underline"
+                asChild
+              >
                 <Link href={`/admin/businesses/${params.id}/branding`}>
                   Manage branding
                 </Link>
@@ -515,21 +588,29 @@ export default async function BusinesswithID({
                 <Building2 className="h-4 w-4 text-slate-700" />
                 Business info
               </CardTitle>
-              <p className="text-sm text-muted-foreground">System metadata (safe view).</p>
+              <p className="text-sm text-muted-foreground">
+                System metadata (safe view).
+              </p>
             </CardHeader>
             <CardContent className="p-5 pt-0 space-y-3 text-sm">
               <div className="flex items-center justify-between">
                 <span className="text-muted-foreground">Created</span>
-                <span className="font-medium text-slate-900">{fmtDate(business.createdAt)}</span>
+                <span className="font-medium text-slate-900">
+                  {fmtDate(business.createdAt)}
+                </span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-muted-foreground">Updated</span>
-                <span className="font-medium text-slate-900">{fmtDate(business.updatedAt)}</span>
+                <span className="font-medium text-slate-900">
+                  {fmtDate(business.updatedAt)}
+                </span>
               </div>
               <Separator />
               <div className="text-xs text-muted-foreground font-semibold">
                 Logged in as{" "}
-                <span className="font-medium text-slate-900">{user?.name || "User"}</span>
+                <span className="font-medium text-slate-900">
+                  {user?.name || "User"}
+                </span>
               </div>
             </CardContent>
           </Card>

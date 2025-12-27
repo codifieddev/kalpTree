@@ -10,7 +10,14 @@ import { cn } from "@/lib/utils";
 import { GoSidebarCollapse, GoSidebarExpand } from "react-icons/go";
 import { Bell, Search, Sparkles } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@radix-ui/react-dropdown-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@radix-ui/react-dropdown-menu";
 import { Avatar, AvatarFallback } from "@radix-ui/react-avatar";
 
 type TopbarProps = {
@@ -38,7 +45,13 @@ export function Topbar({
       localStorage.clear();
       sessionStorage.clear();
 
-      await signOut({ callbackUrl: "/", redirect: true });
+      const res = await fetch("/api/appshell-data", {
+        method: "POST",
+      });
+      const result = await res.json();
+      if (result.success) {
+        await signOut({ callbackUrl: "/", redirect: true });
+      }
     } catch (error) {
       console.error("Error during sign out:", error);
       await signOut({ callbackUrl: "/" });
@@ -51,7 +64,6 @@ export function Topbar({
     dispatch(clearSegments());
     dispatch(clearCategories());
   };
-
 
   return (
     <header className="flex h-14 items-center justify-between border-b bg-background/80 px-8 backdrop-blur md:h-16 shadow-sm">
@@ -134,15 +146,24 @@ export function Topbar({
             </Button>
           </DropdownMenuTrigger>
 
-          <DropdownMenuContent align="end" className="bg-white rounded-md shadow-md w-40">
-            <DropdownMenuLabel className="hover:bg-primary hover:text-white p-2">{user?.email || "User"}</DropdownMenuLabel>
+          <DropdownMenuContent
+            align="end"
+            className="bg-white rounded-md shadow-md w-40"
+          >
+            <DropdownMenuLabel className="hover:bg-primary hover:text-white p-2">
+              {user?.email || "User"}
+            </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="hover:bg-primary hover:text-white p-2">Profile</DropdownMenuItem>
-            <DropdownMenuItem className="hover:bg-primary hover:text-white p-2">Account settings</DropdownMenuItem>
+            <DropdownMenuItem className="hover:bg-primary hover:text-white p-2">
+              Profile
+            </DropdownMenuItem>
+            <DropdownMenuItem className="hover:bg-primary hover:text-white p-2">
+              Account settings
+            </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem
               onClick={handleSignOut}
-             className="hover:bg-primary hover:text-white p-2"  
+              className="hover:bg-primary hover:text-white p-2"
             >
               Sign out
             </DropdownMenuItem>

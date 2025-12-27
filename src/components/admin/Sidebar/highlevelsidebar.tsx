@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { usePathname } from "next/navigation";
+import { useParams, usePathname } from "next/navigation";
 import {
   Home,
   Globe,
@@ -139,13 +139,15 @@ export function HighLevelSidebar({
   setShowSidebar,
 }: HighLevelSidebarProps) {
   const pathname = usePathname();
-
+  const params = useParams();
   const [openItems, setOpenItems] = React.useState<Record<string, boolean>>({});
   const [hoverItemId, setHoverItemId] = React.useState<string | null>(null);
 
   const toggleItem = (id: string) => {
     setOpenItems((prev) => ({ ...prev, [id]: !prev[id] }));
   };
+
+  console.log(params)
 
   const toggleCollapsed = () => setCollapsed((v) => !v);
 

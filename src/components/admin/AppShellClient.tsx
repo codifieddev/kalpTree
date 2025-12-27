@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { AppShell, Website, User } from "./AppShell";
 import { useDispatch } from "react-redux";
 import { AppDispatch, store } from "@/store/store";
@@ -42,14 +42,17 @@ export function AppShellClient({
   currentagency: initialCurrentAgency,
   agencies,
 }: AppShellClientProps) {
-
-
   const [currentWebsite, setCurrentWebsite] = useState(initialCurrentWebsite);
   const [currentTenant, setCurrentTenant] = useState(initialCurrentTenant);
   const [currentAgency, setCurrentAgency] = useState(initialCurrentAgency);
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
+  const params = useParams();
   const dispatch = useDispatch<AppDispatch>();
+  const query = useSearchParams();
+  const tenantId = query.get("tenantId");
+  const businessid = query.get("businessid");
+  const url = params.website;
 
   const resetRedux = () => {
     dispatch(clearAttributes());
@@ -59,16 +62,24 @@ export function AppShellClient({
     dispatch(clearProducts());
   };
   const handleWebsiteChange = async (websiteId: string) => {
-    const newWebsite = websites.find((w) => w._id === websiteId) || null;
+    let newWebsite;
+    if (url) {
+      newWebsite = websites.find((w) => w.primaryDomain?.includes(url)) || null;
+    } else {
+      newWebsite = websites.find((w) => w._id === websiteId) || null;
+    }
     setCurrentWebsite(newWebsite);
+    console.log(newWebsite)
+    const id = newWebsite?._id === websiteId
+    
     try {
       // Call API to update the current website cookie
-      const response = await fetch("/api/session/website", {
+      const response = await fetch(`/api/session/website`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ websiteId }),
+        body: JSON.stringify({ id }),
       });
 
       if (response.ok) {
@@ -89,18 +100,20 @@ export function AppShellClient({
   };
 
   const handleTenantChange = async (tenantId: string) => {
-   
     const newTenant = tenants.find((w) => w._id === tenantId) || null;
     setCurrentTenant(newTenant);
     try {
       // Call API to update the current website cookie
-      const response = await fetch("/api/session/tenant", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ tenantId }),
-      });
+      const response = await fetch(
+        `/api/session/tenant?businessid=${tenantId}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ tenantId }),
+        }
+      );
       if (response.ok) {
         const json = await response.json();
         // Clear Redux state first to prevent old data from being used
@@ -124,13 +137,16 @@ export function AppShellClient({
     setCurrentAgency(newagency);
     try {
       // Call API to update the current website cookie
-      const response = await fetch("/api/session/agency", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ agencyId }),
-      });
+      const response = await fetch(
+        `/api/session/agency?agencyid=${businessid}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ agencyId }),
+        }
+      );
       if (response.ok) {
         const json = await response.json();
         // Clear Redux state first to prevent old data from being used

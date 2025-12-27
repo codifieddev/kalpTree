@@ -327,7 +327,7 @@ export const currentWebsiteSections: NavSection[] = [
         icon: Award,
         permission: ["product:read", "product:update", "product:delete"],
       },
-  
+
       {
         label: "Attribute",
         href: "/admin/attribute",
@@ -736,13 +736,18 @@ export function AppShell({
       localStorage.clear();
       sessionStorage.clear();
 
-      await signOut({ callbackUrl: "/", redirect: true });
+      const res = await fetch("/api/appshell-data", {
+        method: "POST",
+      });
+      const result = await res.json();
+      if (result.success) {
+        await signOut({ callbackUrl: "/", redirect: true });
+      }
     } catch (error) {
       console.error("Error during sign out:", error);
       await signOut({ callbackUrl: "/" });
     }
   };
-
 
   const resetRedux = () => {
     dispatch(clearAttributes());
@@ -752,8 +757,9 @@ export function AppShell({
   };
   const dispatch = useDispatch();
 
-  const [collapsed, setCollapsed] = React.useState(false);
+  const [collapsed, setCollapsed] = React.useState(Boolean(params.website));
   const [showSidebar, setShowSidebar] = React.useState(true);
+
   return (
     <>
       <header className="h-16 w-full bg-white border-b border-gray-200 flex items-center justify-between px-5">
@@ -791,7 +797,8 @@ export function AppShell({
           {currentWebsite && (
             <div className="flex items-center gap-2 rounded-full border bg-muted/60 px-3 py-1 text-xs text-muted-foreground">
               <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-primary/15 text-[10px] font-semibold text-primary">
-                {currentWebsite.name && currentWebsite.name.charAt(0).toUpperCase()}
+                {currentWebsite.name &&
+                  currentWebsite.name.charAt(0).toUpperCase()}
               </span>
               <span className="hidden md:inline">{currentWebsite.name}</span>
               <span className="hidden text-[11px] text-muted-foreground/80 sm:inline">
@@ -872,7 +879,7 @@ export function AppShell({
           setShowSidebar={setShowSidebar}
         />
 
-        {showSidebar && (
+        {Boolean(params.website) && (
           <Sidebar
             tenants={tenants}
             currentTenant={currentTenant}
