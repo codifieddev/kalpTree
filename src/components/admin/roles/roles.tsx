@@ -21,38 +21,74 @@ export default function RolesManagement() {
   });
 
   const availablePermissions = [
-    // Dashboard / Analytics
-    "dashboard:update",
-    "analytics:read",
+  // Dashboard
+  "dashboard:create",
+  "dashboard:read",
+  "dashboard:update",
+  "dashboard:delete",
 
-    // Security / System
-    "security:read",
+  // Analytics
+  "analytics:create",
+  "analytics:read",
+  "analytics:update",
+  "analytics:delete",
 
-    // Websites / CMS
-    "websites:read",
-    "websites:update",
-    "websites:delete",
+  // Security / System
+  "security:create",
+  "security:read",
+  "security:update",
+  "security:delete",
 
-    // Media
-    "media:read",
-    "media:update",
-    "media:delete",
+  // Websites / CMS
+  "websites:create",
+  "websites:read",
+  "websites:update",
+  "websites:delete",
 
-    // Content / Branding / Marketing / Users / Settings
-    "content:read",
-    "content:update",
-    "content:delete",
+  // Media
+  "media:create",
+  "media:read",
+  "media:update",
+  "media:delete",
 
-    // Products & E-commerce core
-    "product:read",
-    "product:update",
-    "product:delete",
+  // Content / Branding / Marketing / Users / Settings
+  "content:create",
+  "content:read",
+  "content:update",
+  "content:delete",
 
-    // AI Studio
-    "ai:read",
-    "ai:update",
-    "ai:delete",
-  ];
+  // Products & E-commerce core
+  "product:create",
+  "product:read",
+  "product:update",
+  "product:delete",
+
+  // AI Studio
+  "ai:create",
+  "ai:read",
+  "ai:update",
+  "ai:delete",
+];
+
+
+  type PermissionGroups = Record<string, string[]>;
+
+const permissionGroups: PermissionGroups = availablePermissions.reduce(
+  (acc, permission) => {
+    const [resource, action] = permission.split(":");
+
+    if (!acc[resource]) {
+      acc[resource] = [];
+    }
+
+    if (!acc[resource].includes(action)) {
+      acc[resource].push(action);
+    }
+
+    return acc;
+  },
+  {} as PermissionGroups
+);
 
   useEffect(() => {
     fetchRoles();
@@ -157,6 +193,19 @@ export default function RolesManagement() {
     }
   };
 
+  const togglePermission = (resource: string, action: string) => {
+  const permission = `${resource}:${action}`;
+
+  setFormData((prev) => ({
+    ...prev,
+    permissions: prev.permissions.includes(permission)
+      ? prev.permissions.filter((p) => p !== permission)
+      : [...prev.permissions, permission],
+  }));
+};
+  const hasPermission = (resource: string, action: string) => {
+  return formData.permissions.includes(`${resource}:${action}`);
+};
   return (
     <div className="p-6 max-w-7xl mx-auto">
       <div className="flex justify-between items-center mb-6">
@@ -293,7 +342,7 @@ export default function RolesManagement() {
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Permissions
                   </label>
-                  <div className="grid grid-cols-2 gap-2">
+                  {/* <div className="grid grid-cols-2 gap-2">
                     {availablePermissions.map((permission) => (
                       <label
                         key={permission}
@@ -310,7 +359,36 @@ export default function RolesManagement() {
                         </span>
                       </label>
                     ))}
-                  </div>
+                  </div> */}
+                   <div className="space-y-4">
+    {Object.entries(permissionGroups).map(([resource, actions]) => (
+      <div
+        key={resource}
+        className="border border-gray-200 rounded-lg p-4"
+      >
+        <div className="font-semibold text-gray-800 capitalize mb-3">
+          {resource}
+        </div>
+
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          {actions.map((action) => (
+            <label
+              key={action}
+              className="flex items-center gap-2 cursor-pointer"
+            >
+              <input
+                type="checkbox"
+                checked={hasPermission(resource, action)}
+                onChange={() => togglePermission(resource, action)}
+                className="w-4 h-4 text-blue-600 rounded"
+              />
+              <span className="text-sm capitalize">{action}</span>
+            </label>
+          ))}
+        </div>
+      </div>
+    ))}
+  </div>
                 </div>
               </div>
 

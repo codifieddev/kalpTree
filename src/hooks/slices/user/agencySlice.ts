@@ -1,3 +1,27 @@
+import { createAsyncThunk } from '@reduxjs/toolkit';
+
+// Thunk to delete an agency by id
+export const deleteAgency = createAsyncThunk<
+  string, // return type (deleted agency id)
+  string, // argument type (agency id)
+  { rejectValue: string }
+>(
+  'agency/deleteAgency',
+  async (agencyId, { rejectWithValue }) => {
+    try {
+      const res = await fetch(`/api/admin/agency?id=${agencyId}`, {
+        method: 'DELETE',
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data?.error || `HTTP ${res.status}`);
+      }
+      return agencyId;
+    } catch (err: any) {
+      return rejectWithValue(err?.message || 'Failed to delete agency');
+    }
+  }
+);
 import { IUser } from '@/models/user';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
@@ -35,6 +59,19 @@ const agencySlice = createSlice({
       state.hasfetched = false;
       state.curretAgency = null;
     },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(deleteAgency.pending, (state) => {
+        state.isAgencyLoading = true;
+      })
+      .addCase(deleteAgency.fulfilled, (state, action) => {
+        state.isAgencyLoading = false;
+        state.agencies = state.agencies.filter(a => a._id !== action.payload);
+      })
+      .addCase(deleteAgency.rejected, (state) => {
+        state.isAgencyLoading = false;
+      });
   },
 });
 
