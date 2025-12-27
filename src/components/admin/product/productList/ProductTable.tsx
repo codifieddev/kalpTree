@@ -32,7 +32,7 @@ const ProductTable = () => {
   );
   const { listCategory } = useSelector((state: RootState) => state.category);
   const { listBrand } = useSelector((state: RootState) => state.brand);
-  const { listSegment } = useSelector((state: RootState) => state.segment);
+
   const { currentWebsite } = useSelector((state: RootState) => state.websites);
   const { user } = useSelector((state: RootState) => state.user);
   const dispatch = useDispatch<AppDispatch>();
@@ -50,20 +50,18 @@ const ProductTable = () => {
           (cat) => cat._id == categoryId
         )?.name;
         const brand = listBrand.find((b) => (b as any)._id == brandId)?.name;
-        const segment = listSegment.find(
-          (s) => (s as any)._id == segmentId
-        )?.name;
+     
 
         return {
           ...item,
           category: category || "-",
           brand: brand || "-",
-          segment: segment || "-",
+         
         };
       });
     }
     return [];
-  }, [listCategory, listBrand, listSegment, listProduct]);
+  }, [listCategory, listBrand, listProduct]);
 
   const handleAdd = () => {
     setNewProduct({

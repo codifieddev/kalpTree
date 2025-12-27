@@ -16,6 +16,8 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { auth } from "@/auth";
+import React, { Suspense } from "react";
+const ShowBusiness = React.lazy(() => import("@/components/admin/business/showbusiness"));
 
 type Business = {
   _id: string;
@@ -199,6 +201,8 @@ export default async function BusinessList({
     );
   }
 
+
+ 
   return (
     <div className="w-full max-w-[1200px] space-y-6">
       {/* Header */}
@@ -354,16 +358,13 @@ export default async function BusinessList({
                       </Link>
                     </Button>
 
-                    <Button
-                      asChild
-                      variant="outline"
-                      className="h-10 rounded-xl px-5 text-sm font-semibold"
-                    >
-                      <Link href={href} className="flex items-center gap-2">
-                        Open Dashboard
-                        <ArrowRight className="h-4 w-4" />
-                      </Link>
-                    </Button>
+                    <Suspense fallback={null}>
+                      <>
+                        <ShowBusiness businessId={b._id} />
+                      </>
+                    </Suspense>
+                 
+                   
                   </div>
                 </div>
               </CardContent>

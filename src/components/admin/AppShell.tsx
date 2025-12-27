@@ -102,10 +102,11 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { signOut } from "next-auth/react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { GoSidebarCollapse, GoSidebarExpand } from "react-icons/go";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { RootState } from "@/store/store";
 // ---------------------------------------------------------------------------
 // Types & interfaces
 // ---------------------------------------------------------------------------
@@ -759,7 +760,7 @@ export function AppShell({
 
   const [collapsed, setCollapsed] = React.useState(Boolean(params.website));
   const [showSidebar, setShowSidebar] = React.useState(true);
-
+  const {isSecondDashBoard}= useSelector((state:RootState)=>state.user)
   return (
     <>
       <header className="h-16 w-full bg-white border-b border-gray-200 flex items-center justify-between px-5">
@@ -879,7 +880,7 @@ export function AppShell({
           setShowSidebar={setShowSidebar}
         />
 
-        {Boolean(params.website) && (
+        { isSecondDashBoard &&(
           <Sidebar
             tenants={tenants}
             currentTenant={currentTenant}

@@ -2,11 +2,13 @@ import { IUser } from '@/models/user';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface UserState {
-  user:IUser| null
+  user:IUser| null,
+  isSecondDashBoard:boolean
 }
 
 const initialState: UserState = {
   user: null,
+  isSecondDashBoard:false
 };
 
 const userSlice = createSlice({
@@ -24,8 +26,14 @@ const userSlice = createSlice({
         state.user = { ...state.user, ...action.payload };
       }
     },
+    updateIsSecondDashBoard:(state,action)=>{
+      state.isSecondDashBoard= action.payload    }
   },
 });
 
-export const { setUser, clearUser, updateUser } = userSlice.actions;
+export const { 
+  setUser, 
+  clearUser, 
+  updateUser ,
+updateIsSecondDashBoard} = userSlice.actions;
 export default userSlice.reducer;
