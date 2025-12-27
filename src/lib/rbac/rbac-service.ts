@@ -58,7 +58,7 @@ export class RBACService {
       {
         isOwn: context?.isOwn,
         isTenantLevel: context?.tenantId?.equals(user.tenantId),
-        isFranchiseLevel: await this.isFranchiseLevel(user.tenantId, context?.tenantId),
+        isFranchiseLevel: await this.isFranchiseLevel(user?.tenantId, context?.tenantId),
       }
     );
 

@@ -7,11 +7,11 @@ import type { RootState } from "@/store/store";
 import type { MaterialCategory } from "./category/types/CategoryModel";
 import type { MaterialBrandModel } from "./brand/types/brandModel";
 import { MaterialAttributes } from "./attribute/types/attributeModel";
-import { MaterialSegmentModel } from "./segment/types/SegmentModel";
+
 import { ProductModel } from "./product/type/ProductModel";
 import CategoryForm from "./category/forms/CategoryForm";
 import BrandForm from "./brand/forms/BrandForm";
-import SegmentForm from "./segment/forms/SegmentForm";
+
 import AttributeForm from "./attribute/forms/AttributeForm";
 import ProductForm from "./product/forms/ProductForm";
 
@@ -25,7 +25,7 @@ export default function EntityCreateModal({ entity }: Props) {
 
   const { listCategory } = useSelector((state: RootState) => state.category);
   const { listBrand } = useSelector((state: RootState) => state.brand);
-  const { listSegment } = useSelector((state: RootState) => state.segment);
+
   // read tenant and website from redux store so we can include them in payloads
   const currentWebsite = useSelector(
     (state: RootState) => state.websites.currentWebsite
@@ -38,9 +38,7 @@ export default function EntityCreateModal({ entity }: Props) {
   const filterBrand = listBrand.filter(
     (item) => (item as any).websiteId === currentWebsite?._id
   );
-  const filterSegment = listSegment.filter(
-    (item) => (item as any).websiteId === currentWebsite?._id
-  );
+ 
   const dispatch = useDispatch();
 
   // Category-specific state derived from MaterialCategory
@@ -50,20 +48,7 @@ export default function EntityCreateModal({ entity }: Props) {
     sort_order: 0,
   });
 
-  const [segment, setSegment] = useState<MaterialSegmentModel>({
-    name: "",
-    color: "",
-    color_code: "",
-    icon: "",
-    icon_svg: "",
-    index: 0,
-    is_active: false,
-    is_visible: false,
-    description: "",
-    short_code: "",
-    categories: "",
-    gallery: "",
-  });
+
   // Brand-specific state derived from MaterialBrandModel
   const [brand, setBrand] = useState<MaterialBrandModel>({
     name: "",
@@ -102,20 +87,7 @@ export default function EntityCreateModal({ entity }: Props) {
     setLoading(false);
     // reset
     setCategory({ name: "", icon: "", sort_order: 0 });
-    setSegment({
-      name: "",
-      color: "",
-      color_code: "",
-      icon: "",
-      icon_svg: "",
-      index: 0,
-      is_active: false,
-      is_visible: false,
-      description: "",
-      short_code: "",
-      categories: "",
-      gallery: "",
-    });
+   
     setBrand({ name: "", url: "", description: "", logo: "" });
     setAttribute({
       name: "",
@@ -144,20 +116,7 @@ export default function EntityCreateModal({ entity }: Props) {
     setLoading(false);
     setCategory({ name: "", icon: "", sort_order: 0 });
     setBrand({ name: "", url: "", description: "", logo: "" });
-    setSegment({
-      name: "",
-      color: "",
-      color_code: "",
-      icon: "",
-      icon_svg: "",
-      index: 0,
-      is_active: false,
-      is_visible: false,
-      description: "",
-      short_code: "",
-      categories: "",
-      gallery: "",
-    });
+  
     setAttribute({
       name: "",
       unit: "",
@@ -192,13 +151,7 @@ export default function EntityCreateModal({ entity }: Props) {
         errs.name = "Name is required";
       if (Number.isNaN(Number(category.sort_order)) || category.sort_order! < 0)
         errs.sort_order = "Sort order must be >= 0";
-    } else if (entity === "segment") {
-      if (!segment.name || segment.name.trim() === "")
-        errs.name = "Name is required";
-      // optionally validate index
-      if (Number.isNaN(Number(segment.index ?? 0)) || (segment.index ?? 0) < 0)
-        errs.index = "Index must be >= 0";
-    } else if (entity === "brand") {
+    }else if (entity === "brand") {
       if (!brand.name || brand.name.trim() === "")
         errs.name = "Name is required";
       if (brand.url && brand.url.trim() !== "") {
@@ -257,12 +210,7 @@ export default function EntityCreateModal({ entity }: Props) {
       const websiteId = currentWebsite?.websiteId ?? currentWebsite?._id;
       if (websiteId) payload.websiteId = websiteId;
       if (currentUser?.tenantId) payload.tenantId = currentUser.tenantId;
-    } else if (entity === "segment") {
-      payload = { ...segment } as any;
-      const websiteId = currentWebsite?.websiteId ?? currentWebsite?._id;
-      if (websiteId) payload.websiteId = websiteId;
-      if (currentUser?.tenantId) payload.tenantId = currentUser.tenantId;
-    } else if (entity === "brand") {
+    }  else if (entity === "brand") {
       payload = { ...brand } as any;
       const websiteId = currentWebsite?.websiteId ?? currentWebsite?._id;
       if (websiteId) payload.websiteId = websiteId;
@@ -326,15 +274,6 @@ export default function EntityCreateModal({ entity }: Props) {
               "@/hooks/slices/attribute/AttributeSlice"
             );
             dispatch(addAttribute(created));
-          }
-        } else if (entity === "segment") {
-          // backend may return the created item directly or under keys like `item` or `brand`
-          const created = data?.item ?? data?.segment ?? data;
-          if (created) {
-            const { addSegment } = await import(
-              "@/hooks/slices/segment/SegmentSlice"
-            );
-            dispatch(addSegment(created));
           }
         } else if (entity === "products") {
           // backend may return the created item directly or under keys like `item` or `product`

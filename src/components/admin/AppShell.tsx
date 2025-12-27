@@ -86,7 +86,7 @@ import { useParams } from "next/navigation";
 import { Button } from "../ui/button";
 import { clearAttributes } from "@/hooks/slices/attribute/AttributeSlice";
 import { clearBrands } from "@/hooks/slices/brand/BrandSlice";
-import { clearSegments } from "@/hooks/slices/segment/SegmentSlice";
+
 import { clearCategories } from "@/hooks/slices/category/CategorySlice";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
@@ -752,7 +752,7 @@ export function AppShell({
   const resetRedux = () => {
     dispatch(clearAttributes());
     dispatch(clearBrands());
-    dispatch(clearSegments());
+
     dispatch(clearCategories());
   };
   const dispatch = useDispatch();

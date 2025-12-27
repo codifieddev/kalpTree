@@ -6,7 +6,7 @@ export default async function EntityIndexPage(props: any) {
   const params = await props.params;
   const { entity } = params as { entity: string };
 
-  // Check if entity is valid
+ // Check if entity is valid
   // if (!isValidEntityComponent(entity)) {
   //   return (
   //     <div className="mx-auto max-w-full px-6">
